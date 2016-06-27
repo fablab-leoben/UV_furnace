@@ -8,6 +8,10 @@
 #define APP_NAME "UV furnace"
 String VERSION = "Version 0.01";
 
+
+//compatibility with Arduino IDE 1.6.9
+//void dummy(){}
+
 /*******************************************************************************
  initialize FSM states with proper enter, update and exit functions
 *******************************************************************************/
@@ -146,5 +150,33 @@ float readTemperature(){
       b7 * pow(voltageSum, 7.0) +
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
+}
+
+/*******************************************************************************
+********************************************************************************
+********************************************************************************
+ FINITE STATE MACHINE FUNCTIONS
+********************************************************************************
+********************************************************************************
+*******************************************************************************/
+void initEnterFunction(){
+  //start the timer of this cycle
+  initTimer = 0;
+}
+void initUpdateFunction(){
+  //time is up?
+  if (initTimer > INIT_TIMEOUT) {
+    uvFurnaceStateMachine.transitionTo(idleState);
+  }
+}
+void initExitFunction(){
+  Serial.println("Initialization done");
+}
+
+void idleEnterFunction(){
+}
+void idleUpdateFunction(){
+}
+void idleExitFunction(){
 }
  
