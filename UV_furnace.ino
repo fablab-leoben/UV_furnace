@@ -1271,7 +1271,10 @@ State dummyState = State(dummy);
 State initState = State( initEnterFunction, initUpdateFunction, initExitFunction );
 State idleState = State( idleEnterFunction, idleUpdateFunction, idleExitFunction );
 State settingsState = State( settingsEnterFunction, settingsUpdateFunction, settingsExitFunction );
-
+State setLEDs = State( setLEDsEnterFunction, setLEDsUpdateFunction, setLEDsExitFunction );
+State setTemp = State( setTempEnterFunction, setTempUpdateFunction, setTempExitFunction );
+State setTimer = State( setTimerEnterFunction, setTimerUpdateFunction, setTimerExitFunction );
+State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction ); 
 
 //initialize state machine, start in state: Idle
 FSM uvFurnaceStateMachine = FSM(initState);
@@ -1385,7 +1388,6 @@ void loop() {
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
-
 }
 
 
@@ -1655,5 +1657,45 @@ void settingsUpdateFunction(){
 }
 void settingsExitFunction(){
   DEBUG_PRINTLN(F("settingsExit"));
+}
+
+void setLEDsEnterFunction(){
+  DEBUG_PRINTLN(F("setLEDsEnter"));
+}
+void setLEDsUpdateFunction(){
+  DEBUG_PRINTLN(F("setLEDsUpdate"));
+}
+void setLEDsExitFunction(){
+  DEBUG_PRINTLN(F("setLEDsExit"));
+}
+
+void setTempEnterFunction(){
+  DEBUG_PRINTLN(F("setTempEnter"));
+}
+void setTempUpdateFunction(){
+  DEBUG_PRINTLN(F("setTempUpdate"));
+}
+void setTempExitFunction(){
+  DEBUG_PRINTLN(F("setTempExit"));
+}
+
+void setTimerEnterFunction(){
+  DEBUG_PRINTLN(F("setTimerEnter"));
+}
+void setTimerUpdateFunction(){
+  DEBUG_PRINTLN(F("setTimerUpdate"));
+}
+void setTimerExitFunction(){
+  DEBUG_PRINTLN(F("setTimerExit"));
+}
+
+void setPIDEnterFunction(){
+  DEBUG_PRINTLN(F("setPIDEnter"));
+}
+void setPIDUpdateFunction(){
+  DEBUG_PRINTLN(F("setPIDUpdate"));
+}
+void setPIDExitFunction(){
+  DEBUG_PRINTLN(F("setPIDExit"));
 }
  
