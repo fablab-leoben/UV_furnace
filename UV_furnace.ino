@@ -14,7 +14,7 @@
  #define DEBUG_PRINT(x)
 #endif
 ************************************************/
-#define DEBUG
+//#define DEBUG
 
 
 
@@ -25,6 +25,16 @@ String VERSION = "Version 0.01";
 /************************************************
  PID Variables and constants
 ************************************************/
+
+//Define Variables we'll be connecting to
+double Setpoint;
+double Input;
+double Output;
+
+// pid tuning parameters
+double Kp;
+double Ki;
+double Kd;
 
 // EEPROM addresses for persisted data
 const int SpAddress = 0;
@@ -48,7 +58,7 @@ elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
 
 //compatibility with Arduino IDE 1.6.9
-//void dummy(){}
+void dummy(){}
 
 /*******************************************************************************
  initialize FSM states with proper enter, update and exit functions
@@ -75,14 +85,16 @@ elapsedMillis initTimer;
 
 void setup() {
 
-  Serial.begin(19600);
-
+  #ifdef DEBUG
+    Serial.begin(9600);
+  #endif
+  
   //declare and init pins
   
   // put your setup code here, to run once:
 
   #ifdef DEBUG
-    #define Serial.println("setup");
+    Serial.println("setup");
   #endif
 
 }
@@ -110,7 +122,7 @@ void loop() {
  *******************************************************************************/
 int readTemperature(){
    #ifdef DEBUG
-     #define Serial.println("readTemperature");
+     Serial.println("readTemperature");
    #endif
 
    //time is up? no, then come back later
@@ -202,8 +214,8 @@ int readTemperature(){
       b9 * pow(voltageSum, 9.0);
 
    #ifdef DEBUG
-     #define Serial.print(currentTemperature);
-     #define Serial.print(" °C");
+     Serial.print(currentTemperature);
+     Serial.print(" °C");
    #endif
 }
 
@@ -213,7 +225,7 @@ int readTemperature(){
 void SaveParameters()
 {
    #ifdef DEBUG
-     #define Serial.println("Save any parameter changes to EEPROM");
+     Serial.println("Save any parameter changes to EEPROM");
    #endif
    if (Setpoint != EEPROM_readDouble(SpAddress))
    {
@@ -239,7 +251,7 @@ void SaveParameters()
 void LoadParameters()
 {
    #ifdef DEBUG
-     #define Serial.println("Load parameters from EEPROM");
+     Serial.println("Load parameters from EEPROM");
    #endif
    // Load from EEPROM
    Setpoint = EEPROM_readDouble(SpAddress);
@@ -272,7 +284,7 @@ void LoadParameters()
 void EEPROM_writeDouble(int address, double value)
 {
    #ifdef DEBUG
-     #define Serial.println("EEPROM_writeDouble");
+     Serial.println("EEPROM_writeDouble");
    #endif
    byte* p = (byte*)(void*)&value;
    for (int i = 0; i < sizeof(value); i++)
@@ -287,7 +299,7 @@ void EEPROM_writeDouble(int address, double value)
 double EEPROM_readDouble(int address)
 {
    #ifdef DEBUG
-     #define Serial.println("EEPROM_readDouble");
+     Serial.println("EEPROM_readDouble");
    #endif
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
@@ -306,18 +318,17 @@ double EEPROM_readDouble(int address)
 ********************************************************************************
 ********************************************************************************
 *******************************************************************************/
-void dummy(){}
 
 void initEnterFunction(){
   #ifdef DEBUG
-    #define Serial.println("initEnter");
+    Serial.println("initEnter");
   #endif
   //start the timer of this cycle
   initTimer = 0;
 }
 void initUpdateFunction(){
   #ifdef DEBUG
-    #define Serial.println("initUpdate");
+    Serial.println("initUpdate");
   #endif
   //time is up?
   if (initTimer > INIT_TIMEOUT) {
@@ -326,40 +337,40 @@ void initUpdateFunction(){
 }
 void initExitFunction(){
   #ifdef DEBUG
-    #define Serial.println("initExit");
+    Serial.println("initExit");
   #endif
   Serial.println("Initialization done");
 }
 
 void idleEnterFunction(){
   #ifdef DEBUG
-    #define Serial.println("idleEnter");
+    Serial.println("idleEnter");
   #endif
 }
 void idleUpdateFunction(){
   #ifdef DEBUG
-    #define Serial.println("idleUpdate");
+    Serial.println("idleUpdate");
   #endif
 }
 void idleExitFunction(){
   #ifdef DEBUG
-    #define Serial.println("idleExit");
+    Serial.println("idleExit");
   #endif
 }
 
 void settingsEnterFunction(){
   #ifdef DEBUG
-    #define Serial.println("settingsEnter");
+    Serial.println("settingsEnter");
   #endif
 }
-void settingsUpdateFunction{
+void settingsUpdateFunction(){
   #ifdef DEBUG
-    #define Serial.println("settingsUpdate");
+    Serial.println("settingsUpdate");
   #endif
 }
-void settingsExitFunction{
+void settingsExitFunction(){
   #ifdef DEBUG
-    #define Serial.println("settingsExit");
+    Serial.println("settingsExit");
   #endif
 }
  
