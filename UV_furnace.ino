@@ -75,7 +75,9 @@ elapsedMillis initTimer;
 
 void setup() {
 
-//declare and init pins
+  Serial.begin(19600);
+
+  //declare and init pins
   
   // put your setup code here, to run once:
 
