@@ -194,6 +194,36 @@ void SaveParameters()
    }
 }
 
+// ************************************************
+// Load parameters from EEPROM
+// ************************************************
+void LoadParameters()
+{
+  // Load from EEPROM
+   Setpoint = EEPROM_readDouble(SpAddress);
+   Kp = EEPROM_readDouble(KpAddress);
+   Ki = EEPROM_readDouble(KiAddress);
+   Kd = EEPROM_readDouble(KdAddress);
+   
+   // Use defaults if EEPROM values are invalid
+   if (isnan(Setpoint))
+   {
+     Setpoint = 60;
+   }
+   if (isnan(Kp))
+   {
+     Kp = 850;
+   }
+   if (isnan(Ki))
+   {
+     Ki = 0.5;
+   }
+   if (isnan(Kd))
+   {
+     Kd = 0.1;
+   }  
+}
+
 /*******************************************************************************
 ********************************************************************************
 ********************************************************************************
