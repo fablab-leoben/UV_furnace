@@ -7,6 +7,14 @@
 
 #include <FiniteStateMachine.h>
 
+/************************************************
+#ifdef DEBUG
+ #define DEBUG_PRINT(x)  Serial.println (x)
+#else
+ #define DEBUG_PRINT(x)
+#endif
+************************************************/
+#define DEBUG
 
 
 
@@ -14,9 +22,9 @@
 String VERSION = "Version 0.01";
 
 
-// ************************************************
-// PID Variables and constants
-// ************************************************
+/************************************************
+ PID Variables and constants
+************************************************/
 
 // EEPROM addresses for persisted data
 const int SpAddress = 0;
