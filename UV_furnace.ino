@@ -8,6 +8,15 @@
 #define APP_NAME "UV furnace"
 String VERSION = "Version 0.01";
 
+/*******************************************************************************
+ MAX31855 Thermocouple Amplifier
+ Creating a thermocouple instance with software SPI on any three
+ digital IO pins.
+*******************************************************************************/
+#define DO   3
+#define CS   4
+#define CLK  5
+Adafruit_MAX31855 thermocouple(CLK, CS, DO);
 
 //compatibility with Arduino IDE 1.6.9
 //void dummy(){}
