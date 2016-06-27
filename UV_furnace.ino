@@ -1,3 +1,11 @@
+#include <Time.h>
+
+#include <Ethernet.h>
+
+#include <SPI.h>
+
+#include <SD.h>
+
 // So we can save and retrieve settings
 #include <EEPROM.h>
 
