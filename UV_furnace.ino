@@ -236,6 +236,20 @@ void EEPROM_writeDouble(int address, double value)
    }
 }
 
+// ************************************************
+// Read floating point values from EEPROM
+// ************************************************
+double EEPROM_readDouble(int address)
+{
+   double value = 0.0;
+   byte* p = (byte*)(void*)&value;
+   for (int i = 0; i < sizeof(value); i++)
+   {
+      *p++ = EEPROM.read(address++);
+   }
+   return value;
+}
+
 
 /*******************************************************************************
 ********************************************************************************
