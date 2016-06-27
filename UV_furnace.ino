@@ -1,3 +1,6 @@
+// So we can save and retrieve settings
+#include <EEPROM.h>
+
 #include <Adafruit_MAX31855.h>
 
 #include <elapsedMillis.h>
@@ -5,8 +8,23 @@
 #include <FiniteStateMachine.h>
 
 
+
+
 #define APP_NAME "UV furnace"
 String VERSION = "Version 0.01";
+
+
+// ************************************************
+// PID Variables and constants
+// ************************************************
+
+// EEPROM addresses for persisted data
+const int SpAddress = 0;
+const int KpAddress = 8;
+const int KiAddress = 16;
+const int KdAddress = 24;
+
+
 
 /*******************************************************************************
  MAX31855 Thermocouple Amplifier
@@ -41,14 +59,6 @@ elapsedMillis initTimer;
 /*******************************************************************************
  IO mapping
 *******************************************************************************/
-
-
-/*******************************************************************************
- MAX31855 sensor
-*******************************************************************************/
-
-
-
 
 void setup() {
 
@@ -159,6 +169,29 @@ float readTemperature(){
       b7 * pow(voltageSum, 7.0) +
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
+}
+
+// ************************************************
+// Save any parameter changes to EEPROM
+// ************************************************
+void SaveParameters()
+{
+   if (Setpoint != EEPROM_readDouble(SpAddress))
+   {
+      EEPROM_writeDouble(SpAddress, Setpoint);
+   }
+   if (Kp != EEPROM_readDouble(KpAddress))
+   {
+      EEPROM_writeDouble(KpAddress, Kp);
+   }
+   if (Ki != EEPROM_readDouble(KiAddress))
+   {
+      EEPROM_writeDouble(KiAddress, Ki);
+   }
+   if (Kd != EEPROM_readDouble(KdAddress))
+   {
+      EEPROM_writeDouble(KdAddress, Kd);
+   }
 }
 
 /*******************************************************************************
