@@ -79,6 +79,10 @@ void setup() {
   
   // put your setup code here, to run once:
 
+  #ifdef DEBUG
+    #define Serial.println("setup");
+  #endif
+
 }
 
 void loop() {
@@ -103,6 +107,9 @@ void loop() {
  * Return         : 0
  *******************************************************************************/
 int readTemperature(){
+   #ifdef DEBUG
+     #define Serial.println("readTemperature");
+   #endif
 
    //time is up? no, then come back later
    if (MAX31855SampleInterval < MAX31855_SAMPLE_INTERVAL) {
@@ -191,6 +198,11 @@ int readTemperature(){
       b7 * pow(voltageSum, 7.0) +
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
+
+   #ifdef DEBUG
+     #define Serial.print(currentTemperature);
+     #define Serial.print(" °C");
+   #endif
 }
 
 // ************************************************
@@ -198,6 +210,9 @@ int readTemperature(){
 // ************************************************
 void SaveParameters()
 {
+   #ifdef DEBUG
+     #define Serial.println("Save any parameter changes to EEPROM");
+   #endif
    if (Setpoint != EEPROM_readDouble(SpAddress))
    {
       EEPROM_writeDouble(SpAddress, Setpoint);
@@ -221,7 +236,10 @@ void SaveParameters()
 // ************************************************
 void LoadParameters()
 {
-  // Load from EEPROM
+   #ifdef DEBUG
+     #define Serial.println("Load parameters from EEPROM");
+   #endif
+   // Load from EEPROM
    Setpoint = EEPROM_readDouble(SpAddress);
    Kp = EEPROM_readDouble(KpAddress);
    Ki = EEPROM_readDouble(KiAddress);
@@ -251,6 +269,9 @@ void LoadParameters()
 // ************************************************
 void EEPROM_writeDouble(int address, double value)
 {
+   #ifdef DEBUG
+     #define Serial.println("EEPROM_writeDouble");
+   #endif
    byte* p = (byte*)(void*)&value;
    for (int i = 0; i < sizeof(value); i++)
    {
@@ -263,6 +284,9 @@ void EEPROM_writeDouble(int address, double value)
 // ************************************************
 double EEPROM_readDouble(int address)
 {
+   #ifdef DEBUG
+     #define Serial.println("EEPROM_readDouble");
+   #endif
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
    for (int i = 0; i < sizeof(value); i++)
@@ -281,30 +305,57 @@ double EEPROM_readDouble(int address)
 ********************************************************************************
 *******************************************************************************/
 void initEnterFunction(){
+  #ifdef DEBUG
+    #define Serial.println("initEnter");
+  #endif
   //start the timer of this cycle
   initTimer = 0;
 }
 void initUpdateFunction(){
+  #ifdef DEBUG
+    #define Serial.println("initUpdate");
+  #endif
   //time is up?
   if (initTimer > INIT_TIMEOUT) {
     uvFurnaceStateMachine.transitionTo(idleState);
   }
 }
 void initExitFunction(){
+  #ifdef DEBUG
+    #define Serial.println("initExit");
+  #endif
   Serial.println("Initialization done");
 }
 
 void idleEnterFunction(){
+  #ifdef DEBUG
+    #define Serial.println("idleEnter");
+  #endif
 }
 void idleUpdateFunction(){
+  #ifdef DEBUG
+    #define Serial.println("idleUpdate");
+  #endif
 }
 void idleExitFunction(){
+  #ifdef DEBUG
+    #define Serial.println("idleExit");
+  #endif
 }
 
 void settingsEnterFunction(){
+  #ifdef DEBUG
+    #define Serial.println("settingsEnter");
+  #endif
 }
 void settingsUpdateFunction{
+  #ifdef DEBUG
+    #define Serial.println("settingsUpdate");
+  #endif
 }
 void settingsExitFunction{
+  #ifdef DEBUG
+    #define Serial.println("settingsExit");
+  #endif
 }
  
