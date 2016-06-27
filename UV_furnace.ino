@@ -42,7 +42,10 @@ const int KdAddress = 24;
 #define DO   3
 #define CS   4
 #define CLK  5
+#define MAX31855_SAMPLE_INTERVAL   1000    // Sample room temperature every 5 seconds
 Adafruit_MAX31855 thermocouple(CLK, CS, DO);
+elapsedMillis MAX31855SampleInterval;
+float currentTemperature;
 
 //compatibility with Arduino IDE 1.6.9
 //void dummy(){}
@@ -77,7 +80,8 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //this function reads the temperature of the MAX31855 Thermocouple Amplifier
+  readTemperature();
 
 
   //this function updates the FSM
@@ -96,7 +100,15 @@ void loop() {
                     assuming global: Adafruit_MAX31855 thermocouple(CLK, CS, DO);
  * Return         : 0
  *******************************************************************************/
-float readTemperature(){
+int readTemperature(){
+
+   //time is up? no, then come back later
+   if (MAX31855SampleInterval < MAX31855_SAMPLE_INTERVAL) {
+    return 0;
+   }
+
+   //time is up, reset timer
+   MAX31855SampleInterval = 0;
    
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
@@ -167,7 +179,7 @@ float readTemperature(){
       return 0;
    }
    
-   return b0 + 
+   currentTemperature = b0 + 
       b1 * voltageSum +
       b2 * pow(voltageSum, 2.0) +
       b3 * pow(voltageSum, 3.0) +
