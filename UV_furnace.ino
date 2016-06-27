@@ -56,6 +56,8 @@ float currentTemperature;
 State dummyState = State(dummy);
 State initState = State( initEnterFunction, initUpdateFunction, initExitFunction );
 State idleState = State( idleEnterFunction, idleUpdateFunction, idleExitFunction );
+State settingsState = State( settingsEnterFunction, settingsUpdateFunction, settingsExitFunction );
+
 
 //initialize state machine, start in state: Idle
 FSM uvFurnaceStateMachine = FSM(initState);
@@ -297,5 +299,12 @@ void idleEnterFunction(){
 void idleUpdateFunction(){
 }
 void idleExitFunction(){
+}
+
+void settingsEnterFunction(){
+}
+void settingsUpdateFunction{
+}
+void settingsExitFunction{
 }
  
