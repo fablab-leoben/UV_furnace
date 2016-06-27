@@ -1,3 +1,6 @@
+//Library for LCD touch screen
+#include <Nextion.h>
+
 #include <Time.h>
 
 #include <Ethernet.h>
@@ -21,21 +24,29 @@
 #define DEBUG
 
 #ifdef DEBUG
-#define DEBUG_PRINT(...)
-#define DEBUG_PRINTLN(...)
+  #define DEBUG_PRINT(...)
+  #define DEBUG_PRINTLN(...)
 #endif
-/*
-#ifdef DEBUG
-#define DEBUG_PRINT(x) Serial.print(F(x))
-#define DEBUG_PRINTLN(x) Serial.println(F(x))
-#else
-#define DEBUG_PRINT(x)
-#define DEBUG_PRINTLN(x)
-#endif
-*/
+
 #define APP_NAME "UV furnace"
 String VERSION = "Version 0.01";
 
+// ************************************************
+// Pin definitions
+// ************************************************
+
+// LEDs
+byte b0Pin = 13;
+byte b1Pin = 12;
+byte b2Pin = 11;
+
+
+// ************************************************
+// LED variables
+// ************************************************
+byte LED1_intensity = 0;
+byte LED2_intensity = 0;
+byte LED3_intensity = 0;
 
 /************************************************
  PID Variables and constants
@@ -103,6 +114,7 @@ void setup() {
   #ifdef DEBUG
     Serial.begin(115200);
   #endif
+  Serial2.begin(9600);
   
   //declare and init pins
   
