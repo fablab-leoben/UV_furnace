@@ -188,6 +188,7 @@ NexButton bTempPlus10 = NexButton(3, 4, "bTempPlus10");
 NexButton bTempMinus1 = NexButton(3, 3, "bTempMinus1");
 NexButton bTempMinus10 = NexButton(3, 5, "bTempMinus10");
 NexButton bHomeTemp = NexButton(3, 6, "bHomeTemp");
+NexButton bPreheat = NexButton(3, 7 , "bPreheat");
 
 //Page4
 NexButton bOHourPlus1 = NexButton(4, 1, "bOHourPlus1");
@@ -244,7 +245,7 @@ NexTouch *nex_listen_list[] =
     
     &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet,
     
-    &bTempPlus1, &bTempPlus10, &bTempMinus1, &bTempMinus10, &bHomeTemp,
+    &bTempPlus1, &bTempPlus10, &bTempMinus1, &bTempMinus10, &bHomeTemp, &bPreheat,
     
     &bOHourPlus1, &bOHourPlus10, &bOHourMinus1, &bOHourMinus10, &bOMinPlus1, &bOMinPlus10, &bOMinMinus1, &bOMinMinus10,
     &bLHourPlus1, &bLHourPlus10, &bLHourMinus1, &bLHourMinus10, &bLMinPlus1, &bLMinPlus10, &bLMinMinus1, &bLMinMinus10, &bHomeTimer,
@@ -344,8 +345,6 @@ void bPreSet1PopCallback(void *ptr)
     bPreSet1.setPic(picNum);
     sendCommand("ref 0");
 }
-
-
 
 void bPreSet2PopCallback(void *ptr)
 {
@@ -567,6 +566,10 @@ void bHomeTempPopCallback(void *ptr)
 {
     page2.show();
     sendCommand("ref 0");
+}
+
+void bPreheatPopCallback(void *ptr)
+{
 }
 
 //End Page3
@@ -1292,12 +1295,12 @@ void alarmIsr(){
 *******************************************************************************/
 void setup() {
 
+  nexInit();
+
   #ifdef DEBUG
     Serial.begin(9600);
   #endif
   //Serial2.begin(9600);
-
-  nexInit();
 
   /* Register the pop event callback function of the current button component. */
   //Page1
@@ -1323,6 +1326,7 @@ void setup() {
   bTempMinus1.attachPop(bTempMinus1PopCallback, &bTempMinus1);
   bTempMinus10.attachPop(bTempMinus10PopCallback, &bTempMinus10);
   bHomeTemp.attachPop(bHomeTempPopCallback, &bHomeTemp);
+  bPreheat.attachPop(bPreheatPopCallback, &bPreheat);
 
   //Page4
   bOHourPlus1.attachPop(bOHourPlus1PopCallback, &bOHourPlus1);
@@ -1374,6 +1378,8 @@ void setup() {
 }
 
 void loop() {
+  nexLoop(nex_listen_list);
+  
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
 
