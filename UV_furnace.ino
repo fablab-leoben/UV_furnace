@@ -59,7 +59,6 @@ FSM uvFurnaceStateMachine = FSM(initState);
 #define INIT_TIMEOUT 5000
 elapsedMillis initTimer;
 
-
 // ************************************************
 // Pin definitions
 // ************************************************
@@ -120,7 +119,6 @@ byte minutes_oven = 0;
 byte hours_led = 0;
 byte minutes_led = 0;
 
-
 // ************************************************
 // chart definitions for Nextion 4,3" display
 // ************************************************
@@ -139,7 +137,6 @@ double targetTemp = 0;
 Adafruit_MAX31855 thermocouple(CLK, CS, DO);
 elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
-
 
 /*******************************************************************************
  SD-Card
@@ -170,8 +167,6 @@ NexText min_uv = NexText(1, 4, "min_uv");
 NexWaveform s0 = NexWaveform(1, 3, "s0");
 NexButton bSettings = NexButton(1, 1, "bSettings");
 NexButton bOnOff = NexButton(1, 2, "bOnOff");
-
-
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -270,7 +265,8 @@ NexTouch *nex_listen_list[] =
 //Page1
 
 void bSettingsPopCallback(void *ptr)
-{   
+{ 
+  DEBUG_PRINTLN(F("transition to settings")); 
   uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
@@ -1272,7 +1268,6 @@ void bHomeLEDPopCallback(void *ptr)
     sendCommand("ref 0");
 }
 
-
 //End Page5
 
 //Page6
@@ -1283,10 +1278,6 @@ void bHomePIDPopCallback(void *ptr)
 }
 //End Page6
 
-
-
-
-
 /*******************************************************************************
  interrupt service routine for DS3231 clock
 *******************************************************************************/
@@ -1296,11 +1287,9 @@ void alarmIsr(){
     alarmIsrWasCalled = true;
 }
 
-
 /*******************************************************************************
  IO mapping
 *******************************************************************************/
-
 void setup() {
 
   #ifdef DEBUG
@@ -1308,11 +1297,7 @@ void setup() {
   #endif
   //Serial2.begin(9600);
 
-  
   nexInit();
-
-    delay(5000);
-    Serial.println("Setup");
 
   /* Register the pop event callback function of the current button component. */
   //Page1
@@ -1391,9 +1376,9 @@ void setup() {
 void loop() {
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
-  Serial.println("Test");
-  DEBUG_PRINTLN(F("Test"));
 
+  updateTargetTemp();
+  
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
@@ -1407,7 +1392,9 @@ void loop() {
  *******************************************************************************/
 void updateTargetTemp()
 {
-  //tTemp.setText(String(currentTemperature));
+    memset(buffer, 0, sizeof(buffer));
+    itoa(int(currentTemperature), buffer, 10);
+    tTemp.setText(buffer);
 }
 
 
@@ -1421,8 +1408,7 @@ void updateTargetTemp()
  * Return         : 0
  *******************************************************************************/
 int readTemperature(){
-     DEBUG_PRINTLN(F("readTemperature"));
-
+    
    //time is up? no, then come back later
    if (MAX31855SampleInterval < MAX31855_SAMPLE_INTERVAL) {
     return 0;
@@ -1511,8 +1497,8 @@ int readTemperature(){
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
 
-    DEBUG_PRINTLN(currentTemperature);
-    DEBUG_PRINTLN(F(" °C"));
+    DEBUG_PRINT(currentTemperature);
+    DEBUG_PRINTLN(F(" C"));
 }
 
 
@@ -1719,5 +1705,5 @@ void setPIDUpdateFunction(){
   DEBUG_PRINTLN(F("setPIDUpdate"));
 }
 void setPIDExitFunction(){
-  DEBUG_PRINTLN(F("setPIDExit"));
+  //DEBUG_PRINTLN(F("setPIDExit"));
 }
