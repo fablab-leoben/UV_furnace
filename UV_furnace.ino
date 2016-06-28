@@ -24,15 +24,41 @@
 /************************************************
   Debug
 ************************************************/
-#define DEBUG
+#define DebugStream    Serial
+#define UV_FURNACE_DEBUG
 
-#ifdef DEBUG
-  #define DEBUG_PRINT(...)
-  #define DEBUG_PRINTLN(...)
+#ifdef UV_FURNACE_DEBUG
+// need to do some debugging...
+  #define DEBUG_PRINT(...)    DebugStream.print(__VA_ARGS__)
+  #define DEBUG_PRINTLN(...)    DebugStream.println(__VA_ARGS__)
 #endif
 
 #define APP_NAME "UV furnace"
 String VERSION = "Version 0.01";
+
+
+//compatibility with Arduino IDE 1.6.9
+void dummy(){}
+
+/*******************************************************************************
+ initialize FSM states with proper enter, update and exit functions
+*******************************************************************************/
+State dummyState = State(dummy);
+State initState = State( initEnterFunction, initUpdateFunction, initExitFunction );
+State idleState = State( idleEnterFunction, idleUpdateFunction, idleExitFunction );
+State settingsState = State( settingsEnterFunction, settingsUpdateFunction, settingsExitFunction );
+State setLEDs = State( setLEDsEnterFunction, setLEDsUpdateFunction, setLEDsExitFunction );
+State setTemp = State( setTempEnterFunction, setTempUpdateFunction, setTempExitFunction );
+State setTimer = State( setTimerEnterFunction, setTimerUpdateFunction, setTimerExitFunction );
+State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction ); 
+
+//initialize state machine, start in state: Idle
+FSM uvFurnaceStateMachine = FSM(initState);
+
+//milliseconds for the init cycle, so everything gets stabilized
+#define INIT_TIMEOUT 5000
+elapsedMillis initTimer;
+
 
 // ************************************************
 // Pin definitions
@@ -244,9 +270,8 @@ NexTouch *nex_listen_list[] =
 //Page1
 
 void bSettingsPopCallback(void *ptr)
-{
-    page2.show();
-    sendCommand("ref 0");
+{   
+  uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
 void bOnOffPopCallback(void *ptr)
@@ -445,8 +470,7 @@ void bPIDSetupPopCallback(void *ptr)
 
 void bHomeSetPopCallback(void *ptr)
 {
-    page1.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(idleState);    
 }
 
 //End Page2
@@ -1261,27 +1285,7 @@ void bHomePIDPopCallback(void *ptr)
 
 
 
-//compatibility with Arduino IDE 1.6.9
-void dummy(){}
 
-/*******************************************************************************
- initialize FSM states with proper enter, update and exit functions
-*******************************************************************************/
-State dummyState = State(dummy);
-State initState = State( initEnterFunction, initUpdateFunction, initExitFunction );
-State idleState = State( idleEnterFunction, idleUpdateFunction, idleExitFunction );
-State settingsState = State( settingsEnterFunction, settingsUpdateFunction, settingsExitFunction );
-State setLEDs = State( setLEDsEnterFunction, setLEDsUpdateFunction, setLEDsExitFunction );
-State setTemp = State( setTempEnterFunction, setTempUpdateFunction, setTempExitFunction );
-State setTimer = State( setTimerEnterFunction, setTimerUpdateFunction, setTimerExitFunction );
-State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction ); 
-
-//initialize state machine, start in state: Idle
-FSM uvFurnaceStateMachine = FSM(initState);
-
-//milliseconds for the init cycle, so everything gets stabilized
-#define INIT_TIMEOUT 10000
-elapsedMillis initTimer;
 
 /*******************************************************************************
  interrupt service routine for DS3231 clock
@@ -1300,11 +1304,15 @@ void alarmIsr(){
 void setup() {
 
   #ifdef DEBUG
-    Serial.begin(115200);
+    Serial.begin(9600);
   #endif
-  Serial2.begin(9600);
+  //Serial2.begin(9600);
 
+  
   nexInit();
+
+    delay(5000);
+    Serial.println("Setup");
 
   /* Register the pop event callback function of the current button component. */
   //Page1
@@ -1383,11 +1391,23 @@ void setup() {
 void loop() {
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
-
+  Serial.println("Test");
+  DEBUG_PRINTLN(F("Test"));
 
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
+}
+
+
+/*******************************************************************************
+ * Function Name  : updateTargetTemp
+ * Description    : updates the value of target temperature of the uv furnace
+ * Return         : none
+ *******************************************************************************/
+void updateTargetTemp()
+{
+  //tTemp.setText(String(currentTemperature));
 }
 
 
@@ -1491,8 +1511,8 @@ int readTemperature(){
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
 
-     DEBUG_PRINTLN(F(currentTemperature));
-     DEBUG_PRINTLN(F(" °C"));
+    DEBUG_PRINTLN(currentTemperature);
+    DEBUG_PRINTLN(F(" °C"));
 }
 
 
@@ -1620,7 +1640,6 @@ double EEPROM_readDouble(int address)
 ********************************************************************************
 ********************************************************************************
 *******************************************************************************/
-
 void initEnterFunction(){
   DEBUG_PRINTLN(F("initEnter"));
   
@@ -1641,6 +1660,8 @@ void initExitFunction(){
 
 void idleEnterFunction(){
   DEBUG_PRINTLN(F("idleEnter"));
+  page1.show();
+  sendCommand("ref 0");
 }
 void idleUpdateFunction(){
   DEBUG_PRINTLN(F("idleUpdate"));
@@ -1651,6 +1672,8 @@ void idleExitFunction(){
 
 void settingsEnterFunction(){
   DEBUG_PRINTLN(F("settingsEnter"));
+  page2.show();
+  sendCommand("ref 0");
 }
 void settingsUpdateFunction(){
   DEBUG_PRINTLN(F("settingsUpdate"));
@@ -1698,4 +1721,3 @@ void setPIDUpdateFunction(){
 void setPIDExitFunction(){
   DEBUG_PRINTLN(F("setPIDExit"));
 }
- 
