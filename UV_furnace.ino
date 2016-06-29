@@ -267,7 +267,7 @@ NexTouch *nex_listen_list[] =
 
 void bSettingsPopCallback(void *ptr)
 { 
-  DEBUG_PRINTLN(F("transition to settings")); 
+  Serial.println(F("transition to settings")); 
   uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
@@ -1398,9 +1398,9 @@ void loop() {
  *******************************************************************************/
 void updateTargetTemp()
 {
-    memset(buffer, 0, sizeof(buffer));
-    itoa(int(currentTemperature), buffer, 10);
-    tTemp.setText(buffer);
+    //memset(buffer, 0, sizeof(buffer));
+    //itoa(int(currentTemperature), buffer, 10);
+    //tTemp.setText(buffer);
 }
 
 
