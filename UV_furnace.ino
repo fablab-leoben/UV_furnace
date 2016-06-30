@@ -137,6 +137,7 @@ double targetTemp = 0;
 Adafruit_MAX31855 thermocouple(CLK, CS, DO);
 elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
+float lastTemperature;
 
 /*******************************************************************************
  SD-Card
@@ -441,26 +442,22 @@ void turnOffButtons(){
 
 void bTempSetupPopCallback(void *ptr)
 {
-    page3.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(setTemp);
 }
 
 void bTimerSetupPopCallback(void *ptr)
-{
-    page4.show();
-    sendCommand("ref 0");
+{   
+    uvFurnaceStateMachine.transitionTo(setTimer);
 }
 
 void bLEDSetupPopCallback(void *ptr)
 {
-    page5.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(setLEDs);
 }
 
 void bPIDSetupPopCallback(void *ptr)
 {
-    page6.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(setPID);
 }
 
 void bHomeSetPopCallback(void *ptr)
@@ -564,8 +561,7 @@ void bTempMinus10PopCallback(void *ptr)
 
 void bHomeTempPopCallback(void *ptr)
 {
-    page2.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 
 void bPreheatPopCallback(void *ptr)
@@ -932,8 +928,7 @@ void bLMinMinus10PopCallback(void *ptr)
 
 void bHomeTimerPopCallback(void *ptr)
 {
-    page2.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 
 //End Page4
@@ -1267,8 +1262,7 @@ void bLED3minus10PopCallback(void *ptr)
 
 void bHomeLEDPopCallback(void *ptr)
 {
-    page2.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 
 //End Page5
@@ -1276,8 +1270,7 @@ void bHomeLEDPopCallback(void *ptr)
 //Page6
 void bHomePIDPopCallback(void *ptr)
 {
-    page2.show();
-    sendCommand("ref 0");
+    uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 //End Page6
 
@@ -1397,10 +1390,13 @@ void loop() {
  * Return         : none
  *******************************************************************************/
 void updateTargetTemp()
-{
-    //memset(buffer, 0, sizeof(buffer));
-    //itoa(int(currentTemperature), buffer, 10);
-    //tTemp.setText(buffer);
+{   
+    if(currentTemperature != lastTemperature) {
+      memset(buffer, 0, sizeof(buffer));
+      itoa(int(currentTemperature), buffer, 10);
+      tTemp.setText(buffer);
+    }
+    lastTemperature = currentTemperature;
 }
 
 
@@ -1676,6 +1672,8 @@ void settingsExitFunction(){
 
 void setLEDsEnterFunction(){
   DEBUG_PRINTLN(F("setLEDsEnter"));
+  page5.show();
+  sendCommand("ref 0");
 }
 void setLEDsUpdateFunction(){
   DEBUG_PRINTLN(F("setLEDsUpdate"));
@@ -1686,6 +1684,8 @@ void setLEDsExitFunction(){
 
 void setTempEnterFunction(){
   DEBUG_PRINTLN(F("setTempEnter"));
+  page3.show();
+  sendCommand("ref 0");
 }
 void setTempUpdateFunction(){
   DEBUG_PRINTLN(F("setTempUpdate"));
@@ -1696,6 +1696,8 @@ void setTempExitFunction(){
 
 void setTimerEnterFunction(){
   DEBUG_PRINTLN(F("setTimerEnter"));
+  page4.show();
+  sendCommand("ref 0");
 }
 void setTimerUpdateFunction(){
   DEBUG_PRINTLN(F("setTimerUpdate"));
@@ -1706,10 +1708,12 @@ void setTimerExitFunction(){
 
 void setPIDEnterFunction(){
   DEBUG_PRINTLN(F("setPIDEnter"));
+  page6.show();
+  sendCommand("ref 0");
 }
 void setPIDUpdateFunction(){
   DEBUG_PRINTLN(F("setPIDUpdate"));
 }
 void setPIDExitFunction(){
-  //DEBUG_PRINTLN(F("setPIDExit"));
+  DEBUG_PRINTLN(F("setPIDExit"));
 }
