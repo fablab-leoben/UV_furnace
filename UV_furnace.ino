@@ -68,9 +68,9 @@ byte b0Pin = 13;
 byte b1Pin = 12;
 byte b2Pin = 11;
 
-// ************************************************
-// LED variables
-// ************************************************
+/************************************************
+ LED variables
+************************************************/
 bool b0State = false;
 bool b1State = false;
 bool b2State = false;
@@ -78,6 +78,11 @@ bool b2State = false;
 byte LED1_intensity = 0;
 byte LED2_intensity = 0;
 byte LED3_intensity = 0;
+
+/************************************************
+ Temperature variables
+************************************************/
+bool preheat = false;
 
 /************************************************
  PID Variables and constants
@@ -119,9 +124,9 @@ byte minutes_oven = 0;
 byte hours_led = 0;
 byte minutes_led = 0;
 
-// ************************************************
-// chart definitions for Nextion 4,3" display
-// ************************************************
+/************************************************
+ chart definitions for Nextion 4,3" display
+************************************************/
 #define inputOffset 0
 double targetTemp = 0;
 
@@ -566,6 +571,22 @@ void bHomeTempPopCallback(void *ptr)
 
 void bPreheatPopCallback(void *ptr)
 {
+    uint32_t picNum = 0;
+    bPreheat.getPic(&picNum);
+    DEBUG_PRINTLN(picNum);
+    if(picNum == 14) {
+      picNum = 15;
+
+      preheat = true;
+      
+    } else if(picNum == 15) {
+      picNum = 14;
+
+      preheat = false;
+    }
+    DEBUG_PRINTLN(preheat);
+    bPreheat.setPic(picNum);
+    sendCommand("ref bPreheat");
 }
 
 //End Page3
@@ -930,10 +951,7 @@ void bHomeTimerPopCallback(void *ptr)
 {
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
-
 //End Page4
-
-//Page5
 
 //Page5
 void bLED1PopCallback(void *ptr)
