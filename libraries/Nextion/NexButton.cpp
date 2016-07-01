@@ -45,7 +45,7 @@ bool NexButton::getPic(uint32_t *number)
 {
     String cmd = String("get ");
     cmd += getObjName();
-    cmd += ".pic";
+    cmd += ".picc";
     sendCommand(cmd.c_str());
     return recvRetNumber(number);
 }
@@ -57,7 +57,7 @@ bool NexButton::setPic(uint32_t number)
     
     utoa(number, buf, 10);
     cmd += getObjName();
-    cmd += ".pic=";
+    cmd += ".picc=";
     cmd += buf;
 
     sendCommand(cmd.c_str());
