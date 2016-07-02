@@ -111,6 +111,26 @@ const int KpAddress = 8;
 const int KiAddress = 16;
 const int KdAddress = 24;
 
+//Specify the links and initial tuning parameters
+PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
+ 
+// 10 second Time Proportional Output window
+int WindowSize = 10000; 
+unsigned long windowStartTime;
+ 
+// ************************************************
+// Auto Tune Variables and constants
+// ************************************************
+byte ATuneModeRemember=2;
+ 
+double aTuneStep=500;
+double aTuneNoise=1;
+unsigned int aTuneLookBack=20;
+ 
+boolean tuning = false;
+ 
+PID_ATune aTune(&Input, &Output);
+
 
 /************************************************
  Timer Variables
