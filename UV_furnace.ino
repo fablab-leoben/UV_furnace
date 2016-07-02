@@ -72,6 +72,9 @@ byte b0Pin = 13;
 byte b1Pin = 12;
 byte b2Pin = 11;
 
+// Output relay
+#define RelayPin 32
+
 /************************************************
  LED variables
 ************************************************/
