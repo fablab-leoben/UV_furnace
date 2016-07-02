@@ -166,11 +166,13 @@ double targetTemp = 0;
  Creating a thermocouple instance with software SPI on any three
  digital IO pins.
 *******************************************************************************/
-#define DO   3
-#define CS   4
-#define CLK  5
+//#define DO   22
+//#define CS   23
+//#define CLK  24
 #define MAX31855_SAMPLE_INTERVAL   1000    // Sample room temperature every 5 seconds
-Adafruit_MAX31855 thermocouple(CLK, CS, DO);
+//Adafruit_MAX31855 thermocouple(CLK, CS, DO);
+#define cs_MAX31855   47
+Adafruit_MAX31855 thermocouple(cs_MAX31855);
 elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
 float lastTemperature;
@@ -178,7 +180,7 @@ float lastTemperature;
 /*******************************************************************************
  SD-Card
 *******************************************************************************/
-const int chipSelect = 53;
+const int cs_SD = 4;
 File dataFile;
 
 /*******************************************************************************
@@ -315,11 +317,6 @@ void bOnOffPopCallback(void *ptr)
      if(picNum == 4) {
       picNum = 5;
 
-      createLogFile();
-      writeHeader();
-         
-      //set alarm
-      setDS3231Alarm(minutes_oven, hours_oven);
       uvFurnaceStateMachine.transitionTo(runState);
 
     } else {
@@ -1423,6 +1420,25 @@ void setup() {
   myPID.SetSampleTime(1000);
   myPID.SetOutputLimits(0, WindowSize);
 
+  //Initializing Chip Select pin for MAX31855
+  pinMode(cs_MAX31855, OUTPUT);
+  digitalWrite(cs_MAX31855, HIGH);
+  
+  //Initializing SD Card
+  DEBUG_PRINTLN("Initializing SD card...");
+  // make sure that the default chip select pin is set to
+  // output, even if you don't use it:
+  //pinMode(4, OUTPUT);
+  //digitalWrite(4, HIGH);
+    // see if the card is present and can be initialized:
+  
+  if (!SD.begin(cs_SD)) {
+    DEBUG_PRINTLN("Card failed, or not present");
+    // don't do anything more:
+    while (1) ;
+  }
+  DEBUG_PRINTLN("card initialized.");
+
   // Run timer2 interrupt every 15 ms 
   TCCR2A = 0;
   TCCR2B = 1<<CS22 | 1<<CS21 | 1<<CS20;
@@ -1822,6 +1838,12 @@ void setPIDExitFunction(){
 
 void runEnterFunction(){
   DEBUG_PRINTLN(F("runEnter"));
+  
+  createLogFile();
+  writeHeader();
+         
+  //set alarm
+  setDS3231Alarm(minutes_oven, hours_oven);
 }
 void runUpdateFunction(){
   DEBUG_PRINTLN(F("runUpdate"));
@@ -1839,5 +1861,3 @@ void errorUpdateFunction(){
 void errorExitFunction(){
   DEBUG_PRINTLN(F("errorExit"));
 }
-
-
