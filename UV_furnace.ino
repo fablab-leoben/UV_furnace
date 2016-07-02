@@ -1,3 +1,7 @@
+#include <PID_AutoTune_v0.h>
+
+#include <PID_v1.h>
+
 //Library for DS3231 clock
 #include <DS3232RTC.h>
 
