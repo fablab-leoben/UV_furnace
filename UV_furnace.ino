@@ -1417,6 +1417,10 @@ void setup() {
   myPID.SetSampleTime(1000);
   myPID.SetOutputLimits(0, WindowSize);
 
+  // Run timer2 interrupt every 15 ms 
+  TCCR2A = 0;
+  TCCR2B = 1<<CS22 | 1<<CS21 | 1<<CS20;
+
   DEBUG_PRINTLN(F("setup ready"));
 
 }
