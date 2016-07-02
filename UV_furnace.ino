@@ -1753,14 +1753,13 @@ void initEnterFunction(){
   initTimer = 0;
 }
 void initUpdateFunction(){
-  DEBUG_PRINTLN("initUpdate");
+  //DEBUG_PRINTLN("initUpdate");
   //time is up?
   if (initTimer > INIT_TIMEOUT) {
     uvFurnaceStateMachine.transitionTo(idleState);
   }
 }
 void initExitFunction(){
-  DEBUG_PRINTLN(F("initExit"));
   DEBUG_PRINTLN(F("Initialization done"));
 }
 
@@ -1770,7 +1769,7 @@ void idleEnterFunction(){
   sendCommand("ref 0");
 }
 void idleUpdateFunction(){
-  DEBUG_PRINTLN(F("idleUpdate"));
+  //DEBUG_PRINTLN(F("idleUpdate"));
 }
 void idleExitFunction(){
   DEBUG_PRINTLN(F("idleExit"));
@@ -1782,7 +1781,7 @@ void settingsEnterFunction(){
   sendCommand("ref 0");
 }
 void settingsUpdateFunction(){
-  DEBUG_PRINTLN(F("settingsUpdate"));
+  //DEBUG_PRINTLN(F("settingsUpdate"));
 }
 void settingsExitFunction(){
   DEBUG_PRINTLN(F("settingsExit"));
@@ -1794,7 +1793,7 @@ void setLEDsEnterFunction(){
   sendCommand("ref 0");
 }
 void setLEDsUpdateFunction(){
-  DEBUG_PRINTLN(F("setLEDsUpdate"));
+  //DEBUG_PRINTLN(F("setLEDsUpdate"));
 }
 void setLEDsExitFunction(){
   DEBUG_PRINTLN(F("setLEDsExit"));
@@ -1806,7 +1805,7 @@ void setTempEnterFunction(){
   sendCommand("ref 0");
 }
 void setTempUpdateFunction(){
-  DEBUG_PRINTLN(F("setTempUpdate"));
+  //DEBUG_PRINTLN(F("setTempUpdate"));
 }
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
@@ -1818,7 +1817,7 @@ void setTimerEnterFunction(){
   sendCommand("ref 0");
 }
 void setTimerUpdateFunction(){
-  DEBUG_PRINTLN(F("setTimerUpdate"));
+  //DEBUG_PRINTLN(F("setTimerUpdate"));
 }
 void setTimerExitFunction(){
   DEBUG_PRINTLN(F("setTimerExit"));
@@ -1830,14 +1829,14 @@ void setPIDEnterFunction(){
   sendCommand("ref 0");
 }
 void setPIDUpdateFunction(){
-  DEBUG_PRINTLN(F("setPIDUpdate"));
+  //DEBUG_PRINTLN(F("setPIDUpdate"));
 }
 void setPIDExitFunction(){
   DEBUG_PRINTLN(F("setPIDExit"));
 }
 
 void runEnterFunction(){
-  DEBUG_PRINTLN(F("runEnter"));
+  //DEBUG_PRINTLN(F("runEnter"));
   
   createLogFile();
   writeHeader();
@@ -1846,18 +1845,18 @@ void runEnterFunction(){
   setDS3231Alarm(minutes_oven, hours_oven);
 }
 void runUpdateFunction(){
-  DEBUG_PRINTLN(F("runUpdate"));
+  //DEBUG_PRINTLN(F("runUpdate"));
 }
 void runExitFunction(){
-  DEBUG_PRINTLN(F("runExit"));
+  //DEBUG_PRINTLN(F("runExit"));
 }
 
 void errorEnterFunction(){
-  DEBUG_PRINTLN(F("errorEnter"));
+  //DEBUG_PRINTLN(F("errorEnter"));
 }
 void errorUpdateFunction(){
-  DEBUG_PRINTLN(F("errorUpdate"));
+  //DEBUG_PRINTLN(F("errorUpdate"));
 }
 void errorExitFunction(){
-  DEBUG_PRINTLN(F("errorExit"));
+  //DEBUG_PRINTLN(F("errorExit"));
 }
