@@ -55,6 +55,8 @@ State setLEDs = State( setLEDsEnterFunction, setLEDsUpdateFunction, setLEDsExitF
 State setTemp = State( setTempEnterFunction, setTempUpdateFunction, setTempExitFunction );
 State setTimer = State( setTimerEnterFunction, setTimerUpdateFunction, setTimerExitFunction );
 State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction ); 
+State runState = State( runEnterFunction, runUpdateFunction, runExitFunction );
+State errorState = State( errorEnterFunction, errorUpdateFunction, errorExitFunction );
 
 //initialize state machine, start in state: Idle
 FSM uvFurnaceStateMachine = FSM(initState);
@@ -99,6 +101,8 @@ bool preheat = false;
 double Setpoint;
 double Input;
 double Output;
+
+volatile long onTime = 0;
 
 // pid tuning parameters
 double Kp;
@@ -313,16 +317,14 @@ void bOnOffPopCallback(void *ptr)
 
       createLogFile();
       writeHeader();
-      
-      //opState = RUN;
-      
+         
       //set alarm
       setDS3231Alarm(minutes_oven, hours_oven);
+      uvFurnaceStateMachine.transitionTo(runState);
 
     } else {
       picNum = 4;
-
-      //opState = OFF;
+      uvFurnaceStateMachine.transitionTo(idleState);
     }
     bOnOff.setPic(picNum);
     sendCommand("ref bOnOff");
@@ -1333,6 +1335,10 @@ void alarmIsr(){
 *******************************************************************************/
 void setup() {
 
+  // Initialize Relay Control:
+  pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
+  digitalWrite(RelayPin, LOW);  // make sure it is off to start
+
   nexInit();
 
   #ifdef DEBUG
@@ -1426,6 +1432,44 @@ void setup() {
 
   DEBUG_PRINTLN(F("setup ready"));
 
+}
+
+/************************************************
+ Timer Interrupt Handler
+************************************************/
+SIGNAL(TIMER2_OVF_vect) 
+{
+  if (uvFurnaceStateMachine.isInState(idleState) == true)
+  {
+    digitalWrite(RelayPin, LOW);  // make sure relay is off
+  }
+  else
+  {
+    DriveOutput();
+    //DEBUG_PRINTLN("DriveOutput");
+  }
+}
+
+/************************************************
+ Called by ISR every 15ms to drive the output
+************************************************/
+void DriveOutput()
+{  
+  long now = millis();
+  // Set the output
+  // "on time" is proportional to the PID output
+  if(now - windowStartTime>WindowSize)
+  { //time to shift the Relay Window
+     windowStartTime += WindowSize;
+  }
+  if((onTime > 100) && (onTime > (now - windowStartTime)))
+  {
+     digitalWrite(RelayPin,HIGH);
+  }
+  else
+  {
+     digitalWrite(RelayPin,LOW);
+  }
 }
 
 void loop() {
@@ -1775,3 +1819,25 @@ void setPIDUpdateFunction(){
 void setPIDExitFunction(){
   DEBUG_PRINTLN(F("setPIDExit"));
 }
+
+void runEnterFunction(){
+  DEBUG_PRINTLN(F("runEnter"));
+}
+void runUpdateFunction(){
+  DEBUG_PRINTLN(F("runUpdate"));
+}
+void runExitFunction(){
+  DEBUG_PRINTLN(F("runExit"));
+}
+
+void errorEnterFunction(){
+  DEBUG_PRINTLN(F("errorEnter"));
+}
+void errorUpdateFunction(){
+  DEBUG_PRINTLN(F("errorUpdate"));
+}
+void errorExitFunction(){
+  DEBUG_PRINTLN(F("errorExit"));
+}
+
+
