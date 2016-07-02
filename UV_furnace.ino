@@ -1411,7 +1411,13 @@ void setup() {
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
 
-  DEBUG_PRINTLN(F("setup"));
+  // Initialize the PID and related variables
+  LoadParameters();
+  myPID.SetTunings(Kp,Ki,Kd);
+  myPID.SetSampleTime(1000);
+  myPID.SetOutputLimits(0, WindowSize);
+
+  DEBUG_PRINTLN(F("setup ready"));
 
 }
 
