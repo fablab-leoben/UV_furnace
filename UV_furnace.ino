@@ -79,6 +79,12 @@ byte b2Pin = 11;
 // Output relay
 #define RelayPin 32
 
+// Reed switch
+#define reedSwitch 20
+
+// ON/OFF Button LED
+#define onOffButton 22
+
 /************************************************
  LED variables
 ************************************************/
@@ -199,6 +205,8 @@ float lastTemperature;
 *******************************************************************************/
 const int cs_SD = 4;
 File dataFile;
+#define SD_CARD_SAMPLE_INTERVAL   1000
+elapsedMillis sdCard;
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -316,11 +324,7 @@ NexTouch *nex_listen_list[] =
     NULL
 };
 
-
-
-
 //Page1
-
 void bSettingsPopCallback(void *ptr)
 { 
   Serial.println(F("transition to settings")); 
@@ -372,11 +376,9 @@ void writeHeader(){
 
    dataFile.flush();
 }
-
 //End Page1
 
 //Page2
-
 void bPreSet1PopCallback(void *ptr)
 {   
   uint32_t picNum = 0;
@@ -512,11 +514,9 @@ void bHomeSetPopCallback(void *ptr)
 {
     uvFurnaceStateMachine.transitionTo(idleState);    
 }
-
 //End Page2
 
 //Page3
-
 void bTempPlus1PopCallback(void *ptr)
 {
     uint16_t len;
@@ -631,11 +631,9 @@ void bPreheatPopCallback(void *ptr)
     bPreheat.setPic(picNum);
     sendCommand("ref bPreheat");
 }
-
 //End Page3
 
 //Page4
-
 void bOHourPlus1PopCallback(void *ptr)
 {
     uint16_t len;
@@ -813,7 +811,6 @@ void bOMinMinus10PopCallback(void *ptr)
 }
 
 //Page4 LED Timer
-
 void bLHourPlus1PopCallback(void *ptr)
 {
     uint16_t len;
@@ -1358,7 +1355,13 @@ void setup() {
   #ifdef DEBUG
     Serial.begin(9600);
   #endif
-  //Serial2.begin(9600);
+//  Serial2.begin(9600);
+
+  pinMode(reedSwitch, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
+
+  pinMode(onOffButton, OUTPUT);
+  digitalWrite(onOffButton, HIGH);
 
   /* Register the pop event callback function of the current button component. */
   //Page1
@@ -1497,6 +1500,14 @@ SIGNAL(TIMER2_OVF_vect)
 }
 
 /************************************************
+ Timer Interrupt Handler
+************************************************/
+void furnaceDoor() {
+  DEBUG_PRINTLN(F("Door open"));
+  uvFurnaceStateMachine.immediateTransitionTo(idleState);
+}
+
+/************************************************
  Called by ISR every 15ms to drive the output
 ************************************************/
 void DriveOutput()
@@ -1531,7 +1542,6 @@ void loop() {
   uvFurnaceStateMachine.update();
 }
 
-
 /*******************************************************************************
  * Function Name  : updateTargetTemp
  * Description    : updates the value of target temperature of the uv furnace
@@ -1547,7 +1557,6 @@ void updateTargetTemp()
     lastTemperature = currentTemperature;
 }
 
-
 /*******************************************************************************
  * Function Name  : readTemperature
  * Description    : reads the temperature of the MAX31855 sensor at every MAX31855_SAMPLE_INTERVAL
@@ -1557,8 +1566,7 @@ void updateTargetTemp()
                     assuming global: Adafruit_MAX31855 thermocouple(CLK, CS, DO);
  * Return         : 0
  *******************************************************************************/
-int readTemperature(){
-    
+int readTemperature(){ 
    //time is up? no, then come back later
    if (MAX31855SampleInterval < MAX31855_SAMPLE_INTERVAL) {
     return 0;
@@ -1650,7 +1658,6 @@ int readTemperature(){
     DEBUG_PRINT(currentTemperature);
     DEBUG_PRINTLN(F(" C"));
 }
-
 
 /*******************************************************************************
  * Function Name  : setDS3231Alarm
@@ -1768,7 +1775,6 @@ double EEPROM_readDouble(int address)
    return value;
 }
 
-
 // ************************************************
 // Read floating point values from EEPROM
 // ************************************************
@@ -1822,6 +1828,64 @@ void sendNTPpacket(IPAddress &address)
   Udp.endPacket();
 }
 
+/************************************************
+ Execute the control loop
+************************************************/
+void DoControl()
+{
+  // Read the input:
+    Input = currentTemperature;
+    
+  if (tuning) // run the auto-tuner
+  {
+     if (aTune.Runtime()) // returns 'true' when done
+     {
+        FinishAutoTune();
+     }
+  }
+  else // Execute control algorithm
+  {
+     myPID.Compute();
+  }
+  
+  // Time Proportional relay state is updated regularly via timer interrupt.
+  onTime = Output; 
+}
+
+/************************************************
+ Start the Auto-Tuning cycle
+************************************************/
+void StartAutoTune()
+{
+   // REmember the mode we were in
+   ATuneModeRemember = myPID.GetMode();
+ 
+   // set up the auto-tune parameters
+   aTune.SetNoiseBand(aTuneNoise);
+   aTune.SetOutputStep(aTuneStep);
+   aTune.SetLookbackSec((int)aTuneLookBack);
+   tuning = true;
+}
+ 
+/************************************************
+ Return to normal control
+************************************************/
+void FinishAutoTune()
+{
+   tuning = false;
+ 
+   // Extract the auto-tune calculated parameters
+   Kp = aTune.GetKp();
+   Ki = aTune.GetKi();
+   Kd = aTune.GetKd();
+ 
+   // Re-tune the PID and revert to normal control mode
+   myPID.SetTunings(Kp,Ki,Kd);
+   myPID.SetMode(ATuneModeRemember);
+   
+   // Persist any changed parameters to EEPROM
+   SaveParameters();
+}
 
 /*******************************************************************************
 ********************************************************************************
@@ -1854,6 +1918,8 @@ void idleEnterFunction(){
 }
 void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
+  myPID.SetMode(MANUAL);
+  digitalWrite(RelayPin, LOW);  // make sure it is off
 }
 void idleExitFunction(){
   DEBUG_PRINTLN(F("idleExit"));
@@ -1930,6 +1996,23 @@ void runEnterFunction(){
 }
 void runUpdateFunction(){
   //DEBUG_PRINTLN(F("runUpdate"));
+
+  SaveParameters();
+   myPID.SetTunings(Kp,Ki,Kd);
+ 
+   uint8_t buttons = 0;
+   
+   DoControl();
+      
+   float pct = map(Output, 0, WindowSize, 0, 1000);
+      
+   // periodically log to serial port in csv format
+   //if (millis() - lastLogTime > logInterval)  
+   //{
+    //  Serial.print(Input);
+    //  Serial.print(",");
+    //  Serial.println(Output);
+   //}
 }
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
