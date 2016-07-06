@@ -80,7 +80,7 @@ byte b2Pin = 11;
 #define RelayPin 32
 
 // Reed switch
-#define reedSwitch 20
+#define reedSwitch 22
 
 // ON/OFF Button LED
 #define onOffButton 22
