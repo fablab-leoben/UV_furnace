@@ -300,6 +300,7 @@ NexText tLED3 = NexText(5, 19, "tLED3");
 
 //Page6
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
+NexButton bAutotune = NexButton(6, 2, "bAutotune");
 
 char buffer[50] = {0};
 
@@ -320,7 +321,7 @@ NexTouch *nex_listen_list[] =
     &bLED3plus1, &bLED3plus10, &bLED3minus1, &bLED3minus10,
     &bHomeLED,
     
-    &bHomePID,
+    &bHomePID, &bAutotune,
     NULL
 };
 
@@ -1330,6 +1331,11 @@ void bHomePIDPopCallback(void *ptr)
 {
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
+
+void bAutotunePopCallback(void *ptr)
+{
+
+}
 //End Page6
 
 /*******************************************************************************
@@ -1428,6 +1434,7 @@ void setup() {
 
   //Page6
   bHomePID.attachPop(bHomePIDPopCallback, &bHomePID);
+  bAutotune.attachPop(bAutotunePopCallback, &bAutotune);
  
   //declare and init pins
   
