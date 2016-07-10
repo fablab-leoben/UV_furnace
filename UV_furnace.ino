@@ -182,7 +182,6 @@ byte minutes_led = 0;
  chart definitions for Nextion 4,3" display
 ************************************************/
 #define inputOffset 0
-double targetTemp = 0;
 
 /*******************************************************************************
  MAX31855 Thermocouple Amplifier
@@ -527,16 +526,16 @@ void bTempPlus1PopCallback(void *ptr)
     memset(buffer, 0, sizeof(buffer));
     tTempSetup.getText(buffer, sizeof(buffer));
 
-    targetTemp = atoi(buffer);
-    targetTemp += 1;
+    Setpoint = atoi(buffer);
+    Setpoint += 1;
 
-    if (targetTemp > 100)
+    if (Setpoint > 100)
     {
-        targetTemp = 100;
+        Setpoint = 100;
     }
     
     memset(buffer, 0, sizeof(buffer));
-    itoa(targetTemp, buffer, 10);
+    itoa(Setpoint, buffer, 10);
     
     tTempSetup.setText(buffer);
 }
@@ -550,16 +549,16 @@ void bTempPlus10PopCallback(void *ptr)
     memset(buffer, 0, sizeof(buffer));
     tTempSetup.getText(buffer, sizeof(buffer));
 
-    targetTemp = atoi(buffer);
-    targetTemp += 10;
+    Setpoint = atoi(buffer);
+    Setpoint += 10;
 
-    if (targetTemp > 100)
+    if (Setpoint > 100)
     {
-        targetTemp = 100;
+        Setpoint = 100;
     }
     
     memset(buffer, 0, sizeof(buffer));
-    itoa(targetTemp, buffer, 10);
+    itoa(Setpoint, buffer, 10);
     
     tTempSetup.setText(buffer);
 }
@@ -572,16 +571,16 @@ void bTempMinus1PopCallback(void *ptr)
     memset(buffer, 0, sizeof(buffer));
     tTempSetup.getText(buffer, sizeof(buffer));
 
-    targetTemp = atoi(buffer);
-    targetTemp -= 1;
+    Setpoint = atoi(buffer);
+    Setpoint -= 1;
 
-    if (targetTemp < 0)
+    if (Setpoint < 0)
     {
-        targetTemp = 0;
+        Setpoint = 0;
     }
     
     memset(buffer, 0, sizeof(buffer));
-    itoa(targetTemp, buffer, 10);
+    itoa(Setpoint, buffer, 10);
     
     tTempSetup.setText(buffer);
 }
@@ -594,16 +593,16 @@ void bTempMinus10PopCallback(void *ptr)
     memset(buffer, 0, sizeof(buffer));
     tTempSetup.getText(buffer, sizeof(buffer));
 
-    targetTemp = atoi(buffer);
-    targetTemp -= 10;
+    Setpoint = atoi(buffer);
+    Setpoint -= 10;
 
-    if (targetTemp < 0)
+    if (Setpoint < 0)
     {
-        targetTemp = 0;
+        Setpoint = 0;
     }
     
     memset(buffer, 0, sizeof(buffer));
-    itoa(targetTemp, buffer, 10);
+    itoa(Setpoint, buffer, 10);
     
     tTempSetup.setText(buffer);
 }
@@ -1542,7 +1541,7 @@ void loop() {
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
 
-  updateTargetTemp();
+  updateCurrentTemperature();
   
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
@@ -1550,11 +1549,11 @@ void loop() {
 }
 
 /*******************************************************************************
- * Function Name  : updateTargetTemp
+ * Function Name  : updateCurrentTemperature
  * Description    : updates the value of target temperature of the uv furnace
  * Return         : none
  *******************************************************************************/
-void updateTargetTemp()
+void updateCurrentTemperature()
 {   
     if(currentTemperature != lastTemperature) {
       memset(buffer, 0, sizeof(buffer));
@@ -1963,6 +1962,7 @@ void setTempEnterFunction(){
 }
 void setTempUpdateFunction(){
   //DEBUG_PRINTLN(F("setTempUpdate"));
+  
 }
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
@@ -2004,11 +2004,9 @@ void runEnterFunction(){
 void runUpdateFunction(){
   //DEBUG_PRINTLN(F("runUpdate"));
 
-  SaveParameters();
+   SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
- 
-   uint8_t buttons = 0;
-   
+    
    DoControl();
       
    float pct = map(Output, 0, WindowSize, 0, 1000);
