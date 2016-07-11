@@ -1,3 +1,12 @@
+
+#include <BlynkSimpleEthernet2.h>
+//#include <BlynkSimpleEthernetV2_0.h>
+
+
+#include <Ethernet2.h>
+
+#include "access.h"
+
 #include <PID_AutoTune_v0.h>
 
 #include <PID_v1.h>
@@ -9,10 +18,6 @@
 #include <Nextion.h>
 
 #include <Time.h>
-
-#include <Ethernet.h>
-
-#include <EthernetUdp.h>
 
 #include <SPI.h>
 
@@ -147,7 +152,6 @@ PID_ATune aTune(&Input, &Output);
  NTP
 ************************************************/
 
-byte mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x8D, 0x55 }; 
 // NTP Servers:
 IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov
 // IPAddress timeServer(132, 163, 4, 102); // time-b.timefreq.bldrdoc.gov
@@ -156,7 +160,6 @@ IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov
 
 const int timeZone = 1;     // Central European Time
 
-EthernetUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 
 /************************************************
@@ -200,12 +203,24 @@ float currentTemperature;
 float lastTemperature;
 
 /*******************************************************************************
+ Blynk
+*******************************************************************************/
+#define BLYNK_INTERVAL   10000
+elapsedMillis BlynkInterval;
+
+
+/*******************************************************************************
  SD-Card
 *******************************************************************************/
-const int cs_SD = 4;
+const int SDCARD_CS = 4;
 File dataFile;
 #define SD_CARD_SAMPLE_INTERVAL   1000
 elapsedMillis sdCard;
+
+/*******************************************************************************
+ Ethernet
+*******************************************************************************/
+#define W5200_CS  10
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -1354,7 +1369,7 @@ void setup() {
   // Initialize Relay Control:
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
   digitalWrite(RelayPin, LOW);  // make sure it is off to start
-
+  DEBUG_PRINTLN("HERE");
   nexInit();
 
   #ifdef DEBUG
@@ -1449,7 +1464,8 @@ void setup() {
   //Initializing Chip Select pin for MAX31855
   pinMode(cs_MAX31855, OUTPUT);
   digitalWrite(cs_MAX31855, HIGH);
-  
+
+  selSD();
   //Initializing SD Card
   DEBUG_PRINTLN("Initializing SD card...");
   // make sure that the default chip select pin is set to
@@ -1458,25 +1474,23 @@ void setup() {
   //digitalWrite(4, HIGH);
     // see if the card is present and can be initialized:
   
-  if (!SD.begin(cs_SD)) {
+  if (!SD.begin(SDCARD_CS)) {
     DEBUG_PRINTLN("Card failed, or not present");
     // don't do anything more:
     while (1) ;
   }
   DEBUG_PRINTLN("card initialized.");
 
+  selETH();
   if (Ethernet.begin(mac) == 0) {
     // no point in carrying on, so do nothing forevermore:
     while (1) {
-      Serial.println("Failed to configure Ethernet using DHCP");
+      DEBUG_PRINTLN("Failed to configure Ethernet using DHCP");
       delay(10000);
     }
   }
-  Serial.print("IP number assigned by DHCP is ");
-  Serial.println(Ethernet.localIP());
-  Udp.begin(localPort);
-  Serial.println("waiting for sync");
-  setSyncProvider(getNtpTime);
+  DEBUG_PRINTLN("IP number assigned by DHCP is ");
+  DEBUG_PRINTLN(Ethernet.localIP());
 
   // Run timer2 interrupt every 15 ms 
   TCCR2A = 0;
@@ -1485,6 +1499,7 @@ void setup() {
   //Timer2 Overflow Interrupt Enable
   TIMSK2 |= 1<<TOIE2;
 
+  Blynk.begin(auth);
   DEBUG_PRINTLN(F("setup ready"));
 
 }
@@ -1537,12 +1552,13 @@ void DriveOutput()
 
 void loop() {
   nexLoop(nex_listen_list);
+
+  Blynk.run();
   
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
-
   updateCurrentTemperature();
-  
+  updateBlynk();
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
@@ -1661,8 +1677,8 @@ int readTemperature(){
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
 
-    DEBUG_PRINT(currentTemperature);
-    DEBUG_PRINTLN(F(" C"));
+    //DEBUG_PRINT(currentTemperature);
+    //DEBUG_PRINTLN(F(" C"));
 }
 
 /*******************************************************************************
@@ -1693,6 +1709,19 @@ int setDS3231Alarm(byte minutes, byte hours) {
 
   return 0;
 }
+
+/*******************************************************************************
+ * Function Name  : updateBlynk
+ * Description    : updates the blynk app
+ * Return         : 0
+*******************************************************************************/
+int updateBlynk(){
+  if (BlynkInterval < BLYNK_INTERVAL) {
+    return 0;
+   }
+  Blynk.virtualWrite(V0, currentTemperature);
+}
+
 
 // ************************************************
 // Save any parameter changes to EEPROM
@@ -1779,59 +1808,6 @@ double EEPROM_readDouble(int address)
       *p++ = EEPROM.read(address++);
    }
    return value;
-}
-
-// ************************************************
-// Read floating point values from EEPROM
-// ************************************************
-const int NTP_PACKET_SIZE = 48; // NTP time is in the first 48 bytes of message
-byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming & outgoing packets
-
-time_t getNtpTime()
-{
-  while (Udp.parsePacket() > 0) ; // discard any previously received packets
-  DEBUG_PRINTLN("Transmit NTP Request");
-  sendNTPpacket(timeServer);
-  uint32_t beginWait = millis();
-  while (millis() - beginWait < 1500) {
-    int size = Udp.parsePacket();
-    if (size >= NTP_PACKET_SIZE) {
-      DEBUG_PRINTLN("Receive NTP Response");
-      Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
-      unsigned long secsSince1900;
-      // convert four bytes starting at location 40 to a long integer
-      secsSince1900 =  (unsigned long)packetBuffer[40] << 24;
-      secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
-      secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
-      secsSince1900 |= (unsigned long)packetBuffer[43];
-      return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;
-    }
-  }
-  DEBUG_PRINTLN("No NTP Response :-(");
-  return 0; // return 0 if unable to get the time
-}
-
-// send an NTP request to the time server at the given address
-void sendNTPpacket(IPAddress &address)
-{
-  // set all bytes in the buffer to 0
-  memset(packetBuffer, 0, NTP_PACKET_SIZE);
-  // Initialize values needed to form NTP request
-  // (see URL above for details on the packets)
-  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
-  packetBuffer[1] = 0;     // Stratum, or type of clock
-  packetBuffer[2] = 6;     // Polling Interval
-  packetBuffer[3] = 0xEC;  // Peer Clock Precision
-  // 8 bytes of zero for Root Delay & Root Dispersion
-  packetBuffer[12]  = 49;
-  packetBuffer[13]  = 0x4E;
-  packetBuffer[14]  = 49;
-  packetBuffer[15]  = 52;
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:                 
-  Udp.beginPacket(address, 123); //NTP requests are to port 123
-  Udp.write(packetBuffer, NTP_PACKET_SIZE);
-  Udp.endPacket();
 }
 
 /************************************************
@@ -1966,6 +1942,7 @@ void setTempUpdateFunction(){
 }
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
+  Blynk.virtualWrite(V1, Setpoint);
 }
 
 void setTimerEnterFunction(){
@@ -2021,6 +1998,7 @@ void runUpdateFunction(){
 }
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
+  Blynk.notify("Hey, I am ready!");
 }
 
 void errorEnterFunction(){
@@ -2031,4 +2009,18 @@ void errorUpdateFunction(){
 }
 void errorExitFunction(){
   //DEBUG_PRINTLN(F("errorExit"));
+}
+
+//################# Chip-Select ansteuern ###################################
+void selETH() {     // waehlt den Ethernetcontroller aus
+ 
+digitalWrite(SDCARD_CS, HIGH);
+digitalWrite(W5200_CS, LOW);
+
+}
+//####################################
+void selSD() {      // waehlt die SD-Karte aus
+ 
+digitalWrite(W5200_CS, HIGH);
+digitalWrite(SDCARD_CS, LOW);
 }
