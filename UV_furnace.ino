@@ -1571,7 +1571,7 @@ void loop() {
  *******************************************************************************/
 void updateCurrentTemperature()
 {   
-    if(currentTemperature != lastTemperature) {
+    if(currentTemperature != lastTemperature && uvFurnaceStateMachine.isInState(runState)) {
       memset(buffer, 0, sizeof(buffer));
       itoa(int(currentTemperature), buffer, 10);
       tTemp.setText(buffer);
