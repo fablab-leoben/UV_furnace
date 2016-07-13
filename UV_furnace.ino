@@ -1,7 +1,4 @@
-
 #include <BlynkSimpleEthernet2.h>
-//#include <BlynkSimpleEthernetV2_0.h>
-
 
 #include <Ethernet2.h>
 
@@ -1977,6 +1974,10 @@ void runEnterFunction(){
          
   //set alarm
   setDS3231Alarm(minutes_oven, hours_oven);
+
+  //turn the PID on
+   myPID.SetMode(AUTOMATIC);
+   windowStartTime = millis();
 }
 void runUpdateFunction(){
   //DEBUG_PRINTLN(F("runUpdate"));
