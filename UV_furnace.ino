@@ -74,9 +74,9 @@ elapsedMillis initTimer;
 // ************************************************
 
 // LEDs
-byte b0Pin = 13;
-byte b1Pin = 12;
-byte b2Pin = 11;
+#define LED1 11
+#define LED2 12
+#define LED3 13
 
 // Output relay
 #define RelayPin 32
@@ -1362,7 +1362,13 @@ void alarmIsr(){
  IO mapping
 *******************************************************************************/
 void setup() {
-
+  // Initialize LEDs:
+  pinMode(LED1, OUTPUT);
+  analogWrite(LED1, 0);
+  pinMode(LED2, OUTPUT);
+  analogWrite(LED2, 0);
+  pinMode(LED3, OUTPUT);
+  analogWrite(LED3, 0);
   // Initialize Relay Control:
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
   digitalWrite(RelayPin, LOW);  // make sure it is off to start
@@ -1975,6 +1981,8 @@ void runEnterFunction(){
   //set alarm
   setDS3231Alarm(minutes_oven, hours_oven);
 
+  setupLEDs();
+  
   //turn the PID on
    myPID.SetMode(AUTOMATIC);
    windowStartTime = millis();
@@ -2025,3 +2033,10 @@ void selSD() {      // waehlt die SD-Karte aus
 digitalWrite(W5200_CS, HIGH);
 digitalWrite(SDCARD_CS, LOW);
 }
+
+void setupLEDs(){
+  analogWrite(LED1, LED1_intensity);
+  analogWrite(LED2, LED2_intensity);
+  analogWrite(LED3, LED3_intensity);
+}
+
