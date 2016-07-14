@@ -90,9 +90,9 @@ byte b2Pin = 11;
 /************************************************
  LED variables
 ************************************************/
-bool b0State = false;
-bool b1State = false;
-bool b2State = false;
+bool bLED1State = false;
+bool bLED2State = false;
+bool bLED3State = false;
 
 byte LED1_intensity = 0;
 byte LED2_intensity = 0;
@@ -1013,12 +1013,12 @@ void bLED1PopCallback(void *ptr)
   if(picNum == 10) {
       picNum = 11;
 
-      b0State = true;
+      bLED1State = true;
       
     } else if(picNum == 11) {
       picNum = 10;
 
-      b0State = false;
+      bLED1State = false;
 
     }
     //Serial.println(picNum);
@@ -1121,12 +1121,12 @@ void bLED2PopCallback(void *ptr)
      if(picNum == 10) {
       picNum = 11;
 
-      b1State = true;
+      bLED2State = true;
 
     } else if(picNum == 11) {
       picNum = 10;
 
-      b1State = false;
+      bLED2State = false;
 
     }
     //Serial.println(picNum);
@@ -1229,12 +1229,12 @@ void bLED3PopCallback(void *ptr)
      if(picNum == 10) {
       picNum = 11;
 
-      b2State = true;
+      bLED3State = true;
 
     } else if(picNum == 11) {
       picNum = 10;
 
-      b2State = false;
+      bLED3State = false;
 
     }
     //Serial.println(picNum);
