@@ -200,6 +200,13 @@ float currentTemperature;
 float lastTemperature;
 
 /*******************************************************************************
+ Power LED
+*******************************************************************************/
+#define POWERLED_BLINK_INTERVAL   500
+elapsedMillis POWERLEDBlinkInterval;
+boolean onOffState = HIGH;
+
+/*******************************************************************************
  Blynk
 *******************************************************************************/
 #define BLYNK_INTERVAL   10000
@@ -1001,6 +1008,7 @@ void bLMinMinus10PopCallback(void *ptr)
 
 void bHomeTimerPopCallback(void *ptr)
 {
+    
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 //End Page4
@@ -1384,7 +1392,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
 
   pinMode(onOffButton, OUTPUT);
-  digitalWrite(onOffButton, HIGH);
+  digitalWrite(onOffButton, onOffState);
 
   /* Register the pop event callback function of the current button component. */
   //Page1
@@ -1900,6 +1908,12 @@ void idleEnterFunction(){
   DEBUG_PRINTLN(F("idleEnter"));
   page1.show();
   sendCommand("ref 0");
+  memset(buffer, 0, sizeof(buffer));
+  itoa(hours_oven, buffer, 10);
+  hour_uv.setText(buffer);
+  memset(buffer, 0, sizeof(buffer));
+  itoa(minutes_oven, buffer, 10);
+  min_uv.setText(buffer);
 }
 void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
@@ -1975,8 +1989,8 @@ void setPIDExitFunction(){
 void runEnterFunction(){
   //DEBUG_PRINTLN(F("runEnter"));
   
-  createLogFile();
-  writeHeader();
+  //createLogFile();
+  //writeHeader();
          
   //set alarm
   setDS3231Alarm(minutes_oven, hours_oven);
@@ -2004,6 +2018,7 @@ void runUpdateFunction(){
     //  Serial.print(",");
     //  Serial.println(Output);
    //}
+   blinkPowerLED();
 }
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
@@ -2038,5 +2053,17 @@ void setupLEDs(){
   analogWrite(LED1, LED1_intensity);
   analogWrite(LED2, LED2_intensity);
   analogWrite(LED3, LED3_intensity);
+}
+
+void blinkPowerLED(){
+  if (POWERLEDBlinkInterval > POWERLED_BLINK_INTERVAL){
+    if (onOffState == LOW) {
+      onOffState = HIGH;
+    } else {
+      onOffState = LOW;
+    }
+    digitalWrite(onOffButton, onOffState);
+    POWERLEDBlinkInterval = 0;
+  }
 }
 
