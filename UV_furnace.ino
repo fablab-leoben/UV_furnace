@@ -74,9 +74,9 @@ elapsedMillis initTimer;
 // ************************************************
 
 // LEDs
-#define LED1 11
-#define LED2 12
-#define LED3 13
+#define LED1 5
+#define LED2 6
+#define LED3 7
 
 // Output relay
 #define RelayPin 32
@@ -85,7 +85,7 @@ elapsedMillis initTimer;
 #define reedSwitch 22
 
 // ON/OFF Button LED
-#define onOffButton 22
+#define onOffButton 23
 
 /************************************************
  LED variables
@@ -94,9 +94,9 @@ bool bLED1State = false;
 bool bLED2State = false;
 bool bLED3State = false;
 
-byte LED1_intensity = 0;
-byte LED2_intensity = 0;
-byte LED3_intensity = 0;
+int LED1_intensity = 0;
+int LED2_intensity = 0;
+int LED3_intensity = 0;
 
 /************************************************
  Temperature variables
@@ -360,6 +360,9 @@ void bOnOffPopCallback(void *ptr)
 
     } else {
       picNum = 4;
+
+      controlLEDs(0, 0, 0);
+      
       uvFurnaceStateMachine.transitionTo(idleState);
     }
     bOnOff.setPic(picNum);
@@ -1048,10 +1051,9 @@ void bLED1plus1PopCallback(void *ptr)
     {
         LED1_intensity = 100;
     }
-    
+
     memset(buffer, 0, sizeof(buffer));
-    itoa(LED1_intensity, buffer, 10);
-    
+    itoa(LED1_intensity, buffer, 10);  
     tLED1.setText(buffer);
 }
 
@@ -1073,7 +1075,6 @@ void bLED1plus10PopCallback(void *ptr)
     
     memset(buffer, 0, sizeof(buffer));
     itoa(LED1_intensity, buffer, 10);
-    
     tLED1.setText(buffer);
 }
 
@@ -1233,7 +1234,7 @@ void bLED3PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bLED3.getPic(&picNum);
-     if(picNum == 10) {
+    if(picNum == 10) {
       picNum = 11;
 
       bLED3State = true;
@@ -1338,7 +1339,26 @@ void bLED3minus10PopCallback(void *ptr)
 }
 
 void bHomeLEDPopCallback(void *ptr)
-{
+{   
+    uint16_t len1;
+    memset(buffer, 0, sizeof(buffer));
+    tLED1.getText(buffer, sizeof(buffer));
+    LED1_intensity = atoi(buffer);
+
+    uint16_t len2;
+    memset(buffer, 0, sizeof(buffer));
+    tLED2.getText(buffer, sizeof(buffer));
+    LED2_intensity = atoi(buffer);
+    
+    uint16_t len3;
+    memset(buffer, 0, sizeof(buffer));
+    tLED3.getText(buffer, sizeof(buffer));
+    LED3_intensity = atoi(buffer);
+     
+    LED1_intensity = map(LED1_intensity, 0, 100, 0, 255);
+    LED2_intensity = map(LED2_intensity, 0, 100, 0, 255);
+    LED3_intensity = map(LED3_intensity, 0, 100, 0, 255);
+
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 
@@ -1371,15 +1391,13 @@ void alarmIsr(){
 void setup() {
   // Initialize LEDs:
   pinMode(LED1, OUTPUT);
-  analogWrite(LED1, 0);
   pinMode(LED2, OUTPUT);
-  analogWrite(LED2, 0);
   pinMode(LED3, OUTPUT);
-  analogWrite(LED3, 0);
+  controlLEDs(0, 0, 0);
   // Initialize Relay Control:
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
   digitalWrite(RelayPin, LOW);  // make sure it is off to start
-  DEBUG_PRINTLN("HERE");
+
   nexInit();
 
   #ifdef DEBUG
@@ -1494,10 +1512,10 @@ void setup() {
   selETH();
   if (Ethernet.begin(mac) == 0) {
     // no point in carrying on, so do nothing forevermore:
-    while (1) {
+    //while (1) {
       DEBUG_PRINTLN("Failed to configure Ethernet using DHCP");
-      delay(10000);
-    }
+      //delay(10000);
+   // }
   }
   DEBUG_PRINTLN("IP number assigned by DHCP is ");
   DEBUG_PRINTLN(Ethernet.localIP());
@@ -1508,7 +1526,7 @@ void setup() {
 
   //Timer2 Overflow Interrupt Enable
   TIMSK2 |= 1<<TOIE2;
-
+  
   Blynk.begin(auth);
   DEBUG_PRINTLN(F("setup ready"));
 
@@ -1562,7 +1580,7 @@ void DriveOutput()
 
 void loop() {
   nexLoop(nex_listen_list);
-
+  
   Blynk.run();
   
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
@@ -1741,10 +1759,9 @@ int updateBlynk(){
 // ************************************************
 void SaveParameters()
 {
-   DEBUG_PRINTLN(F("Save any parameter changes to EEPROM"));
-
    if (Setpoint != EEPROM_readDouble(SpAddress))
    {
+      DEBUG_PRINTLN(F("Save any parameter changes to EEPROM"));
       EEPROM_writeDouble(SpAddress, Setpoint);
    }
    if (Kp != EEPROM_readDouble(KpAddress))
@@ -1812,7 +1829,7 @@ void EEPROM_writeDouble(int address, double value)
 // ************************************************
 double EEPROM_readDouble(int address)
 {
-   DEBUG_PRINTLN(F("EEPROM_readDouble"));
+   //DEBUG_PRINTLN(F("EEPROM_readDouble"));
 
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
@@ -1995,17 +2012,17 @@ void runEnterFunction(){
   //createLogFile();
   //writeHeader();
          
-  //set alarm
-  setDS3231Alarm(minutes_oven, hours_oven);
+   //set alarm
+   setDS3231Alarm(minutes_oven, hours_oven);
 
-  setupLEDs();
+   controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity);
   
-  //turn the PID on
+   //turn the PID on
    myPID.SetMode(AUTOMATIC);
    windowStartTime = millis();
 }
 void runUpdateFunction(){
-  //DEBUG_PRINTLN(F("runUpdate"));
+   //DEBUG_PRINTLN(F("runUpdate"));
 
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
@@ -2059,10 +2076,25 @@ void selMAX31855(){
   digitalWrite(SDCARD_CS, HIGH);
 }
 
-void setupLEDs(){
-  analogWrite(LED1, LED1_intensity);
-  analogWrite(LED2, LED2_intensity);
-  analogWrite(LED3, LED3_intensity);
+void controlLEDs(byte intensity1, byte intensity2, byte intensity3){
+  if(bLED1State == true){
+    analogWrite(LED1, intensity1);
+    DEBUG_PRINTLN(LED1_intensity);
+  }else {
+    analogWrite(LED1, 0);
+  }
+  if(bLED2State == true){
+    analogWrite(LED2, intensity2);
+    DEBUG_PRINTLN(LED2_intensity);
+  }else {
+    analogWrite(LED2, 0);
+  }
+  if(bLED3State == true){
+    analogWrite(LED3, intensity3);
+    DEBUG_PRINTLN(LED3_intensity);
+  }else {
+    analogWrite(LED3, 0);
+  }
 }
 
 void blinkPowerLED(){
@@ -2076,4 +2108,3 @@ void blinkPowerLED(){
     POWERLEDBlinkInterval = 0;
   }
 }
-
