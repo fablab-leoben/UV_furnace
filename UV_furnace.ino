@@ -207,6 +207,12 @@ elapsedMillis POWERLEDBlinkInterval;
 boolean onOffState = HIGH;
 
 /*******************************************************************************
+ Graph
+*******************************************************************************/
+#define GRAPH_UPDATE_INTERVAL   5000
+elapsedMillis GraphUpdateInterval;
+
+/*******************************************************************************
  Blynk
 *******************************************************************************/
 #define BLYNK_INTERVAL   10000
@@ -2038,6 +2044,7 @@ void runUpdateFunction(){
     //  Serial.print(",");
     //  Serial.println(Output);
    //}
+   updateGraph();
    blinkPowerLED();
 }
 void runExitFunction(){
@@ -2108,3 +2115,13 @@ void blinkPowerLED(){
     POWERLEDBlinkInterval = 0;
   }
 }
+
+void updateGraph(){
+  if(GraphUpdateInterval < GRAPH_UPDATE_INTERVAL){
+    return;
+  }
+  s0.addValue(0, currentTemperature);
+  s0.addValue(1, Setpoint);
+  GraphUpdateInterval = 0;
+}
+
