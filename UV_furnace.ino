@@ -212,7 +212,6 @@ boolean onOffState = HIGH;
 #define BLYNK_INTERVAL   10000
 elapsedMillis BlynkInterval;
 
-
 /*******************************************************************************
  SD-Card
 *******************************************************************************/
@@ -1732,7 +1731,8 @@ int updateBlynk(){
   if (BlynkInterval < BLYNK_INTERVAL) {
     return 0;
    }
-  Blynk.virtualWrite(V0, currentTemperature);
+   selETH();
+   Blynk.virtualWrite(V0, currentTemperature);
 }
 
 
@@ -1961,6 +1961,7 @@ void setTempUpdateFunction(){
 }
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
+  selETH();
   Blynk.virtualWrite(V1, Setpoint);
 }
 
@@ -2024,6 +2025,7 @@ void runUpdateFunction(){
 }
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
+  selETH();
   Blynk.notify("Hey, I am ready!");
 }
 
