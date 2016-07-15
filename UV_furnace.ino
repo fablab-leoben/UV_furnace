@@ -1608,6 +1608,8 @@ int readTemperature(){
    //time is up, reset timer
    MAX31855SampleInterval = 0;
    
+   selMAX31855();
+   
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
    
@@ -2038,15 +2040,21 @@ void errorExitFunction(){
 //################# Chip-Select ansteuern ###################################
 void selETH() {     // waehlt den Ethernetcontroller aus
  
-digitalWrite(SDCARD_CS, HIGH);
-digitalWrite(W5200_CS, LOW);
-
+  digitalWrite(SDCARD_CS, HIGH);
+  digitalWrite(W5200_CS, LOW);
+  digitalWrite(cs_MAX31855, HIGH); 
 }
 //####################################
 void selSD() {      // waehlt die SD-Karte aus
- 
-digitalWrite(W5200_CS, HIGH);
-digitalWrite(SDCARD_CS, LOW);
+  digitalWrite(W5200_CS, HIGH);
+  digitalWrite(SDCARD_CS, LOW);
+  digitalWrite(cs_MAX31855, HIGH); 
+}
+
+void selMAX31855(){
+  digitalWrite(cs_MAX31855, LOW); 
+  digitalWrite(W5200_CS, HIGH);
+  digitalWrite(SDCARD_CS, HIGH);
 }
 
 void setupLEDs(){
