@@ -1766,9 +1766,10 @@ int setDS3231Alarm(byte minutes, byte hours) {
  * Return         : 0
 *******************************************************************************/
 int updateBlynk(){
-  if (BlynkInterval < BLYNK_INTERVAL) {
+   if (BlynkInterval < BLYNK_INTERVAL) {
     return 0;
    }
+   DEBUG_PRINTLN(F("updating Blynk"));
    selETH();
    Blynk.virtualWrite(V0, currentTemperature);
 }
@@ -2086,12 +2087,14 @@ void runEnterFunction(){
    //turn the PID on
    myPID.SetMode(AUTOMATIC);
    windowStartTime = millis();
+
+   SaveParameters();
+   myPID.SetTunings(Kp,Ki,Kd);
 }
 void runUpdateFunction(){
    //DEBUG_PRINTLN(F("runUpdate"));
 
-   SaveParameters();
-   myPID.SetTunings(Kp,Ki,Kd);
+   
     
    DoControl();
       
