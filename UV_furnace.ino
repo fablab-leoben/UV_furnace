@@ -169,11 +169,9 @@ PID_ATune aTune(&Input, &Output);
 /************************************************
  Timer Variables
 ************************************************/
-
 byte hourAlarm = 0;
 byte minuteAlarm = 0;
 byte secondAlarm = 0;
-
 
 /************************************************
  time settings variables for heating and leds
@@ -205,6 +203,12 @@ Adafruit_MAX31855 thermocouple(cs_MAX31855);
 elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
 float lastTemperature;
+
+/*******************************************************************************
+ Countdown
+*******************************************************************************/
+#define COUNTDOWN_UPDATE_INTERVAL   1000
+elapsedMillis CountdownUpdateInterval;
 
 /*******************************************************************************
  Power LED
@@ -2164,8 +2168,6 @@ void runEnterFunction(){
 }
 void runUpdateFunction(){
    //DEBUG_PRINTLN(F("runUpdate"));
-
-   
     
    DoControl();
       
@@ -2180,7 +2182,9 @@ void runUpdateFunction(){
    //}
    updateGraph();
    blinkPowerLED();
+   refreshCountdown();
 }
+
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
   selETH();
@@ -2282,3 +2286,31 @@ unsigned long sendNTPpacket(char* address)
   Udp.write(packetBuffer, NTP_PACKET_SIZE);
   Udp.endPacket();
 }
+
+void refreshCountdown(){
+      //refresh countdown
+      if(CountdownUpdateInterval < COUNTDOWN_UPDATE_INTERVAL){
+        return;
+      }
+      
+      byte calcMinutes = 0;
+      byte calcHours = 0;
+      if(minuteAlarm < minute()) {
+        calcMinutes = 60 - (minute() - minuteAlarm);
+        calcHours = hourAlarm - hour() - 1;
+      } else {
+        calcMinutes = minuteAlarm - minute();
+        calcHours = hourAlarm - hour();
+      }
+         
+      char temp[10] = {0};
+      utoa(calcHours, temp, 10);
+      hour_uv.setText(temp);
+      
+      temp[10] = {0};
+      utoa(calcMinutes, temp, 10);
+      min_uv.setText(temp);
+
+      CountdownUpdateInterval = 0;
+}
+
