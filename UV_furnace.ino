@@ -1520,6 +1520,10 @@ void setup() {
   myPID.SetSampleTime(1000);
   myPID.SetOutputLimits(0, WindowSize);
 
+  //Initializing Chip Select pin for MAX31855
+  pinMode(cs_MAX31855, OUTPUT);
+  selMAX31855();
+  
   selSD();
   //Initializing SD Card
   DEBUG_PRINTLN("Initializing SD card...");
@@ -1655,7 +1659,7 @@ int readTemperature(){
 
    //time is up, reset timer
    MAX31855SampleInterval = 0;
-      
+   Serial.println(thermocouple.readCelsius());
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
    
