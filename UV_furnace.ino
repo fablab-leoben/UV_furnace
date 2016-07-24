@@ -87,7 +87,7 @@ elapsedMillis initTimer;
 #define reedSwitch 22
 
 // ON/OFF Button LED
-#define onOffButton 44
+#define onOffButton 3
 
 /************************************************
  LED variables
@@ -1520,10 +1520,6 @@ void setup() {
   myPID.SetSampleTime(1000);
   myPID.SetOutputLimits(0, WindowSize);
 
-  //Initializing Chip Select pin for MAX31855
-  pinMode(cs_MAX31855, OUTPUT);
-  digitalWrite(cs_MAX31855, HIGH);
-
   selSD();
   //Initializing SD Card
   DEBUG_PRINTLN("Initializing SD card...");
@@ -1740,8 +1736,8 @@ int readTemperature(){
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
 
-    //DEBUG_PRINT(currentTemperature);
-    //DEBUG_PRINTLN(F(" C"));
+    DEBUG_PRINT(currentTemperature);
+    DEBUG_PRINTLN(F(" C"));
 }
 
 /*******************************************************************************
@@ -2220,9 +2216,9 @@ void selSD() {      // waehlt die SD-Karte aus
 }
 
 void selMAX31855(){
-  digitalWrite(cs_MAX31855, LOW); 
   digitalWrite(W5200_CS, HIGH);
   digitalWrite(SDCARD_CS, HIGH);
+  digitalWrite(cs_MAX31855, LOW); 
 }
 
 void controlLEDs(byte intensity1, byte intensity2, byte intensity3){
