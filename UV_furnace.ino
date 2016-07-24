@@ -1427,7 +1427,7 @@ void setup() {
   controlLEDs(0, 0, 0);
   // Initialize Relay Control:
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
-  digitalWrite(RelayPin, LOW);  // make sure it is off to start
+  digitalWrite(RelayPin, HIGH);  // make sure it is off to start
 
   nexInit();
 
@@ -1572,7 +1572,7 @@ SIGNAL(TIMER2_OVF_vect)
 {
   if (uvFurnaceStateMachine.isInState(idleState) == true)
   {
-    digitalWrite(RelayPin, LOW);  // make sure relay is off
+    digitalWrite(RelayPin, HIGH);  // make sure relay is off
   }
   else
   {
@@ -1603,11 +1603,11 @@ void DriveOutput()
   }
   if((onTime > 100) && (onTime > (now - windowStartTime)))
   {
-     digitalWrite(RelayPin,HIGH);
+     digitalWrite(RelayPin,LOW);
   }
   else
   {
-     digitalWrite(RelayPin,LOW);
+     digitalWrite(RelayPin,HIGH);
   }
 }
 
@@ -1655,11 +1655,11 @@ int readTemperature(){
     return 0;
    }
 
+   selMAX31855();
+
    //time is up, reset timer
    MAX31855SampleInterval = 0;
-   
-   selMAX31855();
-   
+      
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
    
@@ -2036,7 +2036,7 @@ void idleEnterFunction(){
 void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
   myPID.SetMode(MANUAL);
-  digitalWrite(RelayPin, LOW);  // make sure it is off
+  digitalWrite(RelayPin, HIGH);  // make sure it is off
   fadePowerLED();
 }
 void idleExitFunction(){
