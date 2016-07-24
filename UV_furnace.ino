@@ -204,6 +204,12 @@ float currentTemperature;
 float lastTemperature;
 
 /*******************************************************************************
+ DS3231 
+*******************************************************************************/
+#define DS3231_TEMP_INTERVAL   2000
+elapsedMillis DS3231TempInterval;
+
+/*******************************************************************************
  Countdown
 *******************************************************************************/
 #define COUNTDOWN_UPDATE_INTERVAL   1000
@@ -1618,6 +1624,7 @@ void loop() {
   
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
+  readInternalTemperature();
   updateCurrentTemperature();
   updateBlynk();
   //this function updates the FSM
@@ -1659,7 +1666,7 @@ int readTemperature(){
 
    //time is up, reset timer
    MAX31855SampleInterval = 0;
-   Serial.println(thermocouple.readCelsius());
+   DEBUG_PRINTLN(thermocouple.readCelsius());
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
    
@@ -1743,6 +1750,22 @@ int readTemperature(){
     DEBUG_PRINT(currentTemperature);
     DEBUG_PRINTLN(F(" C"));
 }
+
+/*******************************************************************************
+ * Function Name  : readInternalTemperature
+ * Description    : reads the temperature of the DS3231
+ * Return         : 0
+ *******************************************************************************/
+int readInternalTemperature(){
+  if(DS3231TempInterval < DS3231_TEMP_INTERVAL) {
+    return 0;
+  }
+  
+  if(RTC.temperature() / 4.0 > 35) {
+    uvFurnaceStateMachine.immediateTransitionTo(errorState);
+  }
+}
+ 
 
 /*******************************************************************************
  * Function Name  : setDS3231Alarm
@@ -2196,10 +2219,14 @@ void runExitFunction(){
 }
 
 void errorEnterFunction(){
-  //DEBUG_PRINTLN(F("errorEnter"));
+  DEBUG_PRINTLN(F("errorEnter"));
+  //Turn off LEDs
+  controlLEDs(0, 0, 0);
+  //Turn off relay
+  digitalWrite(RelayPin, HIGH);  // make sure it is off to start
 }
 void errorUpdateFunction(){
-  //DEBUG_PRINTLN(F("errorUpdate"));
+  DEBUG_PRINTLN(F("errorUpdate"));
 }
 void errorExitFunction(){
   //DEBUG_PRINTLN(F("errorExit"));
