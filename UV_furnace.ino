@@ -87,7 +87,7 @@ elapsedMillis initTimer;
 #define reedSwitch 22
 
 // ON/OFF Button LED
-#define onOffButton 23
+#define onOffButton 44
 
 /************************************************
  LED variables
@@ -117,7 +117,6 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing pack
 
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
-
 
 /************************************************
  Temperature variables
@@ -216,6 +215,10 @@ elapsedMillis CountdownUpdateInterval;
 #define POWERLED_BLINK_INTERVAL   500
 elapsedMillis POWERLEDBlinkInterval;
 boolean onOffState = HIGH;
+
+unsigned long fadeTime = 0;
+byte fadeValue;
+int periode = 2000;
 
 /*******************************************************************************
  Graph
@@ -2034,6 +2037,7 @@ void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
   myPID.SetMode(MANUAL);
   digitalWrite(RelayPin, LOW);  // make sure it is off
+  fadePowerLED();
 }
 void idleExitFunction(){
   DEBUG_PRINTLN(F("idleExit"));
@@ -2312,5 +2316,11 @@ void refreshCountdown(){
       min_uv.setText(temp);
 
       CountdownUpdateInterval = 0;
+}
+
+void fadePowerLED(){
+   fadeTime = millis();
+   fadeValue = 128+127*cos(2*PI/periode*fadeTime);
+   analogWrite(onOffButton, fadeValue);           // sets the value (range from 0 to 255) 
 }
 
