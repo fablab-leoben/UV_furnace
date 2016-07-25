@@ -35,6 +35,7 @@
 //Library for LCD touch screen
 #include <Nextion.h>
 #include <Time.h>
+#include <Timezone.h>
 #include <SPI.h>
 #include <SD.h>
 // So we can save and retrieve settings
