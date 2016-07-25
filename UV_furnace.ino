@@ -99,7 +99,7 @@ elapsedMillis initTimer;
 #define reedSwitch 22
 
 // ON/OFF Button LED
-#define onOffButton 3
+#define onOffButton 12
 
 /************************************************
  LED variables
@@ -2243,6 +2243,7 @@ void errorEnterFunction(){
   controlLEDs(0, 0, 0);
   //Turn off relay
   digitalWrite(RelayPin, HIGH);  // make sure it is off to start
+  Blynk.notify("Error occured!");
 }
 void errorUpdateFunction(){
   DEBUG_PRINTLN(F("errorUpdate"));
@@ -2369,4 +2370,3 @@ void fadePowerLED(){
    fadeValue = 128+127*cos(2*PI/periode*fadeTime);
    analogWrite(onOffButton, fadeValue);           // sets the value (range from 0 to 255) 
 }
-
