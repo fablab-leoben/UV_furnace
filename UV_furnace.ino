@@ -58,7 +58,6 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
 
-
 //compatibility with Arduino IDE 1.6.9
 void dummy(){}
 
