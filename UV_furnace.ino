@@ -56,7 +56,7 @@
 #endif
 
 #define APP_NAME "UV furnace"
-String VERSION = "Version 0.1";
+const char VERSION[] = "Version 0.1";
 
 
 //compatibility with Arduino IDE 1.6.9
@@ -279,6 +279,9 @@ NexPage page6    = NexPage(6, 0, "page6");
  * Declare a button object [page id:0,component id:1, component name: "b0"]. 
  */
 
+//Page0
+NexText tVersion = NexText(0, 1, "tVersion");
+
 //Page1
 NexText tTemp = NexText(1, 5, "tTemp");
 NexText hour_uv = NexText(1, 6, "hour_uv");
@@ -286,6 +289,7 @@ NexText min_uv = NexText(1, 4, "min_uv");
 NexWaveform s0 = NexWaveform(1, 3, "s0");
 NexButton bSettings = NexButton(1, 1, "bSettings");
 NexButton bOnOff = NexButton(1, 2, "bOnOff");
+
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -361,6 +365,8 @@ char buffer[50] = {0};
 
 NexTouch *nex_listen_list[] = 
 {
+    &tVersion,
+    
     &bSettings, &bOnOff,
     
     &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet,
@@ -1448,7 +1454,8 @@ void setup() {
   digitalWrite(RelayPin, HIGH);  // make sure it is off to start
 
   nexInit();
-
+  tVersion.setText(VERSION);  
+  
   #ifdef DEBUG
     Serial.begin(9600);
   #endif
