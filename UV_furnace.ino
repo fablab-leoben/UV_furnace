@@ -24,6 +24,7 @@
  * MA 02111-1307 USA                                                    *
  *----------------------------------------------------------------------*/
 
+#include <Arduino.h>
 #include <BlynkSimpleEthernet2.h>
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>
@@ -35,6 +36,7 @@
 //Library for LCD touch screen
 #include <Nextion.h>
 #include <Time.h>
+#include <TimeLib.h>
 #include <Timezone.h>
 #include <SPI.h>
 #include <SD.h>
@@ -43,6 +45,7 @@
 #include <Adafruit_MAX31855.h>
 #include <elapsedMillis.h>
 #include <FiniteStateMachine.h>
+#include <SDConfigFile.h>
 
 /************************************************
   Debug
@@ -114,6 +117,16 @@ byte LED3_intensity = 0;
 byte LED1_intens = 0;
 byte LED2_intens = 0;
 byte LED3_intens = 0;
+
+/************************************************
+Config files
+************************************************/
+const char CONFIG_preset1[] = "preset1.cfg";
+const char CONFIG_preset2[] = "preset2.cfg";
+//const char CONFIG_preset3[] = "preset3.cfg";
+//const char CONFIG_preset4[] = "preset4.cfg";
+//const char CONFIG_preset5[] = "preset5.cfg";
+//const char CONFIG_preset6[] = "preset6.cfg";
 
 /************************************************
 Ethernet
@@ -413,34 +426,6 @@ void bOnOffPopCallback(void *ptr)
     sendCommand("ref bOnOff");
 }
 
-void createLogFile(){
-    // Open/Create the file we're going to log to with current date and time!
-    time_t t = now();
-    String filename = String(day(t)) + String(month(t)) + String(hour(t)) + String(minute(t)) + ".csv";
-    Serial.println(filename); 
-    if (! SD.exists(filename)) {
-      // only open a new file if it doesn't exist
-      dataFile = SD.open(filename, FILE_WRITE);
-      Serial.println("create new file");
-    }
-    
-    if (! dataFile) {
-    Serial.println("couldnt create file");
-    // Wait forever since we cant write data
-    while (1) ;
-    }
-}
-
-//Write header to logfile
-void writeHeader(){
-
-   dataFile.println(F("Lehrstuhl für Chemie der Kunststoffe"));
-   dataFile.println(F("Timer Ofen: "));
-   dataFile.println(F("Timer LED: "));
-   dataFile.println(F("Tist, Tsoll, UV_LED1, UV_LED2, UV_LED3"));
-
-   dataFile.flush();
-}
 //End Page1
 
 //Page2
@@ -2196,10 +2181,7 @@ void setPIDExitFunction(){
 
 void runEnterFunction(){
   //DEBUG_PRINTLN(F("runEnter"));
-  
-  //createLogFile();
-  //writeHeader();
-         
+ 
    //set alarm
    setDS3231Alarm(minutes_oven, hours_oven);
 
