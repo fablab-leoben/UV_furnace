@@ -123,10 +123,10 @@ Config files
 ************************************************/
 const char CONFIG_preset1[] = "preset1.cfg";
 const char CONFIG_preset2[] = "preset2.cfg";
-//const char CONFIG_preset3[] = "preset3.cfg";
-//const char CONFIG_preset4[] = "preset4.cfg";
-//const char CONFIG_preset5[] = "preset5.cfg";
-//const char CONFIG_preset6[] = "preset6.cfg";
+const char CONFIG_preset3[] = "preset3.cfg";
+const char CONFIG_preset4[] = "preset4.cfg";
+const char CONFIG_preset5[] = "preset5.cfg";
+const char CONFIG_preset6[] = "preset6.cfg";
 
 /************************************************
 Ethernet
