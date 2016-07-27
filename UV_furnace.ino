@@ -114,10 +114,10 @@ bool bLED3State = false;
 byte LED1_intensity = 0;
 byte LED2_intensity = 0;
 byte LED3_intensity = 0;
+
 byte LED1_intens = 0;
 byte LED2_intens = 0;
 byte LED3_intens = 0;
-
 /************************************************
 Config files
 ************************************************/
@@ -127,6 +127,9 @@ const char CONFIG_preset3[] = "preset3.cfg";
 const char CONFIG_preset4[] = "preset4.cfg";
 const char CONFIG_preset5[] = "preset5.cfg";
 const char CONFIG_preset6[] = "preset6.cfg";
+
+boolean didReadConfig;
+boolean readConfiguration();
 
 /************************************************
 Ethernet
@@ -2351,4 +2354,112 @@ void fadePowerLED(){
    fadeTime = millis();
    fadeValue = 128+127*cos(2*PI/periode*fadeTime);
    analogWrite(onOffButton, fadeValue);           // sets the value (range from 0 to 255) 
+}
+
+/*******************************************************************************
+ * Function Name  : readConfiguration
+ * Description    : reads the configuration of a config file on the SD card.
+ * Return         : true
+ *******************************************************************************/
+boolean readConfiguration(const char CONFIG_FILE[]) {
+  /*
+   * Length of the longest line expected in the config file.
+   * The larger this number, the more memory is used
+   * to read the file.
+   * You probably won't need to change this number.
+   */
+  const uint8_t CONFIG_LINE_LENGTH = 30;
+  
+  // The open configuration file.
+  SDConfigFile cfg;
+  
+  // Open the configuration file.
+  if (!cfg.begin(CONFIG_FILE, CONFIG_LINE_LENGTH)) {
+    Serial.print("Failed to open configuration file: ");
+    Serial.println(CONFIG_preset1);
+    return false;
+  }
+  
+  // Read each setting from the file.
+  while (cfg.readNextSetting()) {
+    
+    // Put a nameIs() block here for each setting you have.
+
+    // doDelay
+    if (cfg.nameIs("bLED1State")) {
+      
+      bLED1State = cfg.getBooleanValue();
+      Serial.print("Read bLED1State: ");
+      if (bLED1State) {
+        Serial.println("true");
+      } else {
+        Serial.println("false");
+      }
+    
+    // waitMs integer
+    } else if (cfg.nameIs("bLED2State")) {
+      
+      bLED2State = cfg.getBooleanValue();
+      Serial.print("Read bLED2State: ");
+      if (bLED1State) {
+        Serial.println("true");
+      } else {
+        Serial.println("false");
+      }
+    } else if (cfg.nameIs("bLED3State")) {
+      
+      bLED1State = cfg.getBooleanValue();
+      Serial.print("Read bLED3State: ");
+      if (bLED3State) {
+        Serial.println("true");
+      } else {
+        Serial.println("false");
+      }
+    } else if (cfg.nameIs("temp")) {
+      
+      Setpoint = cfg.getIntValue();
+      Serial.print("Read Setpoint: ");
+      Serial.println(Setpoint);
+
+    // hello string (char *)
+    } else if (cfg.nameIs("LED1_intensity")) {
+
+      LED1_intensity = cfg.getIntValue();
+      Serial.print("Read LED1_intensity: ");
+      Serial.println(LED1_intensity);
+      
+    } else if (cfg.nameIs("LED2_intensity")) {
+
+      LED2_intensity = cfg.getIntValue();
+      Serial.print("Read LED2_intensity: ");
+      Serial.println(LED2_intensity);
+    
+    } else if (cfg.nameIs("LED3_intensity")) {
+
+      LED1_intensity = cfg.getIntValue();
+      Serial.print("Read LED3_intensity: ");
+      Serial.println(LED3_intensity);
+
+    } else if (cfg.nameIs("hours_oven")) {
+
+      hours_oven = cfg.getIntValue();
+      Serial.print("Read hours_oven: ");
+      Serial.println(hours_oven);
+
+    } else if (cfg.nameIs("minutes_oven")) {
+
+      minutes_oven = cfg.getIntValue();
+      Serial.print("Read minutes_oven: ");
+      Serial.println(minutes_oven);
+
+    }
+    else {
+      // report unrecognized names.
+      Serial.print("Unknown name in config: ");
+      Serial.println(cfg.getName());
+    }
+  }
+  
+  // clean up
+  cfg.end();
 }
