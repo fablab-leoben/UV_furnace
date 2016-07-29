@@ -438,7 +438,8 @@ void bPreSet1PopCallback(void *ptr)
   bPreSet1.getPic(&picNum);
   if(picNum == 6) {
     picNum = 7;
-    turnOffButtons();
+    turnOffPresetButtons();
+    didReadConfig = readConfiguration(CONFIG_preset1);
     
     } else if(picNum == 7) {
       picNum = 6;
@@ -456,8 +457,9 @@ void bPreSet2PopCallback(void *ptr)
   bPreSet2.getPic(&picNum);
   if(picNum == 6) {
       picNum = 7;
-      turnOffButtons();
-    
+      turnOffPresetButtons();
+      didReadConfig = readConfiguration(CONFIG_preset2);
+
     } else if(picNum == 7) {
       picNum = 6;
       
@@ -473,8 +475,9 @@ void bPreSet3PopCallback(void *ptr)
   bPreSet3.getPic(&picNum);
   if(picNum == 6) {
       picNum = 7;
-      turnOffButtons();
-    
+      turnOffPresetButtons();
+      didReadConfig = readConfiguration(CONFIG_preset3);
+
     } else if(picNum == 7) {
       picNum = 6;
       
@@ -489,8 +492,9 @@ void bPreSet4PopCallback(void *ptr)
   bPreSet4.getPic(&picNum);
   if(picNum == 6) {
       picNum = 7;
-      turnOffButtons();
-    
+      turnOffPresetButtons();
+      didReadConfig = readConfiguration(CONFIG_preset4);
+ 
     } else if(picNum == 7) {
       picNum = 6;
       
@@ -505,8 +509,9 @@ void bPreSet5PopCallback(void *ptr)
   bPreSet5.getPic(&picNum);
   if(picNum == 6) {
       picNum = 7;
-      turnOffButtons();
-    
+      turnOffPresetButtons();
+      didReadConfig = readConfiguration(CONFIG_preset5);
+
     } else if(picNum == 7) {
       picNum = 6;
       
@@ -521,8 +526,9 @@ void bPreSet6PopCallback(void *ptr)
   bPreSet6.getPic(&picNum);
   if(picNum == 6) {
       picNum = 7;
-      turnOffButtons();
-    
+      turnOffPresetButtons();
+      didReadConfig = readConfiguration(CONFIG_preset6);
+
     } else if(picNum == 7) {
       picNum = 6;
       
@@ -532,7 +538,7 @@ void bPreSet6PopCallback(void *ptr)
     sendCommand("ref bPreSet6");
 }
 
-void turnOffButtons(){
+void turnOffPresetButtons(){
     bPreSet1.setPic(6);
     bPreSet2.setPic(6);
     bPreSet3.setPic(6);
@@ -2368,6 +2374,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
    * to read the file.
    * You probably won't need to change this number.
    */
+  selSD();
   const uint8_t CONFIG_LINE_LENGTH = 30;
   
   // The open configuration file.
