@@ -47,5 +47,8 @@
 |  39  |   1    |  []  | USB-Einbaubuchsen vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
 |  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
 
-### 2. 
+### 2. CAD design
+
+The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing). It is free for Hobbyists, Makers.
+[UV furnace design](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80)
 
