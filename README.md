@@ -49,6 +49,6 @@
 
 ### 2. CAD design
 
-The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing). It is free for Hobbyists, Makers.
-[UV furnace design](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80)
+The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing "Onshape"). It is free for Hobbyists, Makers.
+[UV furnace design](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80 "UV furnace design")
 
