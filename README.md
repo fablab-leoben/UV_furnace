@@ -4,6 +4,7 @@
 
 ### 1. [Introduction](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#1-introduction "Introduction")
 ### 2. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#2-bill-of-materials "Bill of Materials")
+### 3. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#3-cad-design "CAD design")
 
 ### 1. Introduction
 
