@@ -3,6 +3,7 @@
 ## Table of contents
 
 ### 1. [Introduction](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#1-introduction "Introduction")
+### 2. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#2-bill-of-materials "Bill of Materials")
 
 ### 1. Introduction
 
