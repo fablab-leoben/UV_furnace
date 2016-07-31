@@ -2,7 +2,12 @@
 
 ## Table of contents
 
-### 1. Bill of materials
+
+### 1. Introduction
+
+This UV furnace is an open source oven for curing DLP Resin 3D prints.
+
+### 2. Bill of materials
 
 | Pos. | Pieces | Unit |  Name                                                                     |          comment          |
 |------|--------|------|---------------------------------------------------------------------------|---------------------------|
@@ -47,8 +52,9 @@
 |  39  |   1    |  []  | USB-Einbaubuchsen vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
 |  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
 |  41  |   4    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
+|  41  |   4    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
 
-### 2. CAD design
+### 3. CAD design
 
 The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing "Onshape"). It is free for Hobbyists, Makers.
 
