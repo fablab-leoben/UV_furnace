@@ -18,7 +18,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |   2  |   1    |  []  | Arduino Ethernet Shield 2                                                 |                           |
 |   3  |   1    |  []  | Adafruit Thermoelement-Verstärker MAX31855 breakout board - v2.0          |                           |
 |   4  |   1    |  []  | Thermocouple Type-K Glass Braid Insulated - K                             |                           |
-|   5  |   1    |  []  | Magnetic contact switch (door sensor)                                     | Normally open reed switch |
+|   5  |   1    |  []  | Adafruit Magnetic contact switch (door sensor)                            | Normally open reed switch |
 |   6  |   2    |  []  | Kingston 8 GB Micro-SDHC Class10 Speicherkarte                            | any Micro-SD card is ok   |
 |   7  |   1    |  []  | Adafruit ChronoDot - Ultra-precise Real Time Clock - v2.1                 |                           |
 |   8  |   1    |  []  | Adafruit VEML6070 UV Index Sensor Breakout                                | optional                  |
