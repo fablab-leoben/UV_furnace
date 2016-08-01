@@ -71,6 +71,10 @@ typedef struct myBoolStruct
    uint8_t preset5: 1;
    uint8_t preset6: 1;
    uint8_t preheat: 1;
+
+   uint8_t bLED1State: 1;
+   uint8_t bLED2State: 1;
+   uint8_t bLED3State: 1;
 }; 
 myBoolStruct myBoolean;
 
@@ -119,10 +123,6 @@ elapsedMillis initTimer;
 /************************************************
  LED variables
 ************************************************/
-bool bLED1State = false;
-bool bLED2State = false;
-bool bLED3State = false;
-
 byte LED1_intensity = 0;
 byte LED2_intensity = 0;
 byte LED3_intensity = 0;
@@ -610,8 +610,6 @@ void bHomeSetPopCallback(void *ptr)
 //Page3
 void bTempPlus1PopCallback(void *ptr)
 {
-    uint16_t len;
-    //uint8_t minutes = 0;
     dbSerialPrintln("bTempPlus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -640,8 +638,6 @@ String intToString(int variable){
 
 void bTempPlus10PopCallback(void *ptr)
 {
-    uint16_t len;
-    //uint8_t minutes = 0;
     dbSerialPrintln("bTempPlus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -663,7 +659,6 @@ void bTempPlus10PopCallback(void *ptr)
 
 void bTempMinus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bTempMinus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -685,7 +680,6 @@ void bTempMinus1PopCallback(void *ptr)
 
 void bTempMinus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bTempMinus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -734,7 +728,6 @@ void bPreheatPopCallback(void *ptr)
 //Page4
 void bOHourPlus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourPlus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -756,7 +749,6 @@ void bOHourPlus1PopCallback(void *ptr)
 
 void bOHourPlus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourPlus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -778,7 +770,6 @@ void bOHourPlus10PopCallback(void *ptr)
 
 void bOHourMinus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourMinus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -800,7 +791,6 @@ void bOHourMinus1PopCallback(void *ptr)
 
 void bOHourMinus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourMinus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -822,7 +812,6 @@ void bOHourMinus10PopCallback(void *ptr)
 
 void bOMinPlus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourPlus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -844,7 +833,6 @@ void bOMinPlus1PopCallback(void *ptr)
 
 void bOMinPlus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourPlus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -866,7 +854,6 @@ void bOMinPlus10PopCallback(void *ptr)
 
 void bOMinMinus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourMinus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -888,7 +875,6 @@ void bOMinMinus1PopCallback(void *ptr)
 
 void bOMinMinus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bOHourMinus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -911,7 +897,6 @@ void bOMinMinus10PopCallback(void *ptr)
 //Page4 LED Timer
 void bLHourPlus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourPlus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -933,7 +918,6 @@ void bLHourPlus1PopCallback(void *ptr)
 
 void bLHourPlus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourPlus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -955,7 +939,6 @@ void bLHourPlus10PopCallback(void *ptr)
 
 void bLHourMinus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourMinus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -977,7 +960,6 @@ void bLHourMinus1PopCallback(void *ptr)
 
 void bLHourMinus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourMinus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -999,7 +981,6 @@ void bLHourMinus10PopCallback(void *ptr)
 
 void bLMinPlus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourPlus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1021,7 +1002,6 @@ void bLMinPlus1PopCallback(void *ptr)
 
 void bLMinPlus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourPlus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1043,7 +1023,6 @@ void bLMinPlus10PopCallback(void *ptr)
 
 void bLMinMinus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourMinus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1065,7 +1044,6 @@ void bLMinMinus1PopCallback(void *ptr)
 
 void bLMinMinus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLHourMinus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1100,12 +1078,12 @@ void bLED1PopCallback(void *ptr)
   if(picNum == 10) {
       picNum = 11;
 
-      bLED1State = true;
+      myBoolean.bLED1State = true;
       
     } else if(picNum == 11) {
       picNum = 10;
 
-      bLED1State = false;
+      myBoolean.bLED1State = false;
 
     }
     //Serial.println(picNum);
@@ -1115,7 +1093,6 @@ void bLED1PopCallback(void *ptr)
 
 void bLED1plus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED1plus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1136,7 +1113,6 @@ void bLED1plus1PopCallback(void *ptr)
 
 void bLED1plus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED1plus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1157,7 +1133,6 @@ void bLED1plus10PopCallback(void *ptr)
 
 void bLED1minus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED1minus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1179,7 +1154,6 @@ void bLED1minus1PopCallback(void *ptr)
 
 void bLED1minus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED1minus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1206,12 +1180,12 @@ void bLED2PopCallback(void *ptr)
      if(picNum == 10) {
       picNum = 11;
 
-      bLED2State = true;
+      myBoolean.bLED2State = true;
 
     } else if(picNum == 11) {
       picNum = 10;
 
-      bLED2State = false;
+      myBoolean.bLED2State = false;
 
     }
     //Serial.println(picNum);
@@ -1221,7 +1195,6 @@ void bLED2PopCallback(void *ptr)
 
 void bLED2plus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED2plus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1243,7 +1216,6 @@ void bLED2plus1PopCallback(void *ptr)
 
 void bLED2plus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED2plus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1265,7 +1237,6 @@ void bLED2plus10PopCallback(void *ptr)
 
 void bLED2minus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED2minus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1287,7 +1258,6 @@ void bLED2minus1PopCallback(void *ptr)
 
 void bLED2minus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED2minus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1314,12 +1284,12 @@ void bLED3PopCallback(void *ptr)
     if(picNum == 10) {
       picNum = 11;
 
-      bLED3State = true;
+      myBoolean.bLED3State = true;
 
     } else if(picNum == 11) {
       picNum = 10;
 
-      bLED3State = false;
+      myBoolean.bLED3State = false;
 
     }
     //Serial.println(picNum);
@@ -1329,7 +1299,6 @@ void bLED3PopCallback(void *ptr)
 
 void bLED3plus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED3plus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1351,7 +1320,6 @@ void bLED3plus1PopCallback(void *ptr)
 
 void bLED3plus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED3plus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1373,7 +1341,6 @@ void bLED3plus10PopCallback(void *ptr)
 
 void bLED3minus1PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED3minus1PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1395,7 +1362,6 @@ void bLED3minus1PopCallback(void *ptr)
 
 void bLED3minus10PopCallback(void *ptr)
 {
-    uint16_t len;
     dbSerialPrintln("bLED3minus10PopCallback");
 
     memset(buffer, 0, sizeof(buffer));
@@ -1417,17 +1383,14 @@ void bLED3minus10PopCallback(void *ptr)
 
 void bHomeLEDPopCallback(void *ptr)
 {   
-    uint16_t len1;
     memset(buffer, 0, sizeof(buffer));
     tLED1.getText(buffer, sizeof(buffer));
     LED1_intensity = atoi(buffer);
 
-    uint16_t len2;
     memset(buffer, 0, sizeof(buffer));
     tLED2.getText(buffer, sizeof(buffer));
     LED2_intensity = atoi(buffer);
     
-    uint16_t len3;
     memset(buffer, 0, sizeof(buffer));
     tLED3.getText(buffer, sizeof(buffer));
     LED3_intensity = atoi(buffer);
@@ -1489,6 +1452,11 @@ void setup() {
   myBoolean.preset5 = 0;
   myBoolean.preset6 = 0;
   myBoolean.preheat = 0;
+
+  myBoolean.bLED1State = false;
+  myBoolean.bLED2State = false;
+  myBoolean.bLED3State = false;
+
   
   #ifdef DEBUG
     Serial.begin(9600);
@@ -2165,17 +2133,17 @@ void setLEDsEnterFunction(){
   itoa(LED3_intens, buffer, 10); 
   tLED3.setText(buffer);
 
-  if(bLED1State == true){
+  if(myBoolean.bLED1State == true){
     bLED1.setPic(11);
   }else{
     bLED1.setPic(10);
   }
-  if(bLED2State == true){
+  if(myBoolean.bLED2State == true){
     bLED2.setPic(11);
   }else{
     bLED2.setPic(10);
   }
-  if(bLED3State == true){
+  if(myBoolean.bLED3State == true){
     bLED3.setPic(11);
   }else{
     bLED3.setPic(10);
@@ -2324,19 +2292,19 @@ void selMAX31855(){
 }
 
 void controlLEDs(byte intensity1, byte intensity2, byte intensity3){
-  if(bLED1State == true){
+  if(myBoolean.bLED1State == true){
     analogWrite(LED1, intensity1);
     DEBUG_PRINTLN(LED1_intensity);
   }else {
     analogWrite(LED1, 0);
   }
-  if(bLED2State == true){
+  if(myBoolean.bLED2State == true){
     analogWrite(LED2, intensity2);
     DEBUG_PRINTLN(LED2_intensity);
   }else {
     analogWrite(LED2, 0);
   }
-  if(bLED3State == true){
+  if(myBoolean.bLED3State == true){
     analogWrite(LED3, intensity3);
     DEBUG_PRINTLN(LED3_intensity);
   }else {
@@ -2453,31 +2421,31 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
     // Put a nameIs() block here for each setting you have.
 
     // doDelay
-    if (cfg.nameIs("bLED1State")) {
+    if (cfg.nameIs("myBoolean.bLED1State")) {
       
-      bLED1State = cfg.getBooleanValue();
-      Serial.print("Read bLED1State: ");
-      if (bLED1State) {
+      myBoolean.bLED1State = cfg.getBooleanValue();
+      Serial.print("Read myBoolean.bLED1State: ");
+      if (myBoolean.bLED1State) {
         Serial.println("true");
       } else {
         Serial.println("false");
       }
     
     // waitMs integer
-    } else if (cfg.nameIs("bLED2State")) {
+    } else if (cfg.nameIs("myBoolean.bLED2State")) {
       
-      bLED2State = cfg.getBooleanValue();
-      Serial.print("Read bLED2State: ");
-      if (bLED1State) {
+      myBoolean.bLED2State = cfg.getBooleanValue();
+      Serial.print("Read myBoolean.bLED2State: ");
+      if (myBoolean.bLED1State) {
         Serial.println("true");
       } else {
         Serial.println("false");
       }
-    } else if (cfg.nameIs("bLED3State")) {
+    } else if (cfg.nameIs("myBoolean.bLED3State")) {
       
-      bLED1State = cfg.getBooleanValue();
-      Serial.print("Read bLED3State: ");
-      if (bLED3State) {
+      myBoolean.bLED1State = cfg.getBooleanValue();
+      Serial.print("Read myBoolean.bLED3State: ");
+      if (myBoolean.bLED3State) {
         Serial.println("true");
       } else {
         Serial.println("false");
