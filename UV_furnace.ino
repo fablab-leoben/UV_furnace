@@ -75,6 +75,8 @@ typedef struct myBoolStruct
    uint8_t bLED1State: 1;
    uint8_t bLED2State: 1;
    uint8_t bLED3State: 1;
+
+   uint8_t didReadConfig: 1;
 }; 
 myBoolStruct myBoolean;
 
@@ -141,7 +143,6 @@ const char CONFIG_preset4[] = "preset4.cfg";
 const char CONFIG_preset5[] = "preset5.cfg";
 const char CONFIG_preset6[] = "preset6.cfg";
 
-boolean didReadConfig;
 boolean readConfiguration();
 
 
@@ -213,7 +214,6 @@ byte secondAlarm = 0;
 /************************************************
  time settings variables for heating and leds
 ************************************************/
-char temporaer[10] = {0};
 byte hours_oven = 0;
 byte minutes_oven = 0;
 
@@ -449,7 +449,7 @@ void bPreSet1PopCallback(void *ptr)
   if(picNum == 6) {
     picNum = 7;
     turnOffPresetButtons();
-    didReadConfig = readConfiguration(CONFIG_preset1);
+    myBoolean.didReadConfig = readConfiguration(CONFIG_preset1);
     myBoolean.preset1 = 1;
 
     } else if(picNum == 7) {
@@ -470,7 +470,7 @@ void bPreSet2PopCallback(void *ptr)
   if(picNum == 6) {
       picNum = 7;
       turnOffPresetButtons();
-      didReadConfig = readConfiguration(CONFIG_preset2);
+      myBoolean.didReadConfig = readConfiguration(CONFIG_preset2);
       myBoolean.preset2 = 1;
 
     } else if(picNum == 7) {
@@ -490,7 +490,7 @@ void bPreSet3PopCallback(void *ptr)
   if(picNum == 6) {
       picNum = 7;
       turnOffPresetButtons();
-      didReadConfig = readConfiguration(CONFIG_preset3);
+      myBoolean.didReadConfig = readConfiguration(CONFIG_preset3);
       myBoolean.preset3 = 1;
 
     } else if(picNum == 7) {
@@ -509,7 +509,7 @@ void bPreSet4PopCallback(void *ptr)
   if(picNum == 6) {
       picNum = 7;
       turnOffPresetButtons();
-      didReadConfig = readConfiguration(CONFIG_preset4);
+      myBoolean.didReadConfig = readConfiguration(CONFIG_preset4);
       myBoolean.preset4 = 1;
    
     } else if(picNum == 7) {
@@ -528,7 +528,7 @@ void bPreSet5PopCallback(void *ptr)
   if(picNum == 6) {
       picNum = 7;
       turnOffPresetButtons();
-      didReadConfig = readConfiguration(CONFIG_preset5);
+      myBoolean.didReadConfig = readConfiguration(CONFIG_preset5);
       myBoolean.preset5 = 1;
 
 
@@ -549,7 +549,7 @@ void bPreSet6PopCallback(void *ptr)
   if(picNum == 6) {
       picNum = 7;
       turnOffPresetButtons();
-      didReadConfig = readConfiguration(CONFIG_preset6);
+      myBoolean.didReadConfig = readConfiguration(CONFIG_preset6);
       myBoolean.preset6 = 1;
 
 
@@ -1364,6 +1364,7 @@ void setup() {
   myBoolean.bLED2State = false;
   myBoolean.bLED3State = false;
 
+  myBoolean.didReadConfig = false;
   
   #ifdef DEBUG
     Serial.begin(9600);
@@ -1976,12 +1977,8 @@ void initExitFunction(){
 void idleEnterFunction(){
   DEBUG_PRINTLN(F("idleEnter"));
   page1.show();
-  memset(buffer, 0, sizeof(buffer));
-  itoa(hours_oven, buffer, 10);
-  hour_uv.setText(buffer);
-  memset(buffer, 0, sizeof(buffer));
-  itoa(minutes_oven, buffer, 10);
-  min_uv.setText(buffer);
+  hour_uv.setText(intToChar(hours_oven));
+  min_uv.setText(intToChar(minutes_oven));
   sendCommand("ref 0");
 }
 void idleUpdateFunction(){
@@ -2030,15 +2027,9 @@ void setLEDsEnterFunction(){
   DEBUG_PRINTLN(F("setLEDsEnter"));
   page5.show();
 
-  memset(buffer, 0, sizeof(buffer));
-  itoa(LED1_intens, buffer, 10); 
-  tLED1.setText(buffer);
-  memset(buffer, 0, sizeof(buffer));
-  itoa(LED2_intens, buffer, 10); 
-  tLED2.setText(buffer);
-  memset(buffer, 0, sizeof(buffer));
-  itoa(LED3_intens, buffer, 10); 
-  tLED3.setText(buffer);
+  tLED1.setText(intToChar(LED1_intens));
+  tLED2.setText(intToChar(LED2_intens)); 
+  tLED3.setText(intToChar(LED3_intens));
 
   if(myBoolean.bLED1State == true){
     bLED1.setPic(11);
@@ -2068,9 +2059,7 @@ void setTempEnterFunction(){
   DEBUG_PRINTLN(F("setTempEnter"));
   page3.show();
 
-  memset(buffer, 0, sizeof(buffer));
-  itoa(Setpoint, buffer, 10);
-  tTempSetup.setText(buffer);
+  tTempSetup.setText(intToChar(Setpoint));
 
   sendCommand("ref 0");
 }
@@ -2088,21 +2077,12 @@ void setTempExitFunction(){
 void setTimerEnterFunction(){
   DEBUG_PRINTLN(F("setTimerEnter"));
   page4.show();
-  memset(buffer, 0, sizeof(buffer));
-  itoa(minutes_oven, buffer, 10);
-  tOvenMinuteT.setText(buffer);
-  memset(buffer, 0, sizeof(buffer));
-  itoa(hours_oven, buffer, 10);
-  tOvenHourT.setText(buffer);
-  memset(buffer, 0, sizeof(buffer));
-  itoa(minutes_LED, buffer, 10);
-  tLEDsMinuteT.setText(buffer);
-  memset(buffer, 0, sizeof(buffer));
-  itoa(hours_LED, buffer, 10);
-  tLEDsHourT.setText(buffer);
+  tOvenMinuteT.setText(intToChar(minutes_oven));
+  tOvenHourT.setText(intToChar(hours_oven));
+  tLEDsMinuteT.setText(intToChar(minutes_LED));
+  tLEDsHourT.setText(intToChar(hours_LED));
   
   sendCommand("ref 0");
- 
 }
 void setTimerUpdateFunction(){
   //DEBUG_PRINTLN(F("setTimerUpdate"));
@@ -2179,20 +2159,19 @@ void errorExitFunction(){
 }
 
 //################# Chip-Select ansteuern ###################################
-void selETH() {     // waehlt den Ethernetcontroller aus
- 
+void selETH() {     // chooses the Ethernetcontroller
   digitalWrite(SDCARD_CS, HIGH);
   digitalWrite(W5200_CS, LOW);
   digitalWrite(cs_MAX31855, HIGH); 
 }
 //####################################
-void selSD() {      // waehlt die SD-Karte aus
+void selSD() {      // chooses the SD-card
   digitalWrite(W5200_CS, HIGH);
   digitalWrite(SDCARD_CS, LOW);
   digitalWrite(cs_MAX31855, HIGH); 
 }
 
-void selMAX31855(){
+void selMAX31855(){  // chooses the MAX31855
   digitalWrite(W5200_CS, HIGH);
   digitalWrite(SDCARD_CS, HIGH);
   digitalWrite(cs_MAX31855, LOW); 
@@ -2317,7 +2296,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
   
   // Open the configuration file.
   if (!cfg.begin(CONFIG_FILE, CONFIG_LINE_LENGTH)) {
-    Serial.print("Failed to open configuration file: ");
+    Serial.print(F("Failed to open configuration file: "));
     Serial.println(CONFIG_preset1);
     return false;
   }
@@ -2331,73 +2310,73 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
     if (cfg.nameIs("myBoolean.bLED1State")) {
       
       myBoolean.bLED1State = cfg.getBooleanValue();
-      Serial.print("Read myBoolean.bLED1State: ");
+      Serial.print(F("Read myBoolean.bLED1State: "));
       if (myBoolean.bLED1State) {
-        Serial.println("true");
+        Serial.println(F("true"));
       } else {
-        Serial.println("false");
+        Serial.println(F("false"));
       }
     
     // waitMs integer
     } else if (cfg.nameIs("myBoolean.bLED2State")) {
       
       myBoolean.bLED2State = cfg.getBooleanValue();
-      Serial.print("Read myBoolean.bLED2State: ");
-      if (myBoolean.bLED1State) {
-        Serial.println("true");
+      Serial.print(F("Read myBoolean.bLED2State: "));
+      if (myBoolean.bLED2State) {
+        Serial.println(F("true"));
       } else {
-        Serial.println("false");
+        Serial.println(F("false"));
       }
     } else if (cfg.nameIs("myBoolean.bLED3State")) {
       
       myBoolean.bLED1State = cfg.getBooleanValue();
-      Serial.print("Read myBoolean.bLED3State: ");
+      Serial.print(F("Read myBoolean.bLED3State: "));
       if (myBoolean.bLED3State) {
-        Serial.println("true");
+        Serial.println(F("true"));
       } else {
-        Serial.println("false");
+        Serial.println(F("false"));
       }
     } else if (cfg.nameIs("temp")) {
       
       Setpoint = cfg.getIntValue();
-      Serial.print("Read Setpoint: ");
+      Serial.print(F("Read Setpoint: "));
       Serial.println(Setpoint);
 
     // hello string (char *)
     } else if (cfg.nameIs("LED1_intensity")) {
 
       LED1_intensity = cfg.getIntValue();
-      Serial.print("Read LED1_intensity: ");
+      Serial.print(F("Read LED1_intensity: "));
       Serial.println(LED1_intensity);
       
     } else if (cfg.nameIs("LED2_intensity")) {
 
       LED2_intensity = cfg.getIntValue();
-      Serial.print("Read LED2_intensity: ");
+      Serial.print(F("Read LED2_intensity: "));
       Serial.println(LED2_intensity);
     
     } else if (cfg.nameIs("LED3_intensity")) {
 
       LED1_intensity = cfg.getIntValue();
-      Serial.print("Read LED3_intensity: ");
+      Serial.print(F("Read LED3_intensity: "));
       Serial.println(LED3_intensity);
 
     } else if (cfg.nameIs("hours_oven")) {
 
       hours_oven = cfg.getIntValue();
-      Serial.print("Read hours_oven: ");
+      Serial.print(F("Read hours_oven: "));
       Serial.println(hours_oven);
 
     } else if (cfg.nameIs("minutes_oven")) {
 
       minutes_oven = cfg.getIntValue();
-      Serial.print("Read minutes_oven: ");
+      Serial.print(F("Read minutes_oven: "));
       Serial.println(minutes_oven);
 
     }
     else {
       // report unrecognized names.
-      Serial.print("Unknown name in config: ");
+      Serial.print(F("Unknown name in config: "));
       Serial.println(cfg.getName());
     }
   }
