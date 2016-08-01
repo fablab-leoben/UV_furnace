@@ -62,6 +62,17 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
 
+typedef struct presetStruct
+{
+   uint8_t preset1: 1;
+   uint8_t preset2: 1;
+   uint8_t preset3: 1;
+   uint8_t preset4: 1;
+   uint8_t preset5: 1;
+   uint8_t preset6: 1;
+}; 
+presetStruct presetBoolean;
+
 //compatibility with Arduino IDE 1.6.9
 void dummy(){}
 
@@ -132,12 +143,7 @@ const char CONFIG_preset6[] = "preset6.cfg";
 boolean didReadConfig;
 boolean readConfiguration();
 
-boolean preset1On = false;
-boolean preset2On = false;
-boolean preset3On = false;
-boolean preset4On = false;
-boolean preset5On = false;
-boolean preset6On = false;
+
 
 /************************************************
 Ethernet
@@ -448,10 +454,12 @@ void bPreSet1PopCallback(void *ptr)
     picNum = 7;
     turnOffPresetButtons();
     didReadConfig = readConfiguration(CONFIG_preset1);
-    preset1On = true;
+    presetBoolean.preset1 = 1;
+
     } else if(picNum == 7) {
       picNum = 6;
-      preset1On = false;
+      presetBoolean.preset1 = 0;
+
     }
     //Serial.println(picNum);
 
@@ -467,10 +475,12 @@ void bPreSet2PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset2);
-      preset2On = true;
+      presetBoolean.preset2 = 1;
+
     } else if(picNum == 7) {
       picNum = 6;
-      preset2On = false;
+      presetBoolean.preset2 = 0;
+
     }
     //Serial.println(picNum);
     bPreSet2.setPic(picNum);
@@ -485,10 +495,12 @@ void bPreSet3PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset3);
-      preset3On = true;
+      presetBoolean.preset3 = 1;
+
     } else if(picNum == 7) {
       picNum = 6;
-      preset3On = false;      
+      presetBoolean.preset3 = 0;
+  
     }
     //Serial.println(picNum);
     bPreSet3.setPic(picNum);
@@ -502,11 +514,12 @@ void bPreSet4PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset4);
-      preset4On = true;
-    
+      presetBoolean.preset4 = 1;
+   
     } else if(picNum == 7) {
       picNum = 6;
-      preset4On = false;      
+      presetBoolean.preset4 = 0;
+         
     }
     //Serial.println(picNum);
     bPreSet4.setPic(picNum);
@@ -520,11 +533,14 @@ void bPreSet5PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset5);
-      preset5On = true;
+      presetBoolean.preset5 = 1;
+
 
     } else if(picNum == 7) {
       picNum = 6;
-      preset5On = false;   
+      presetBoolean.preset5 = 0;
+
+   
     }
     //Serial.println(picNum);
     bPreSet5.setPic(picNum);
@@ -538,11 +554,13 @@ void bPreSet6PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset6);
-      preset6On = true;
+      presetBoolean.preset6 = 1;
+
 
     } else if(picNum == 7) {
       picNum = 6;
-      preset6On = false;
+      presetBoolean.preset6 = 0;
+      
     }
     //Serial.println(picNum);
     bPreSet6.setPic(picNum);
@@ -1460,6 +1478,13 @@ void setup() {
 
   nexInit();
   tVersion.setText(VERSION);  
+
+  presetBoolean.preset1 = 0;
+  presetBoolean.preset2 = 0;
+  presetBoolean.preset3 = 0;
+  presetBoolean.preset4 = 0;
+  presetBoolean.preset5 = 0;
+  presetBoolean.preset6 = 0;
   
   #ifdef DEBUG
     Serial.begin(9600);
@@ -2093,24 +2118,26 @@ void idleExitFunction(){
 void settingsEnterFunction(){
   DEBUG_PRINTLN(F("settingsEnter"));
   page2.show();
-  if(preset1On == true){
+  
+  if(presetBoolean.preset1 == 1){
       bPreSet1.setPic(7);
   }
-  if(preset2On == true){
+  if(presetBoolean.preset2 == 1){
       bPreSet2.setPic(7);
   }
-  if(preset3On == true){
+  if(presetBoolean.preset3 == 1){
       bPreSet3.setPic(7);
   }
-  if(preset4On == true){
+  if(presetBoolean.preset4 == 1){
       bPreSet4.setPic(7);
   }
-  if(preset5On == true){
+  if(presetBoolean.preset5 == 1){
       bPreSet5.setPic(7);
   }
-  if(preset6On == true){
+  if(presetBoolean.preset6 == 1){
       bPreSet6.setPic(7);
   }
+ 
   sendCommand("ref 0");
 }
 void settingsUpdateFunction(){
