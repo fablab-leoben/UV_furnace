@@ -387,7 +387,7 @@ NexText tLED3 = NexText(5, 19, "tLED3");
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
 NexButton bAutotune = NexButton(6, 2, "bAutotune");
 
-char buffer[50] = {0};
+char buffer[5] = {0};
 
 NexTouch *nex_listen_list[] = 
 {
@@ -622,14 +622,11 @@ void bTempPlus1PopCallback(void *ptr)
     {
         Setpoint = 100;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(Setpoint, buffer, 10);
-    
-    tTempSetup.setText(buffer);
+
+    tTempSetup.setText(intToChar(Setpoint));
 }
 
-String intToString(int variable){
+char* intToChar(int variable){
     memset(buffer, 0, sizeof(buffer));
     itoa(variable, buffer, 10);
     
@@ -651,10 +648,7 @@ void bTempPlus10PopCallback(void *ptr)
         Setpoint = 100;
     }
     
-    memset(buffer, 0, sizeof(buffer));
-    itoa(Setpoint, buffer, 10);
-    
-    tTempSetup.setText(buffer);
+   tTempSetup.setText(intToChar(Setpoint));
 }
 
 void bTempMinus1PopCallback(void *ptr)
@@ -672,10 +666,8 @@ void bTempMinus1PopCallback(void *ptr)
         Setpoint = 0;
     }
     
-    memset(buffer, 0, sizeof(buffer));
-    itoa(Setpoint, buffer, 10);
-    
-    tTempSetup.setText(buffer);
+   
+    tTempSetup.setText(intToChar(Setpoint));
 }
 
 void bTempMinus10PopCallback(void *ptr)
@@ -693,10 +685,7 @@ void bTempMinus10PopCallback(void *ptr)
         Setpoint = 0;
     }
     
-    memset(buffer, 0, sizeof(buffer));
-    itoa(Setpoint, buffer, 10);
-    
-    tTempSetup.setText(buffer);
+    tTempSetup.setText(intToChar(Setpoint));
 }
 
 void bHomeTempPopCallback(void *ptr)
@@ -740,11 +729,8 @@ void bOHourPlus1PopCallback(void *ptr)
     {
         hours_oven = 99;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_oven, buffer, 10);
-    
-    tOvenHourT.setText(buffer);
+
+    tOvenHourT.setText(intToChar(hours_oven));
 }
 
 void bOHourPlus10PopCallback(void *ptr)
@@ -762,10 +748,7 @@ void bOHourPlus10PopCallback(void *ptr)
         hours_oven = 99;
     }
     
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_oven, buffer, 10);
-    
-    tOvenHourT.setText(buffer);
+    tOvenHourT.setText(intToChar(hours_oven));
 }
 
 void bOHourMinus1PopCallback(void *ptr)
@@ -782,11 +765,8 @@ void bOHourMinus1PopCallback(void *ptr)
     {
         hours_oven = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_oven, buffer, 10);
-    
-    tOvenHourT.setText(buffer);
+
+    tOvenHourT.setText(intToChar(hours_oven));
 }
 
 void bOHourMinus10PopCallback(void *ptr)
@@ -804,10 +784,7 @@ void bOHourMinus10PopCallback(void *ptr)
         hours_oven = 0;
     }
     
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_oven, buffer, 10);
-    
-    tOvenHourT.setText(buffer);
+    tOvenHourT.setText(intToChar(hours_oven));
 }
 
 void bOMinPlus1PopCallback(void *ptr)
@@ -824,11 +801,8 @@ void bOMinPlus1PopCallback(void *ptr)
     {
         minutes_oven = 60;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_oven, buffer, 10);
-    
-    tOvenMinuteT.setText(buffer);
+
+    tOvenMinuteT.setText(intToChar(minutes_oven));
 }
 
 void bOMinPlus10PopCallback(void *ptr)
@@ -845,11 +819,8 @@ void bOMinPlus10PopCallback(void *ptr)
     {
         minutes_oven = 60;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_oven, buffer, 10);
-    
-    tOvenMinuteT.setText(buffer);
+
+    tOvenMinuteT.setText(intToChar(minutes_oven));
 }
 
 void bOMinMinus1PopCallback(void *ptr)
@@ -866,11 +837,8 @@ void bOMinMinus1PopCallback(void *ptr)
     {
         minutes_oven = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_oven, buffer, 10);
-    
-    tOvenMinuteT.setText(buffer);
+
+    tOvenMinuteT.setText(intToChar(minutes_oven));
 }
 
 void bOMinMinus10PopCallback(void *ptr)
@@ -887,11 +855,8 @@ void bOMinMinus10PopCallback(void *ptr)
     {
         minutes_oven = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_oven, buffer, 10);
-    
-    tOvenMinuteT.setText(buffer);
+
+    tOvenMinuteT.setText(intToChar(minutes_oven));
 }
 
 //Page4 LED Timer
@@ -909,11 +874,8 @@ void bLHourPlus1PopCallback(void *ptr)
     {
         hours_LED = 99;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_LED, buffer, 10);
-    
-    tLEDsHourT.setText(buffer);
+
+    tLEDsHourT.setText(intToChar(hours_LED));
 }
 
 void bLHourPlus10PopCallback(void *ptr)
@@ -930,11 +892,8 @@ void bLHourPlus10PopCallback(void *ptr)
     {
         hours_LED = 99;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_LED, buffer, 10);
-    
-    tLEDsHourT.setText(buffer);
+
+    tLEDsHourT.setText(intToChar(hours_LED));
 }
 
 void bLHourMinus1PopCallback(void *ptr)
@@ -951,11 +910,8 @@ void bLHourMinus1PopCallback(void *ptr)
     {
         hours_LED = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_LED, buffer, 10);
-    
-    tLEDsHourT.setText(buffer);
+
+    tLEDsHourT.setText(intToChar(hours_LED));
 }
 
 void bLHourMinus10PopCallback(void *ptr)
@@ -972,11 +928,8 @@ void bLHourMinus10PopCallback(void *ptr)
     {
         hours_LED = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(hours_LED, buffer, 10);
-    
-    tLEDsHourT.setText(buffer);
+
+    tLEDsHourT.setText(intToChar(hours_LED));
 }
 
 void bLMinPlus1PopCallback(void *ptr)
@@ -993,11 +946,8 @@ void bLMinPlus1PopCallback(void *ptr)
     {
         minutes_LED = 60;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_LED, buffer, 10);
-    
-    tLEDsMinuteT.setText(buffer);
+
+    tLEDsMinuteT.setText(intToChar(minutes_LED));
 }
 
 void bLMinPlus10PopCallback(void *ptr)
@@ -1014,11 +964,8 @@ void bLMinPlus10PopCallback(void *ptr)
     {
         minutes_LED = 60;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_LED, buffer, 10);
-    
-    tLEDsMinuteT.setText(buffer);
+
+    tLEDsMinuteT.setText(intToChar(minutes_LED));
 }
 
 void bLMinMinus1PopCallback(void *ptr)
@@ -1035,11 +982,8 @@ void bLMinMinus1PopCallback(void *ptr)
     {
         minutes_LED = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_LED, buffer, 10);
-    
-    tLEDsMinuteT.setText(buffer);
+
+    tLEDsMinuteT.setText(intToChar(minutes_LED));
 }
 
 void bLMinMinus10PopCallback(void *ptr)
@@ -1056,11 +1000,8 @@ void bLMinMinus10PopCallback(void *ptr)
     {
         minutes_LED = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(minutes_LED, buffer, 10);
-    
-    tLEDsMinuteT.setText(buffer);
+
+    tLEDsMinuteT.setText(intToChar(minutes_LED));
 }
 
 void bHomeTimerPopCallback(void *ptr)
@@ -1106,9 +1047,7 @@ void bLED1plus1PopCallback(void *ptr)
         LED1_intensity = 100;
     }
 
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED1_intensity, buffer, 10);  
-    tLED1.setText(buffer);
+    tLED1.setText(intToChar(LED1_intensity));
 }
 
 void bLED1plus10PopCallback(void *ptr)
@@ -1126,9 +1065,7 @@ void bLED1plus10PopCallback(void *ptr)
         LED1_intensity = 100;
     }
     
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED1_intensity, buffer, 10);
-    tLED1.setText(buffer);
+    tLED1.setText(intToChar(LED1_intensity));
 }
 
 void bLED1minus1PopCallback(void *ptr)
@@ -1145,11 +1082,8 @@ void bLED1minus1PopCallback(void *ptr)
     {
         LED1_intensity = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED1_intensity, buffer, 10);
-    
-    tLED1.setText(buffer);
+
+    tLED1.setText(intToChar(LED1_intensity));
 }
 
 void bLED1minus10PopCallback(void *ptr)
@@ -1166,11 +1100,8 @@ void bLED1minus10PopCallback(void *ptr)
     {
         LED1_intensity = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED1_intensity, buffer, 10);
-    
-    tLED1.setText(buffer);
+
+    tLED1.setText(intToChar(LED1_intensity));
 }
 
 void bLED2PopCallback(void *ptr)
@@ -1207,11 +1138,8 @@ void bLED2plus1PopCallback(void *ptr)
     {
         LED2_intensity = 100;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED2_intensity, buffer, 10);
-    
-    tLED2.setText(buffer);
+
+    tLED2.setText(intToChar(LED2_intensity));
 }
 
 void bLED2plus10PopCallback(void *ptr)
@@ -1228,11 +1156,8 @@ void bLED2plus10PopCallback(void *ptr)
     {
         LED2_intensity = 100;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED2_intensity, buffer, 10);
-    
-    tLED2.setText(buffer);
+
+    tLED2.setText(intToChar(LED2_intensity));
 }
 
 void bLED2minus1PopCallback(void *ptr)
@@ -1249,11 +1174,8 @@ void bLED2minus1PopCallback(void *ptr)
     {
         LED2_intensity = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED2_intensity, buffer, 10);
-    
-    tLED2.setText(buffer);
+
+    tLED2.setText(intToChar(LED2_intensity));
 }
 
 void bLED2minus10PopCallback(void *ptr)
@@ -1270,11 +1192,8 @@ void bLED2minus10PopCallback(void *ptr)
     {
         LED2_intensity = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED2_intensity, buffer, 10);
-    
-    tLED2.setText(buffer);
+
+    tLED2.setText(intToChar(LED2_intensity));
 }
 
 void bLED3PopCallback(void *ptr)
@@ -1311,11 +1230,8 @@ void bLED3plus1PopCallback(void *ptr)
     {
         LED3_intensity = 100;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED3_intensity, buffer, 10);
-    
-    tLED3.setText(buffer);
+ 
+    tLED3.setText(intToChar(LED3_intensity));
 }
 
 void bLED3plus10PopCallback(void *ptr)
@@ -1332,11 +1248,8 @@ void bLED3plus10PopCallback(void *ptr)
     {
         LED3_intensity = 100;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED3_intensity, buffer, 10);
-    
-    tLED3.setText(buffer);
+
+    tLED3.setText(intToChar(LED3_intensity));
 }
 
 void bLED3minus1PopCallback(void *ptr)
@@ -1353,11 +1266,8 @@ void bLED3minus1PopCallback(void *ptr)
     {
         LED3_intensity = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED3_intensity, buffer, 10);
-    
-    tLED3.setText(buffer);
+
+    tLED3.setText(intToChar(LED3_intensity));
 }
 
 void bLED3minus10PopCallback(void *ptr)
@@ -1374,11 +1284,8 @@ void bLED3minus10PopCallback(void *ptr)
     {
         LED3_intensity = 0;
     }
-    
-    memset(buffer, 0, sizeof(buffer));
-    itoa(LED3_intensity, buffer, 10);
-    
-    tLED3.setText(buffer);
+
+    tLED3.setText(intToChar(LED3_intensity));
 }
 
 void bHomeLEDPopCallback(void *ptr)
