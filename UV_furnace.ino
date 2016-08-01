@@ -145,8 +145,6 @@ const char CONFIG_preset6[] = "preset6.cfg";
 
 boolean readConfiguration();
 
-
-
 /************************************************
 Ethernet
 ************************************************/
@@ -300,6 +298,8 @@ NexPage page3    = NexPage(3, 0, "page3");
 NexPage page4    = NexPage(4, 0, "page4");
 NexPage page5    = NexPage(5, 0, "page5");
 NexPage page6    = NexPage(6, 0, "page6");
+NexPage page7    = NexPage(7, 0, "page7");
+NexPage page8    = NexPage(8, 0, "page8");
 
 /*
  * Declare a button object [page id:0,component id:1, component name: "b0"]. 
@@ -329,6 +329,7 @@ NexButton bTimerSetup   = NexButton(2, 8, "bTimerSetup");
 NexButton bLEDSetup   = NexButton(2, 9, "bLEDSetup");
 NexButton bPIDSetup   = NexButton(2, 10, "bPIDSetup");
 NexButton bHomeSet = NexButton(2, 11, "bHomeSet");
+NexButton bCredits = NexButton(2, 12, "bCredits");
 
 //Page3
 NexText tTempSetup = NexText(3, 1, "tTempSetup");
@@ -387,6 +388,12 @@ NexText tLED3 = NexText(5, 19, "tLED3");
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
 NexButton bAutotune = NexButton(6, 2, "bAutotune");
 
+//Page7
+NexButton bReset = NexButton(6, 1, "bReset");
+
+//Page8
+NexButton bHomeCredits = NexButton(6, 1, "bHomeCredits");
+
 char buffer[5] = {0};
 
 NexTouch *nex_listen_list[] = 
@@ -395,7 +402,7 @@ NexTouch *nex_listen_list[] =
     
     &bSettings, &bOnOff,
     
-    &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet,
+    &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits,
     
     &bTempPlus1, &bTempPlus10, &bTempMinus1, &bTempMinus10, &bHomeTemp, &bPreheat,
     
@@ -409,6 +416,10 @@ NexTouch *nex_listen_list[] =
     &bHomeLED,
     
     &bHomePID, &bAutotune,
+
+    &bReset,
+
+    &bHomeCredits,
     NULL
 };
 
@@ -423,13 +434,13 @@ void bOnOffPopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bOnOff.getPic(&picNum);
-     if(picNum == 4) {
-      picNum = 5;
+     if(picNum == 1) {
+      picNum = 2;
 
       uvFurnaceStateMachine.transitionTo(runState);
 
     } else {
-      picNum = 4;
+      picNum = 1;
 
       controlLEDs(0, 0, 0);
       
@@ -446,14 +457,14 @@ void bPreSet1PopCallback(void *ptr)
 {   
   uint32_t picNum = 0;
   bPreSet1.getPic(&picNum);
-  if(picNum == 6) {
-    picNum = 7;
+  if(picNum == 3) {
+    picNum = 4;
     turnOffPresetButtons();
     myBoolean.didReadConfig = readConfiguration(CONFIG_preset1);
     myBoolean.preset1 = 1;
 
-    } else if(picNum == 7) {
-      picNum = 6;
+    } else if(picNum == 4) {
+      picNum = 3;
       myBoolean.preset1 = 0;
 
     }
@@ -467,14 +478,14 @@ void bPreSet2PopCallback(void *ptr)
 {
    uint32_t picNum = 0;
   bPreSet2.getPic(&picNum);
-  if(picNum == 6) {
-      picNum = 7;
+  if(picNum == 3) {
+      picNum = 4;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset2);
       myBoolean.preset2 = 1;
 
-    } else if(picNum == 7) {
-      picNum = 6;
+    } else if(picNum == 4) {
+      picNum = 3;
       myBoolean.preset2 = 0;
 
     }
@@ -487,14 +498,14 @@ void bPreSet3PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
   bPreSet3.getPic(&picNum);
-  if(picNum == 6) {
-      picNum = 7;
+  if(picNum == 3) {
+      picNum = 4;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset3);
       myBoolean.preset3 = 1;
 
-    } else if(picNum == 7) {
-      picNum = 6;
+    } else if(picNum == 4) {
+      picNum = 3;
       myBoolean.preset3 = 0;
   
     }
@@ -506,14 +517,14 @@ void bPreSet4PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
   bPreSet4.getPic(&picNum);
-  if(picNum == 6) {
-      picNum = 7;
+  if(picNum == 3) {
+      picNum = 4;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset4);
       myBoolean.preset4 = 1;
    
-    } else if(picNum == 7) {
-      picNum = 6;
+    } else if(picNum == 4) {
+      picNum = 3;
       myBoolean.preset4 = 0;
          
     }
@@ -525,15 +536,15 @@ void bPreSet5PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
   bPreSet5.getPic(&picNum);
-  if(picNum == 6) {
-      picNum = 7;
+  if(picNum == 3) {
+      picNum = 4;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset5);
       myBoolean.preset5 = 1;
 
 
-    } else if(picNum == 7) {
-      picNum = 6;
+    } else if(picNum == 4) {
+      picNum = 3;
       myBoolean.preset5 = 0;
 
    
@@ -546,15 +557,15 @@ void bPreSet6PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
   bPreSet6.getPic(&picNum);
-  if(picNum == 6) {
-      picNum = 7;
+  if(picNum == 3) {
+      picNum = 4;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset6);
       myBoolean.preset6 = 1;
 
 
-    } else if(picNum == 7) {
-      picNum = 6;
+    } else if(picNum == 4) {
+      picNum = 3;
       myBoolean.preset6 = 0;
       
     }
@@ -605,6 +616,12 @@ void bHomeSetPopCallback(void *ptr)
 {
     uvFurnaceStateMachine.transitionTo(idleState);    
 }
+
+void bCreditsPopCallback(void *ptr)
+{
+  page8.show();
+}
+
 //End Page2
 
 //Page3
@@ -698,13 +715,13 @@ void bPreheatPopCallback(void *ptr)
     uint32_t picNum = 0;
     bPreheat.getPic(&picNum);
     DEBUG_PRINTLN(picNum);
-    if(picNum == 14) {
-      picNum = 15;
+    if(picNum == 5) {
+      picNum = 7;
 
       myBoolean.preheat = 1;
       
-    } else if(picNum == 15) {
-      picNum = 14;
+    } else if(picNum == 7) {
+      picNum = 5;
 
       myBoolean.preheat = 0;
     }
@@ -1016,13 +1033,13 @@ void bLED1PopCallback(void *ptr)
 { 
   uint32_t picNum = 0;
   bLED1.getPic(&picNum);
-  if(picNum == 10) {
+  if(picNum == 9) {
       picNum = 11;
 
       myBoolean.bLED1State = true;
       
     } else if(picNum == 11) {
-      picNum = 10;
+      picNum = 9;
 
       myBoolean.bLED1State = false;
 
@@ -1108,13 +1125,13 @@ void bLED2PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bLED2.getPic(&picNum);
-     if(picNum == 10) {
+     if(picNum == 9) {
       picNum = 11;
 
       myBoolean.bLED2State = true;
 
     } else if(picNum == 11) {
-      picNum = 10;
+      picNum = 9;
 
       myBoolean.bLED2State = false;
 
@@ -1200,13 +1217,13 @@ void bLED3PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bLED3.getPic(&picNum);
-    if(picNum == 10) {
+    if(picNum == 9) {
       picNum = 11;
 
       myBoolean.bLED3State = true;
 
     } else if(picNum == 11) {
-      picNum = 10;
+      picNum = 9;
 
       myBoolean.bLED3State = false;
 
@@ -1327,6 +1344,20 @@ void bAutotunePopCallback(void *ptr)
 }
 //End Page6
 
+//Page7
+void bResetPopCallback(void *ptr)
+{
+
+}
+//End Page7
+
+//Page8
+void bHomeCreditsPopCallback(void *ptr)
+{
+    uvFurnaceStateMachine.transitionTo(settingsState);   
+}
+//End Page8
+
 /*******************************************************************************
  interrupt service routine for DS3231 clock
 *******************************************************************************/
@@ -1394,6 +1425,7 @@ void setup() {
   bLEDSetup.attachPop(bLEDSetupPopCallback, &bLEDSetup);
   bPIDSetup.attachPop(bPIDSetupPopCallback, &bPIDSetup);
   bHomeSet.attachPop(bHomeSetPopCallback, &bHomeSet);
+  bCredits.attachPop(bCreditsPopCallback, &bCredits);
 
   //Page3
   bTempPlus1.attachPop(bTempPlus1PopCallback, &bTempPlus1);
@@ -1443,7 +1475,13 @@ void setup() {
   //Page6
   bHomePID.attachPop(bHomePIDPopCallback, &bHomePID);
   bAutotune.attachPop(bAutotunePopCallback, &bAutotune);
- 
+
+  //Page7
+  bReset.attachPop(bResetPopCallback, &bReset);
+
+  //Page8
+  bHomeCredits.attachPop(bHomeCreditsPopCallback, &bHomeCredits);
+
   //declare and init pins
   
   //Disable the default square wave of the SQW pin.
