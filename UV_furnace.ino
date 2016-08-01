@@ -62,7 +62,7 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
 
-typedef struct presetStruct
+typedef struct myBoolStruct
 {
    uint8_t preset1: 1;
    uint8_t preset2: 1;
@@ -70,8 +70,9 @@ typedef struct presetStruct
    uint8_t preset4: 1;
    uint8_t preset5: 1;
    uint8_t preset6: 1;
+   uint8_t preheat: 1;
 }; 
-presetStruct presetBoolean;
+myBoolStruct myBoolean;
 
 //compatibility with Arduino IDE 1.6.9
 void dummy(){}
@@ -149,7 +150,7 @@ boolean readConfiguration();
 Ethernet
 ************************************************/
 
-unsigned int localPort = 8888;       // local port to listen for UDP packets
+const unsigned int localPort = 8888;       // local port to listen for UDP packets
 
 char timeServer[] = "time.nist.gov"; // time.nist.gov NTP server
 
@@ -159,11 +160,6 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing pack
 
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
-
-/************************************************
- Temperature variables
-************************************************/
-bool preheat = false;
 
 /************************************************
  PID Variables and constants
@@ -191,7 +187,7 @@ const int KdAddress = 24;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
  
 // 10 second Time Proportional Output window
-int WindowSize = 10000; 
+const int WindowSize = 10000; 
 unsigned long windowStartTime;
  
 // ************************************************
@@ -454,11 +450,11 @@ void bPreSet1PopCallback(void *ptr)
     picNum = 7;
     turnOffPresetButtons();
     didReadConfig = readConfiguration(CONFIG_preset1);
-    presetBoolean.preset1 = 1;
+    myBoolean.preset1 = 1;
 
     } else if(picNum == 7) {
       picNum = 6;
-      presetBoolean.preset1 = 0;
+      myBoolean.preset1 = 0;
 
     }
     //Serial.println(picNum);
@@ -475,11 +471,11 @@ void bPreSet2PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset2);
-      presetBoolean.preset2 = 1;
+      myBoolean.preset2 = 1;
 
     } else if(picNum == 7) {
       picNum = 6;
-      presetBoolean.preset2 = 0;
+      myBoolean.preset2 = 0;
 
     }
     //Serial.println(picNum);
@@ -495,11 +491,11 @@ void bPreSet3PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset3);
-      presetBoolean.preset3 = 1;
+      myBoolean.preset3 = 1;
 
     } else if(picNum == 7) {
       picNum = 6;
-      presetBoolean.preset3 = 0;
+      myBoolean.preset3 = 0;
   
     }
     //Serial.println(picNum);
@@ -514,11 +510,11 @@ void bPreSet4PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset4);
-      presetBoolean.preset4 = 1;
+      myBoolean.preset4 = 1;
    
     } else if(picNum == 7) {
       picNum = 6;
-      presetBoolean.preset4 = 0;
+      myBoolean.preset4 = 0;
          
     }
     //Serial.println(picNum);
@@ -533,12 +529,12 @@ void bPreSet5PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset5);
-      presetBoolean.preset5 = 1;
+      myBoolean.preset5 = 1;
 
 
     } else if(picNum == 7) {
       picNum = 6;
-      presetBoolean.preset5 = 0;
+      myBoolean.preset5 = 0;
 
    
     }
@@ -554,12 +550,12 @@ void bPreSet6PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset6);
-      presetBoolean.preset6 = 1;
+      myBoolean.preset6 = 1;
 
 
     } else if(picNum == 7) {
       picNum = 6;
-      presetBoolean.preset6 = 0;
+      myBoolean.preset6 = 0;
       
     }
     //Serial.println(picNum);
@@ -574,6 +570,13 @@ void turnOffPresetButtons(){
     bPreSet4.setPic(6);
     bPreSet5.setPic(6);
     bPreSet6.setPic(6);
+    myBoolean.preset1 = 0;
+    myBoolean.preset2 = 0;
+    myBoolean.preset3 = 0;
+    myBoolean.preset4 = 0;
+    myBoolean.preset5 = 0;
+    myBoolean.preset6 = 0;
+
 
     sendCommand("ref 0");
 }
@@ -715,14 +718,14 @@ void bPreheatPopCallback(void *ptr)
     if(picNum == 14) {
       picNum = 15;
 
-      preheat = true;
+      myBoolean.preheat = 1;
       
     } else if(picNum == 15) {
       picNum = 14;
 
-      preheat = false;
+      myBoolean.preheat = 0;
     }
-    DEBUG_PRINTLN(preheat);
+    DEBUG_PRINTLN(myBoolean.preheat);
     bPreheat.setPic(picNum);
     sendCommand("ref bPreheat");
 }
@@ -1479,12 +1482,13 @@ void setup() {
   nexInit();
   tVersion.setText(VERSION);  
 
-  presetBoolean.preset1 = 0;
-  presetBoolean.preset2 = 0;
-  presetBoolean.preset3 = 0;
-  presetBoolean.preset4 = 0;
-  presetBoolean.preset5 = 0;
-  presetBoolean.preset6 = 0;
+  myBoolean.preset1 = 0;
+  myBoolean.preset2 = 0;
+  myBoolean.preset3 = 0;
+  myBoolean.preset4 = 0;
+  myBoolean.preset5 = 0;
+  myBoolean.preset6 = 0;
+  myBoolean.preheat = 0;
   
   #ifdef DEBUG
     Serial.begin(9600);
@@ -2119,22 +2123,22 @@ void settingsEnterFunction(){
   DEBUG_PRINTLN(F("settingsEnter"));
   page2.show();
   
-  if(presetBoolean.preset1 == 1){
+  if(myBoolean.preset1 == 1){
       bPreSet1.setPic(7);
   }
-  if(presetBoolean.preset2 == 1){
+  if(myBoolean.preset2 == 1){
       bPreSet2.setPic(7);
   }
-  if(presetBoolean.preset3 == 1){
+  if(myBoolean.preset3 == 1){
       bPreSet3.setPic(7);
   }
-  if(presetBoolean.preset4 == 1){
+  if(myBoolean.preset4 == 1){
       bPreSet4.setPic(7);
   }
-  if(presetBoolean.preset5 == 1){
+  if(myBoolean.preset5 == 1){
       bPreSet5.setPic(7);
   }
-  if(presetBoolean.preset6 == 1){
+  if(myBoolean.preset6 == 1){
       bPreSet6.setPic(7);
   }
  
