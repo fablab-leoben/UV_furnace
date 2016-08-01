@@ -118,6 +118,7 @@ byte LED3_intensity = 0;
 byte LED1_intens = 0;
 byte LED2_intens = 0;
 byte LED3_intens = 0;
+
 /************************************************
 Config files
 ************************************************/
@@ -130,6 +131,13 @@ const char CONFIG_preset6[] = "preset6.cfg";
 
 boolean didReadConfig;
 boolean readConfiguration();
+
+boolean preset1On = false;
+boolean preset2On = false;
+boolean preset3On = false;
+boolean preset4On = false;
+boolean preset5On = false;
+boolean preset6On = false;
 
 /************************************************
 Ethernet
@@ -440,10 +448,10 @@ void bPreSet1PopCallback(void *ptr)
     picNum = 7;
     turnOffPresetButtons();
     didReadConfig = readConfiguration(CONFIG_preset1);
-    
+    preset1On = true;
     } else if(picNum == 7) {
       picNum = 6;
-      
+      preset1On = false;
     }
     //Serial.println(picNum);
 
@@ -459,10 +467,10 @@ void bPreSet2PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset2);
-
+      preset2On = true;
     } else if(picNum == 7) {
       picNum = 6;
-      
+      preset2On = false;
     }
     //Serial.println(picNum);
     bPreSet2.setPic(picNum);
@@ -477,10 +485,10 @@ void bPreSet3PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset3);
-
+      preset3On = true;
     } else if(picNum == 7) {
       picNum = 6;
-      
+      preset3On = false;      
     }
     //Serial.println(picNum);
     bPreSet3.setPic(picNum);
@@ -494,10 +502,11 @@ void bPreSet4PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset4);
- 
+      preset4On = true;
+    
     } else if(picNum == 7) {
       picNum = 6;
-      
+      preset4On = false;      
     }
     //Serial.println(picNum);
     bPreSet4.setPic(picNum);
@@ -511,10 +520,11 @@ void bPreSet5PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset5);
+      preset5On = true;
 
     } else if(picNum == 7) {
       picNum = 6;
-      
+      preset5On = false;   
     }
     //Serial.println(picNum);
     bPreSet5.setPic(picNum);
@@ -528,10 +538,11 @@ void bPreSet6PopCallback(void *ptr)
       picNum = 7;
       turnOffPresetButtons();
       didReadConfig = readConfiguration(CONFIG_preset6);
+      preset6On = true;
 
     } else if(picNum == 7) {
       picNum = 6;
-      
+      preset6On = false;
     }
     //Serial.println(picNum);
     bPreSet6.setPic(picNum);
@@ -2082,6 +2093,24 @@ void idleExitFunction(){
 void settingsEnterFunction(){
   DEBUG_PRINTLN(F("settingsEnter"));
   page2.show();
+  if(preset1On == true){
+      bPreSet1.setPic(7);
+  }
+  if(preset2On == true){
+      bPreSet2.setPic(7);
+  }
+  if(preset3On == true){
+      bPreSet3.setPic(7);
+  }
+  if(preset4On == true){
+      bPreSet4.setPic(7);
+  }
+  if(preset5On == true){
+      bPreSet5.setPic(7);
+  }
+  if(preset6On == true){
+      bPreSet6.setPic(7);
+  }
   sendCommand("ref 0");
 }
 void settingsUpdateFunction(){
@@ -2375,7 +2404,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
    * You probably won't need to change this number.
    */
   selSD();
-  const uint8_t CONFIG_LINE_LENGTH = 30;
+  const uint8_t CONFIG_LINE_LENGTH = 20;
   
   // The open configuration file.
   SDConfigFile cfg;
