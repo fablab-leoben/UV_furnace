@@ -2034,22 +2034,22 @@ void settingsEnterFunction(){
   page2.show();
   
   if(myBoolean.preset1 == 1){
-      bPreSet1.setPic(7);
+      bPreSet1.setPic(4);
   }
   if(myBoolean.preset2 == 1){
-      bPreSet2.setPic(7);
+      bPreSet2.setPic(4);
   }
   if(myBoolean.preset3 == 1){
-      bPreSet3.setPic(7);
+      bPreSet3.setPic(4);
   }
   if(myBoolean.preset4 == 1){
-      bPreSet4.setPic(7);
+      bPreSet4.setPic(4);
   }
   if(myBoolean.preset5 == 1){
-      bPreSet5.setPic(7);
+      bPreSet5.setPic(4);
   }
   if(myBoolean.preset6 == 1){
-      bPreSet6.setPic(7);
+      bPreSet6.setPic(4);
   }
  
   sendCommand("ref 0");
@@ -2072,17 +2072,17 @@ void setLEDsEnterFunction(){
   if(myBoolean.bLED1State == true){
     bLED1.setPic(11);
   }else{
-    bLED1.setPic(10);
+    bLED1.setPic(9);
   }
   if(myBoolean.bLED2State == true){
     bLED2.setPic(11);
   }else{
-    bLED2.setPic(10);
+    bLED2.setPic(9);
   }
   if(myBoolean.bLED3State == true){
     bLED3.setPic(11);
   }else{
-    bLED3.setPic(10);
+    bLED3.setPic(9);
   } 
   sendCommand("ref 0");
 }
