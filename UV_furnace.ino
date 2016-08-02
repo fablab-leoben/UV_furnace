@@ -575,19 +575,18 @@ void bPreSet6PopCallback(void *ptr)
 }
 
 void turnOffPresetButtons(){
-    bPreSet1.setPic(6);
-    bPreSet2.setPic(6);
-    bPreSet3.setPic(6);
-    bPreSet4.setPic(6);
-    bPreSet5.setPic(6);
-    bPreSet6.setPic(6);
+    bPreSet1.setPic(3);
+    bPreSet2.setPic(3);
+    bPreSet3.setPic(3);
+    bPreSet4.setPic(3);
+    bPreSet5.setPic(3);
+    bPreSet6.setPic(3);
     myBoolean.preset1 = 0;
     myBoolean.preset2 = 0;
     myBoolean.preset3 = 0;
     myBoolean.preset4 = 0;
     myBoolean.preset5 = 0;
     myBoolean.preset6 = 0;
-
 
     sendCommand("ref 0");
 }
