@@ -1380,7 +1380,6 @@ void setup() {
   digitalWrite(RelayPin, HIGH);  // make sure it is off to start
 
   nexInit();
-  tVersion.setText(VERSION);  
 
   myBoolean.preset1 = 0;
   myBoolean.preset2 = 0;
@@ -1480,7 +1479,7 @@ void setup() {
 
   //Page8
   bHomeCredits.attachPop(bHomeCreditsPopCallback, &bHomeCredits);
-
+  
   //declare and init pins
   
   //Disable the default square wave of the SQW pin.
@@ -1931,9 +1930,11 @@ void FinishAutoTune()
 *******************************************************************************/
 void initEnterFunction(){
   DEBUG_PRINTLN(F("initEnter"));
-  
+
   //start the timer of this cycle
   initTimer = 0;
+  page0.show();
+  tVersion.setText(VERSION); 
 
   sendNTPpacket(timeServer); // send an NTP packet to a time server
   selETH();
