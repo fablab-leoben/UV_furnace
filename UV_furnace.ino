@@ -389,10 +389,10 @@ NexButton bHomePID = NexButton(6, 1, "bHomePID");
 NexButton bAutotune = NexButton(6, 2, "bAutotune");
 
 //Page7
-NexButton bReset = NexButton(6, 1, "bReset");
+NexButton bReset = NexButton(7, 1, "bReset");
 
 //Page8
-NexButton bHomeCredits = NexButton(6, 1, "bHomeCredits");
+NexButton bHomeCredits = NexButton(8, 1, "bHomeCredits");
 
 char buffer[5] = {0};
 
