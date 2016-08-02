@@ -617,7 +617,7 @@ void bHomeSetPopCallback(void *ptr)
 }
 
 void bCreditsPopCallback(void *ptr)
-{
+{ 
   page8.show();
 }
 
@@ -1353,7 +1353,7 @@ void bResetPopCallback(void *ptr)
 //Page8
 void bHomeCreditsPopCallback(void *ptr)
 {
-    uvFurnaceStateMachine.transitionTo(settingsState);   
+  page2.show();
 }
 //End Page8
 
