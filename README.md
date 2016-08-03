@@ -54,9 +54,10 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  38  |   1    |  []  | USB 2.0 Anschlusskabel USB 2.0 Stecker A - USB 2.0 Stecker B 0.50 m       |                           |
 |  39  |   1    |  []  | USB-Einbaubuchsen vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
 |  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
-|  41  |   4    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
-|  42  |   4    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
-|  43  |   4    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                  |
+|  41  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
+|  42  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
+|  43  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
+|  43  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              | optional                 |
 
 ### 3. CAD design
 
