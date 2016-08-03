@@ -1364,6 +1364,7 @@ volatile boolean alarmIsrWasCalled = false;
 
 void alarmIsr(){
     alarmIsrWasCalled = true;
+    uvFurnaceStateMachine.immediateTransitionTo(idleState);
 }
 
 /*******************************************************************************
@@ -1557,7 +1558,13 @@ SIGNAL(TIMER2_OVF_vect)
 ************************************************/
 void furnaceDoor() {
   DEBUG_PRINTLN(F("Door open"));
-  uvFurnaceStateMachine.immediateTransitionTo(idleState);
+  if(uvFurnaceStateMachine.isInState(runState) == true){
+      uvFurnaceStateMachine.immediateTransitionTo(errorState);
+  }else {
+    return;
+  }
+  
+  //uvFurnaceStateMachine.immediateTransitionTo(idleState);
 }
 
 /************************************************
