@@ -24,7 +24,6 @@
  * MA 02111-1307 USA                                                    *
  *----------------------------------------------------------------------*/
 
-#include <Arduino.h>
 #include <BlynkSimpleEthernet2.h>
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>
