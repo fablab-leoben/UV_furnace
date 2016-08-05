@@ -62,6 +62,8 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
 
+
+
 typedef struct myBoolStruct
 {
    uint8_t preset1: 1;
@@ -270,7 +272,10 @@ elapsedMillis GraphUpdateInterval;
 
 /*******************************************************************************
  Blynk
+ Here you decide if you want to use Blynk or not
+ Your blynk token goes in another file to avoid sharing it by mistake
 *******************************************************************************/
+#define USE_BLYNK "yes"
 #define BLYNK_INTERVAL   10000
 elapsedMillis BlynkInterval;
 
@@ -1532,7 +1537,11 @@ void setup() {
   //Timer2 Overflow Interrupt Enable
   TIMSK2 |= 1<<TOIE2;
   
-  Blynk.begin(auth);
+   if (USE_BLYNK == "yes") {
+    //init Blynk
+    Blynk.begin(auth);
+  }
+
   DEBUG_PRINTLN(F("setup ready"));
 
 }
@@ -1592,8 +1601,10 @@ void DriveOutput()
 void loop() {
   nexLoop(nex_listen_list);
   
-  Blynk.run();
-  
+  if (USE_BLYNK == "yes") {
+    //all the Blynk magic happens here
+    Blynk.run();
+  }  
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
   readTemperature();
   readInternalTemperature();
