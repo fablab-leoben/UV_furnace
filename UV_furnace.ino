@@ -97,6 +97,7 @@ State setTimer = State( setTimerEnterFunction, setTimerUpdateFunction, setTimerE
 State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction ); 
 State runState = State( runEnterFunction, runUpdateFunction, runExitFunction );
 State errorState = State( errorEnterFunction, errorUpdateFunction, errorExitFunction );
+State offState = State ( offEnterFunction, offUpdateFunction, offExitFunction );
 
 //initialize state machine, start in state: Idle
 FSM uvFurnaceStateMachine = FSM(initState);
@@ -243,6 +244,7 @@ float lastTemperature;
 /*******************************************************************************
  DS3231 
 *******************************************************************************/
+#define SQW_PIN 2
 #define DS3231_TEMP_INTERVAL   2000
 elapsedMillis DS3231TempInterval;
 
@@ -441,14 +443,14 @@ void bOnOffPopCallback(void *ptr)
      if(picNum == 1) {
       picNum = 2;
 
-      uvFurnaceStateMachine.transitionTo(runState);
+      uvFurnaceStateMachine.immediateTransitionTo(runState);
 
     } else {
       picNum = 1;
 
       controlLEDs(0, 0, 0);
       
-      uvFurnaceStateMachine.transitionTo(idleState);
+      uvFurnaceStateMachine.immediateTransitionTo(idleState);
     }
     bOnOff.setPic(picNum);
     sendCommand("ref bOnOff");
@@ -685,7 +687,6 @@ void bTempMinus1PopCallback(void *ptr)
     {
         Setpoint = 0;
     }
-    
    
     tTempSetup.setText(intToChar(Setpoint));
 }
@@ -1367,8 +1368,8 @@ void bHomeCreditsPopCallback(void *ptr)
 volatile boolean alarmIsrWasCalled = false;
 
 void alarmIsr(){
+    DEBUG_PRINTLN("ALARM");
     alarmIsrWasCalled = true;
-    uvFurnaceStateMachine.immediateTransitionTo(idleState);
 }
 
 /*******************************************************************************
@@ -1490,6 +1491,9 @@ void setup() {
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
 
+  pinMode(SQW_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
+
   // Initialize the PID and related variables
   LoadParameters();
   myPID.SetTunings(Kp,Ki,Kd);
@@ -1609,6 +1613,14 @@ void loop() {
   readInternalTemperature();
   updateCurrentTemperature();
   updateBlynk();
+
+  if (alarmIsrWasCalled){
+     if (RTC.alarm(ALARM_1)) {
+        uvFurnaceStateMachine.immediateTransitionTo(offState);
+     }
+     alarmIsrWasCalled = false;
+  }
+
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
@@ -1648,7 +1660,6 @@ int readTemperature(){
 
    //time is up, reset timer
    MAX31855SampleInterval = 0;
-   DEBUG_PRINTLN(thermocouple.readCelsius());
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
    
@@ -2030,16 +2041,18 @@ void initExitFunction(){
 }
 
 void idleEnterFunction(){
+  
   DEBUG_PRINTLN(F("idleEnter"));
   page1.show();
   hour_uv.setText(intToChar(hours_oven));
   min_uv.setText(intToChar(minutes_oven));
   sendCommand("ref 0");
+  digitalWrite(RelayPin, HIGH);  // make sure it is off
+
 }
 void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
   myPID.SetMode(MANUAL);
-  digitalWrite(RelayPin, HIGH);  // make sure it is off
   fadePowerLED();
 }
 void idleExitFunction(){
@@ -2173,6 +2186,7 @@ void runEnterFunction(){
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
 }
+
 void runUpdateFunction(){
    //DEBUG_PRINTLN(F("runUpdate"));
     
@@ -2211,6 +2225,24 @@ void errorUpdateFunction(){
 }
 void errorExitFunction(){
   //DEBUG_PRINTLN(F("errorExit"));
+}
+
+void offEnterFunction(){
+    DEBUG_PRINTLN(F("offExit"));
+
+    myPID.SetMode(MANUAL);
+    controlLEDs(0,0,0);
+    digitalWrite(RelayPin, HIGH);  // make sure it is off
+    RTC.alarm(ALARM_1);
+    RTC.alarmInterrupt(ALARM_1, false);
+}
+
+void offUpdateFunction(){
+  
+}
+
+void offExitFunction(){
+  
 }
 
 //################# Chip-Select ansteuern ###################################
