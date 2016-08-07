@@ -4,7 +4,8 @@
 
 ### 1. [Introduction](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#1-introduction-1 "Introduction")
 ### 2. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#2-bill-of-materials-1 "Bill of Materials")
-### 3. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#3-cad-design-1 "CAD design")
+### 3. [required tools](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#3-required-tools-1 "Required tools")
+### 4. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/develop/README.md#4-cad-design-1 "CAD design")
 
 ### 1. Introduction
 
@@ -59,13 +60,33 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  43  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
 |  44  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              |                           |
 |  45  |   3    |  []  | Resistor 4,7 kOhm                                                         |                           |
+|  46  |   1    |  []  | shrink tubing                                                             |                           |
+|  47  |   1    |  []  | bell wire or other wires in different colors                              |                           |
 
-### 3. CAD design
+
+### 3. Required tools
+
+| Pos. |            Tool                      |        comment          |
+|------|--------------------------------------|-------------------------|
+|  1   |  different Screwdrivers              |                         |
+|  2   |  different hex key drivers           |                         |
+|  3   |  3D Printer                          |                         |
+|  4   |  soldering iron                      |                         |
+|  5   |  drilling machine                    |                         |
+|  6   |  different drills                    |                         |
+|  7   |  hammer                              |                         |
+|  8   |  small buzzsaw or Lasercutter        |                         |
+|  9   |  multimeter                          |                         |
+| 10   |  jigsaw                              |                         |
+| 11   |  lighter                             |                         |
+
+
+### 4. CAD design
 
 The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing "Onshape"). It is free for Hobbyists, Makers.
 
 You can find and download the UV furnace design [here](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80 "UV furnace design").
 
-### 4. Circuit
+### 5. Circuit
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/develop/circuit/UV_furnace_circuit.png "Circuit")
