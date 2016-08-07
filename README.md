@@ -62,6 +62,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  45  |   3    |  []  | Resistor 4,7 kOhm                                                         |                           |
 |  46  |   1    |  []  | shrink tubing                                                             |                           |
 |  47  |   1    |  []  | bell wire or other wires in different colors                              |                           |
+|  48  |   2    |  []  | small hinge from your local DIY market                                    |                           |
 
 
 ### 3. Required tools
@@ -79,7 +80,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  9   |  small buzzsaw or Lasercutter        |                         |
 | 10   |  multimeter                          |                         |
 | 11   |  jigsaw                              |                         |
-| 12   |  lighter                             |                         |
+| 12   |  lighter                             | for shrink tubing       |
 
 
 ### 4. CAD design
