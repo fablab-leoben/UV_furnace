@@ -57,7 +57,8 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  41  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
 |  42  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
 |  43  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
-|  43  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              | optional                 |
+|  44  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              |                           |
+|  45  |   3    |  []  | Resistor 4,7 kOhm                                                         |                           |
 
 ### 3. CAD design
 
