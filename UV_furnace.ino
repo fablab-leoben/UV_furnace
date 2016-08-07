@@ -119,7 +119,7 @@ elapsedMillis initTimer;
 #define RelayPin 32
 
 // Reed switch
-#define reedSwitch 22
+#define reedSwitch 19
 
 // ON/OFF Button LED
 #define onOffButton 12
@@ -1351,7 +1351,7 @@ void bAutotunePopCallback(void *ptr)
 //Page7
 void bResetPopCallback(void *ptr)
 {
-
+  
 }
 //End Page7
 
@@ -1407,7 +1407,7 @@ void setup() {
 //  Serial2.begin(9600);
 
   pinMode(reedSwitch, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, RISING);
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
@@ -1569,14 +1569,11 @@ SIGNAL(TIMER2_OVF_vect)
  Timer Interrupt Handler
 ************************************************/
 void furnaceDoor() {
-  DEBUG_PRINTLN(F("Door open"));
   if(uvFurnaceStateMachine.isInState(runState) == true){
       uvFurnaceStateMachine.immediateTransitionTo(errorState);
   }else {
     return;
   }
-  
-  //uvFurnaceStateMachine.immediateTransitionTo(idleState);
 }
 
 /************************************************
@@ -2172,7 +2169,7 @@ void setPIDExitFunction(){
 }
 
 void runEnterFunction(){
-  //DEBUG_PRINTLN(F("runEnter"));
+   DEBUG_PRINTLN(F("runEnter"));
  
    //set alarm
    setDS3231Alarm(minutes_oven, hours_oven);
@@ -2215,9 +2212,11 @@ void runExitFunction(){
 void errorEnterFunction(){
   DEBUG_PRINTLN(F("errorEnter"));
   //Turn off LEDs
-  controlLEDs(0, 0, 0);
-  //Turn off relay
-  digitalWrite(RelayPin, HIGH);  // make sure it is off to start
+  myPID.SetMode(MANUAL);
+  controlLEDs(0,0,0);
+  digitalWrite(RelayPin, HIGH);  // make sure it is off
+  RTC.alarm(ALARM_1);
+  RTC.alarmInterrupt(ALARM_1, false);
   Blynk.notify("Error occured!");
 }
 void errorUpdateFunction(){
