@@ -68,17 +68,18 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 
 | Pos. |            Tool                      |        comment          |
 |------|--------------------------------------|-------------------------|
-|  1   |  different Screwdrivers              |                         |
-|  2   |  different hex key drivers           |                         |
-|  3   |  3D Printer                          |                         |
-|  4   |  soldering iron                      |                         |
-|  5   |  drilling machine                    |                         |
-|  6   |  different drills                    |                         |
-|  7   |  hammer                              |                         |
-|  8   |  small buzzsaw or Lasercutter        |                         |
-|  9   |  multimeter                          |                         |
-| 10   |  jigsaw                              |                         |
-| 11   |  lighter                             |                         |
+|  1   |  patience ;)                         |                         |
+|  2   |  different Screwdrivers              |                         |
+|  3   |  different hex key drivers           |                         |
+|  4   |  3D Printer                          |                         |
+|  5   |  soldering iron                      |                         |
+|  6   |  drilling machine                    |                         |
+|  7   |  different drills                    |                         |
+|  8   |  hammer                              |                         |
+|  9   |  small buzzsaw or Lasercutter        |                         |
+| 10   |  multimeter                          |                         |
+| 11   |  jigsaw                              |                         |
+| 12   |  lighter                             |                         |
 
 
 ### 4. CAD design
