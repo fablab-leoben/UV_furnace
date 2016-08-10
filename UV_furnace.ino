@@ -2030,7 +2030,7 @@ void initUpdateFunction(){
   //DEBUG_PRINTLN("initUpdate");
   //time is up?
   if (initTimer > INIT_TIMEOUT) {
-    uvFurnaceStateMachine.transitionTo(idleState);
+    uvFurnaceStateMachine.transitionTo(offState);
   }
 }
 void initExitFunction(){
@@ -2040,17 +2040,9 @@ void initExitFunction(){
 void idleEnterFunction(){
   
   DEBUG_PRINTLN(F("idleEnter"));
-  page1.show();
-  hour_uv.setText(intToChar(hours_oven));
-  min_uv.setText(intToChar(minutes_oven));
-  sendCommand("ref 0");
-  digitalWrite(RelayPin, HIGH);  // make sure it is off
-
 }
 void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
-  myPID.SetMode(MANUAL);
-  fadePowerLED();
 }
 void idleExitFunction(){
   DEBUG_PRINTLN(F("idleExit"));
@@ -2199,7 +2191,8 @@ void runUpdateFunction(){
     //  Serial.println(Output);
    //}
    updateGraph();
-   blinkPowerLED();
+   
+   fadePowerLED();
    refreshCountdown();
 }
 
@@ -2221,6 +2214,7 @@ void errorEnterFunction(){
 }
 void errorUpdateFunction(){
   DEBUG_PRINTLN(F("errorUpdate"));
+  blinkPowerLED();
 }
 void errorExitFunction(){
   //DEBUG_PRINTLN(F("errorExit"));
@@ -2229,6 +2223,11 @@ void errorExitFunction(){
 void offEnterFunction(){
     DEBUG_PRINTLN(F("offExit"));
 
+    page1.show();
+    hour_uv.setText(intToChar(hours_oven));
+    min_uv.setText(intToChar(minutes_oven));
+    sendCommand("ref 0");
+    
     myPID.SetMode(MANUAL);
     controlLEDs(0,0,0);
     digitalWrite(RelayPin, HIGH);  // make sure it is off
