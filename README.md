@@ -34,11 +34,11 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  17  |   1    |  []  | 240 V 50 W heater mat                                                     |                           |
 |  18  |   1    |  []  | Nichia SMD LED UV NCSU275 365 nm                                          | on a 10 x 10 mm pcb       |
 |  19  |   1    |  []  | Nichia SMD LED UV NCSU275 400 nm                                          | on a 10 x 10 mm pcb       |
-|  20  |   1    |  []  | NIKKISIO 300 nm LED from EQ Photonics GmbH                                | ~ 260 € per piece         |
+|  20  |   1    |  []  | NIKKISIO 300 nm LED from EQ Photonics GmbH                                | ~ 260 €/piece (optional)  |
 |  21  |   1    |  []  | Arctic Silver Wärmeleitkleber (2x 3.5g)                                   |                           |
 |  22  |   1    |  []  | fused quarz glass plate 200 x 200 x 2 mm                                  |                           |
 |  23  |   1    |  []  | Aluminium plate 200x200x3                                                 |                           |
-|  24  |   1    |  []  | Geocel Plumba Flue Silikondichtmasse, bis+315°C, Kartusche, 310ml         |                           |
+|  24  |   1    |  []  | Geocel Plumba Flue Silikondichtmasse, bis+315°C, Kartusche, 310ml         | optional                  |
 |  25  |   1    |  []  | IEC-Steckverbinder C14, Tafelmontage, gerade 10A 250 V ac                 |                           |
 |  26  |  24    |  []  | Openbeam Corner Cubes                                                     |                           |
 |  27  |  10    | [m]  | Openbeam beam                                                             |                           |
