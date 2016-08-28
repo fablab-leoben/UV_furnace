@@ -96,3 +96,6 @@ You can find and download the UV furnace design [here](https://cad.onshape.com/d
 ### 5. Circuit
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
+
+### 6. Outlook
+
