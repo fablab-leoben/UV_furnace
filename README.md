@@ -67,6 +67,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  50  |   1    | [m]  | three-pole electric cable 1,5 mm²                                         |                           |
 |  51  |   5    | [m]  | eight-pole bell wire | or other wires with different colors |
 |  52  |   1    |  []  | Female/Male 'Extension' Jumper Wires - 40 x 6"                            | to wire the sensors       |
+|  53  |   2    | [m²] | plywood                                                                   |                           |
 
 ### 3. Required tools
 
