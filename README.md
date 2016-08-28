@@ -6,7 +6,7 @@
 ### 2. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#2-bill-of-materials-1 "Bill of Materials")
 ### 3. [Required tools](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#3-required-tools-1 "Required tools")
 ### 4. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
-### 5. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-to-do-1 "Circuit")
+### 5. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-circuit-1 "Circuit")
 ### 6. [To Do]
 
 ### 1. Introduction
