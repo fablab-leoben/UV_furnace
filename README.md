@@ -39,7 +39,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  22  |   1    |  []  | fused quarz glass plate 200 x 200 x 2 mm                                  |                           |
 |  23  |   1    |  []  | Aluminium plate 200x200x3                                                 |                           |
 |  24  |   1    |  []  | Geocel Plumba Flue Silikondichtmasse, bis+315°C, Kartusche, 310ml         |                           |
-|  25  |   1    |  []  | IEC-Steckverbinder C13, Tafelmontage, Anschluss Löten gerade 10A 250 V ac |                           |
+|  25  |   1    |  []  | IEC-Steckverbinder C14, Tafelmontage, gerade 10A 250 V ac                 |                           |
 |  26  |  24    |  []  | Openbeam Corner Cubes                                                     |                           |
 |  27  |  10    | [m]  | Openbeam beam                                                             |                           |
 |  28  |  36    |  []  | Makerbeam Corner brackets                                                 |                           |
@@ -55,15 +55,18 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  38  |   1    |  []  | USB 2.0 Anschlusskabel USB 2.0 Stecker A - USB 2.0 Stecker B 0.50 m       |                           |
 |  39  |   1    |  []  | USB-Einbaubuchsen vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
 |  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
-|  41  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
-|  42  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
-|  43  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
-|  44  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              |                           |
-|  45  |   3    |  []  | Resistor 4,7 kOhm                                                         |                           |
-|  46  |   1    |  []  | shrink tubing                                                             |                           |
-|  47  |   1    |  []  | bell wire or other wires in different colors                              |                           |
-|  48  |   2    |  []  | small hinge from your local DIY market                                    |                           |
-
+|  41  |   1    |  []  | Netzkabel, C13 auf Stecker mit Schutzleiterkontakt, 2,5m, 16 A, 250 V     |                           |
+|  42  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
+|  43  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
+|  44  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
+|  45  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              |                           |
+|  46  |   3    |  []  | Resistor 4,7 kOhm                                                         |                           |
+|  47  |   1    |  []  | shrink tubing                                                             |                           |
+|  48  |   1    |  []  | bell wire or other wires in different colors                              |                           |
+|  49  |   2    |  []  | small hinge from your local DIY market                                    |                           |
+|  50  |   1    | [m]  | three-pole electric cable 1,5 mm²                                         |                           |
+|  51  |   5    | [m]  | eight-pole bell wire | or other wires with different colors |
+|  52  |   1    |  []  | Female/Male 'Extension' Jumper Wires - 40 x 6"                            | to wire the sensors       |
 
 ### 3. Required tools
 
