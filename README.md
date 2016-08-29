@@ -131,12 +131,17 @@ This will save you time as soon as you have found the ideal settings for curing 
 
 From the settings screen you can switch to the temperature setup, UV LED setup, timer setup and PID setup:
 
-![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "Temperature screen")
-![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "LED screen")
-![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "Timer screen")
-![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "PID screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Temp%20Setup%20off.png "Temperature screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/LED%20Setup%20on.png "LED screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Timer%20Setup.png "Timer screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/PID.png "PID screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Credits.png "Credits screen")
 
-Changing the PID values is currently not possible because my calculations are really good, but it will be implemented soon.
+Changing the PID values is currently not supported because my calculations are really good at the moment, but it will be implemented soon.
+
+If the UV furnace detects an error, it shuts down and switches to the error screen:
+
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Error.png "Error screen")
 
 #### 6.2 Flashing the display
 
