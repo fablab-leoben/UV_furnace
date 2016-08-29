@@ -8,6 +8,7 @@
 ### 4. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
 ### 5. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-circuit-1 "Circuit")
 ### 6. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
+### 6.1 [Screenshot]( "Screenshot")
 ### 7. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
@@ -108,6 +109,10 @@ You can find and download the UV furnace design [here](https://cad.onshape.com/d
 Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
+
+### 6.1 Screenshot
+
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
 
 ### 7. To Do
 * preheat function
