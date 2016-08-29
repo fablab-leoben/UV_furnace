@@ -8,7 +8,8 @@
 ### 4. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
 ### 5. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-circuit-1 "Circuit")
 ### 6. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
-#### 6.1 [HMI Screenshots]( "")
+#### 6.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
+#### 6.2 [Flashing the display]( "")
 ### 7. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
 #### 7.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
 ### 8. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
@@ -114,7 +115,7 @@ The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI
 
 #### 6.1 HMI Screenshots
 
-
+#### 6.2 Flashing the display
 
 ### 7. App
 
