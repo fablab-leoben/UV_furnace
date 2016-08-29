@@ -12,6 +12,8 @@
 #### 7.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
 #### 7.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
 ### 8. [UV furnace firmware](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#8-furnace-firmware-1 "UV furnace firmware")
+#### 8.1 [Libraries]( "")
+#### 8.2 [Firmware]( "")
 ### 9. [Smartphone app](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "Smartphone app")
 #### 9.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
 ### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
