@@ -137,7 +137,7 @@ From the settings screen you can switch to the temperature setup, UV LED setup, 
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/PID.png "PID screen")
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Credits.png "Credits screen")
 
-Changing the PID values is currently not supported because my calculations are really good at the moment, but it will be implemented soon.
+Changing the PID values is currently not supported because my calculations are really good at the moment, but it will be implemented soon. There is also a PID autotuning feature integrated which will automatically determine decent tuning constants for the Arduino PID Library. This feature currently cannot be triggered by the user. 
 
 If the UV furnace detects an error, it shuts down and switches to the error screen:
 
