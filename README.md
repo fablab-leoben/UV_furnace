@@ -7,9 +7,10 @@
 ### 3. [Required tools](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#3-required-tools-1 "Required tools")
 ### 4. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
 ### 5. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-circuit-1 "Circuit")
-### 6. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
-#### 6.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
-### 7. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
+### 6. [Human Machine Interface (HMI)]( "Human Machine Interface (HMI)")
+### 7. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
+#### 7.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
+### 8. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
 
@@ -106,17 +107,21 @@ I have designed the circuit with [Fritzing](http://fritzing.org/download/). Down
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
 
-### 6. App
+### 6. Human Machine Interface (HMI)
+
+
+
+### 7. App
 
 Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
 
-#### 6.1 Screenshot
+#### 7.1 Screenshot
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
 
-### 7. To Do
+### 8. To Do
 * preheat function
 * PID finetuning
 * PID tuning without reflashing the sketch
