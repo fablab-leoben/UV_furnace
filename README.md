@@ -102,6 +102,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing "Onshape"). It is free for Hobbyists, Makers.
 
 You can find and download the UV furnace design [here](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80 "UV furnace design").
+Please feel free to use other materials for your furnace design and just take measurements as you need them. 
 
 ### 5. Circuit
 
@@ -111,9 +112,21 @@ I have designed the circuit with [Fritzing](http://fritzing.org/download/). Down
 
 ### 6. Human Machine Interface (HMI)
 
-The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI prototyping tool that's available for ALL platforms. The interface is based on the [Material Design Guidelines](https://material.google.com/) from Google for better useability.
+The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI prototyping tool that's available for ALL platforms. The interface is based on the [Material Design Guidelines](https://material.google.com/) from Google for better useability. You can design each page with the GUI software. For example: you can design one screen where all buttons of your page are off. Then you save the same screen a second time where all buttons are on and a third time where all buttons are pressed. Now you can import these pictures into the [Nextion Editor](http://nextion.itead.cc/download.html) and place button objects, etc on your buttons. The Nextion editor uses partial overlays of your images. This makes designing beautiful interfaces very easy. See the files LED Setup off.png, LED Setup on.png, LED Setup pressed.png for a better imagination. The display has its own processor so it does not use ressources of your Arduino.
 
 #### 6.1 HMI Screenshots
+
+The start screen is shown during the device boots while everything is initialized.
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Start.png "Start screen")
+
+After the start screen you will see the overview page. There you can turn the furnace on/off got to settings and see the timer, current temperature and temperature diagram.
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Overview.png "Overview screen")
+
+From the settings screen you can use preconfigured settings which are stored on the SD card which you put into the SD card slot of the ethernet shield. Please see [preset1.cfg](https://github.com/fablab-leoben/UV_furnace/blob/master/preset1.cfg) for an easy example.
+This will save you time as soon as you have found the ideal settings for curing your 3D printed parts.
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "Settings screen")
+
+
 
 #### 6.2 Flashing the display
 
