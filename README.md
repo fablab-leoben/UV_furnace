@@ -3,7 +3,7 @@
 ## Table of contents
 
 ### 1. [Introduction](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#1-introduction-1 "Introduction")
-### 2. [Safety first]( "")
+### 2. [Safety first](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#2-safety-first-1 "Safety first")
 ### 3. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#2-bill-of-materials-1 "Bill of Materials")
 ### 4. [Required tools](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#3-required-tools-1 "Required tools")
 ### 5. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
@@ -11,7 +11,7 @@
 ### 7. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
 #### 7.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
 #### 7.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
-### 8. [Furnace firmware]( "https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#8-furnace-firmware-1")
+### 8. [UV furnace firmware](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#8-furnace-firmware-1 "UV furnace firmware")
 ### 9. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
 #### 9.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
 ### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
@@ -158,7 +158,7 @@ If the UV furnace detects an error, it shuts down and switches to the error scre
 Save the [UV_furnace.tft](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.tft) file on a micro SD card, insert it into the display and supply it with power. The flash process starts automatically. After that remove the micro SD card and repower the display.
 If you would like to make changes to the interface just open [UV_furnace.HMI](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.HMI) with the [Nextion editor](http://nextion.itead.cc/download.html).
 
-### 8. Furnace firmware
+### 8. UV furnace firmware
 
 ### 9. App
 
