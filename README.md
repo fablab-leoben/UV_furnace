@@ -102,6 +102,8 @@ You can find and download the UV furnace design [here](https://cad.onshape.com/d
 
 ### 5. Circuit
 
+I have designed the circuit with [Fritzing](http://fritzing.org/download/). Download the free software to be able to modify the [circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.fzz).
+
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
 
 ### 6. App
