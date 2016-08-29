@@ -117,16 +117,26 @@ The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI
 #### 6.1 HMI Screenshots
 
 The start screen is shown during the device boots while everything is initialized.
+
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Start.png "Start screen")
 
 After the start screen you will see the overview page. There you can turn the furnace on/off got to settings and see the timer, current temperature and temperature diagram.
+
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Overview.png "Overview screen")
 
 From the settings screen you can use preconfigured settings which are stored on the SD card which you put into the SD card slot of the ethernet shield. Please see [preset1.cfg](https://github.com/fablab-leoben/UV_furnace/blob/master/preset1.cfg) for an easy example.
 This will save you time as soon as you have found the ideal settings for curing your 3D printed parts.
+
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "Settings screen")
 
+From the settings screen you can switch to the temperature setup, UV LED setup, timer setup and PID setup:
 
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "Temperature screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "LED screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "Timer screen")
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Settings%20off.png "PID screen")
+
+Changing the PID values is currently not possible because my calculations are really good, but it will be implemented soon.
 
 #### 6.2 Flashing the display
 
