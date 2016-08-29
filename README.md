@@ -87,6 +87,9 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 | 10   |  multimeter                          |                         |
 | 11   |  jigsaw                              |                         |
 | 12   |  lighter                             | for shrink tubing       |
+| 13   |  [Arduino IDE](https://www.arduino.cc/en/Main/Software)|                         |
+| 14   |  [Nextion Editor](http://nextion.itead.cc/download.html)| to program the display |
+| 15   |  Micro SD Card reader                |                         |
 
 
 ### 4. CAD design
@@ -100,3 +103,6 @@ You can find and download the UV furnace design [here](https://cad.onshape.com/d
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
 
 ### 6. To Do
+* preheat function
+* PID finetuning
+* PID tuning without reflashing the sketch
