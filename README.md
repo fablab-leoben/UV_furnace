@@ -12,7 +12,7 @@
 #### 7.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
 #### 7.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
 ### 8. [UV furnace firmware](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#8-furnace-firmware-1 "UV furnace firmware")
-### 9. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
+### 9. [Smartphone app](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "Smartphone app")
 #### 9.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
 ### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
@@ -159,8 +159,11 @@ Save the [UV_furnace.tft](https://github.com/fablab-leoben/UV_furnace/blob/maste
 If you would like to make changes to the interface just open [UV_furnace.HMI](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.HMI) with the [Nextion editor](http://nextion.itead.cc/download.html).
 
 ### 8. UV furnace firmware
+### 8.1 Arduino Libraries
 
-### 9. App
+### 8.2 Firmware
+
+### 9. Smartphone app
 
 Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
 
