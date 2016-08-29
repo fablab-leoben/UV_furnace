@@ -105,6 +105,8 @@ You can find and download the UV furnace design [here](https://cad.onshape.com/d
 
 ### 6. App
 
+Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file.
+
 ### 7. To Do
 * preheat function
 * PID finetuning
