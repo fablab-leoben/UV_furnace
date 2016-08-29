@@ -3,22 +3,32 @@
 ## Table of contents
 
 ### 1. [Introduction](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#1-introduction-1 "Introduction")
-### 2. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#2-bill-of-materials-1 "Bill of Materials")
-### 3. [Required tools](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#3-required-tools-1 "Required tools")
-### 4. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
-### 5. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-circuit-1 "Circuit")
-### 6. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
-#### 6.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
-#### 6.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
-### 7. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
-#### 7.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
-### 8. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
+### 2. [Safety first]( "")
+### 3. [Bill of materials](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#2-bill-of-materials-1 "Bill of Materials")
+### 4. [Required tools](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#3-required-tools-1 "Required tools")
+### 5. [CAD design](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#4-cad-design-1 "CAD design")
+### 6. [Circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#5-circuit-1 "Circuit")
+### 7. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
+#### 7.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
+#### 7.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
+### 8. [Furnace firmware]( "")
+### 9. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
+#### 9.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
+### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
 
 This UV furnace is an open source oven for curing DLP Resin 3D prints.
 
-### 2. Bill of materials
+### 2. Safety first
+
+Be careful, this project includes light in the UV-A and UV-B spectrum. Please be aware this can harm your eyes and skin in both short and long term! So please take care of that when use build and use this furnace. I take no responsibility if you hurt yourself or others. All initial tests where done with LEDs in the visable light spectrum. After that special safety equipment was used if necessary. 
+The furnace detects an open door through a reed switch and will shut down immediately to protect the user.
+
+Please also take care that there is mains voltage involved which can kill you! If you are not sure what you do ask someone with enough experience. 
+The heating pad can get up to 300 °C so make sure it cannot burn your house.
+
+### 3. Bill of materials
 
 | Pos. | Pieces | Unit |  Name                                                                     |          comment          |
 |------|--------|------|---------------------------------------------------------------------------|---------------------------|
@@ -76,7 +86,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  52  |   1    |  []  | Female/Male 'Extension' Jumper Wires - 40 x 6"                            | to wire the sensors       |
 |  53  |   1,5  | [m²] | plywood 12x1000x1500 mm                                                   |                           |
 
-### 3. Required tools
+### 4. Required tools
 
 | Pos. |            Tool                      |        comment          |
 |------|--------------------------------------|-------------------------|
@@ -97,24 +107,24 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 | 15   |  Micro SD Card reader                |                         |
 
 
-### 4. CAD design
+### 5. CAD design
 
 The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing "Onshape"). It is free for Hobbyists, Makers.
 
 You can find and download the UV furnace design [here](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80 "UV furnace design").
 Please feel free to use other materials for your furnace design and just take measurements as you need them. 
 
-### 5. Circuit
+### 6. Circuit
 
 I have designed the circuit with [Fritzing](http://fritzing.org/download/). Download the free software to be able to modify the [circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.fzz).
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
 
-### 6. Human Machine Interface (HMI)
+### 7. Human Machine Interface (HMI)
 
 The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI prototyping tool that's available for ALL platforms. The interface is based on the [Material Design Guidelines](https://material.google.com/) from Google for better useability. You can design each page with the GUI software. For example: you can design one screen where all buttons of your page are off. Then you save the same screen a second time where all buttons are on and a third time where all buttons are pressed. Now you can import these pictures into the [Nextion Editor](http://nextion.itead.cc/download.html) and place button objects, etc on your buttons. The Nextion editor uses partial overlays of your images. This makes designing beautiful interfaces very easy. See the files LED Setup off.png, LED Setup on.png, LED Setup pressed.png for a better imagination. The display has its own processor so it does not use ressources of your Arduino.
 
-#### 6.1 HMI Screenshots
+#### 7.1 HMI Screenshots
 
 The start screen is shown during the device boots while everything is initialized.
 
@@ -143,22 +153,24 @@ If the UV furnace detects an error, it shuts down and switches to the error scre
 
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/Error.png "Error screen")
 
-#### 6.2 Flashing the display
+#### 7.2 Flashing the display
 
 Save the [UV_furnace.tft](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.tft) file on a micro SD card, insert it into the display and supply it with power. The flash process starts automatically. After that remove the micro SD card and repower the display.
 If you would like to make changes to the interface just open [UV_furnace.HMI](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.HMI) with the [Nextion editor](http://nextion.itead.cc/download.html).
 
-### 7. App
+### 8. Furnace firmware
+
+### 9. App
 
 Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
 
-#### 7.1 Screenshot
+#### 9.1 Screenshot
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
 
-### 8. To Do
+### 10. To Do
 * preheat function
 * PID finetuning
 * PID tuning without reflashing the sketch
