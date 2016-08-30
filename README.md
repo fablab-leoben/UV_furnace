@@ -20,7 +20,9 @@
 
 ### 1. Introduction
 
-This UV furnace is an open source oven for curing DLP Resin 3D prints.
+This UV furnace is an open source oven for curing DLP resin 3D prints. Current DLP & SLA resin 3D printers usually need some form of post curing with additional UV light and heat to strengthen the model. This is achieved by the right spectrum and intensity of UV light and moderate heat that cures parts evenly and fast.
+
+During tests of our self-built DLP 3D printer we quickly found out that some kind of post processing of our printed parts was necessary. So the idea of a flexible and hackable UV furnace was born.
 
 ### 2. Safety first
 
