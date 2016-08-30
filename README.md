@@ -26,9 +26,9 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 
 Be careful, this project includes light in the UV-A and UV-B spectrum. Please be aware this can harm your eyes and skin in both short and long term! So please take care of that when use build and use this furnace. I take no responsibility if you hurt yourself or others. All initial tests where done with LEDs in the visable light spectrum. After that special safety equipment was used if necessary. 
 The furnace detects an open door through a reed switch and will shut down immediately to protect the user.
-
 Please also take care that there is mains voltage involved which can kill you! If you are not sure what you do ask someone with enough experience. 
 The heating pad can get up to 300 °C so make sure it cannot burn your house.
+To protect the electronics from overheating in a case of malfunction the firmware checks continously the temperature of the DS3231 realtime clock and shuts everything of if necessary.
 
 ### 3. Bill of materials
 
