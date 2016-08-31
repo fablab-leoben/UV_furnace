@@ -192,7 +192,7 @@ Docker is the world’s leading software containerization platform. I use it to 
 
 ### 10.1 Requirements
 
-* Computer running Ubuntu or similar distribution
+* Computer running [Ubuntu](http://www.ubuntu.com/) or similar distribution
 * install [Docker](https://www.docker.com/)
 * exisiting folder /media/nas/data/influxdb
 * existing folder /media/nas/data/grafana
