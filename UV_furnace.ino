@@ -1394,8 +1394,8 @@ void setup() {
   #endif
 //  Serial2.begin(9600);
 
-  //pinMode(reedSwitch, INPUT_PULLUP);
-  //attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, RISING);
+  pinMode(reedSwitch, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
