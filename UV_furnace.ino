@@ -1478,8 +1478,9 @@ void setup() {
   
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
+  RTC.alarm(ALARM_1);
   RTC.alarmInterrupt(ALARM_1, false);
-
+  
   pinMode(SQW_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
 
@@ -2506,8 +2507,6 @@ void offEnterFunction(){
     myPID.SetMode(MANUAL);
     controlLEDs(0,0,0);
     digitalWrite(RelayPin, HIGH);  // make sure it is off
-    RTC.alarm(ALARM_1);
-    RTC.alarmInterrupt(ALARM_1, false);
 }
 
 void offUpdateFunction(){
