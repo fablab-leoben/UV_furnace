@@ -16,7 +16,7 @@
 #### 8.2 [Firmware]( "")
 ### 9. [Smartphone app](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "Smartphone app")
 #### 9.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
-### 10. [Logging to InfluxDB and Grafana]( "")
+### 10. [Logging to InfluxDB and Grafana](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#10-logging-to-influxdb-and-grafana-1 "Logging to InfluxDB and Grafana")
 #### 10.1 [Requirements]( "Requirements")
 #### 10.2 [Install InfluxDB]( "Install InfluxDB")
 #### 10.3 [Install Grafana]( "Install Grafana")
