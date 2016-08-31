@@ -20,7 +20,7 @@
 #### 10.1 [Requirements](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-requirements-1 "Requirements")
 #### 10.2 [Install InfluxDB](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#102-install-influxdb-1 "Install InfluxDB")
 #### 10.3 [Install Grafana](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#103-install-grafana-1 "Install Grafana")
-#### 10.4 [Arduino configuration]( "Arduino configuration")
+#### 10.4 [Arduino configuration](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#104-arduino-configuration-1 "Arduino configuration")
 ### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
