@@ -50,7 +50,7 @@
   Debug
 ************************************************/
 #define DebugStream    Serial
-#define UV_FURNACE_DEBUG false
+#define UV_FURNACE_DEBUG
 
 #ifdef UV_FURNACE_DEBUG
 // need to do some debugging...
@@ -60,8 +60,6 @@
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
-
-
 
 typedef struct myBoolStruct
 {
@@ -270,11 +268,17 @@ int periode = 2000;
 elapsedMillis GraphUpdateInterval;
 
 /*******************************************************************************
+ InfluxDB
+*******************************************************************************/
+#define INFLUXDB_UPDATE_INTERVAL   5000
+elapsedMillis InfluxdbUpdateInterval;
+
+/*******************************************************************************
  Blynk
  Here you decide if you want to use Blynk or not
  Your blynk token goes in another file to avoid sharing it by mistake
 *******************************************************************************/
-#define USE_BLYNK "no"
+#define USE_BLYNK "yes"
 #define BLYNK_INTERVAL   10000
 elapsedMillis BlynkInterval;
 
@@ -424,7 +428,7 @@ NexTouch *nex_listen_list[] =
 //Page1
 void bSettingsPopCallback(void *ptr)
 { 
-  Serial.println(F("transition to settings")); 
+  DEBUG_PRINTLN(F("transition to settings")); 
   uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
@@ -1496,7 +1500,7 @@ void setup() {
   
   selSD();
   //Initializing SD Card
-  DEBUG_PRINTLN("Initializing SD card...");
+  DEBUG_PRINTLN(F("Initializing SD card..."));
   // make sure that the default chip select pin is set to
   // output, even if you don't use it:
   //pinMode(4, OUTPUT);
@@ -1504,23 +1508,23 @@ void setup() {
     // see if the card is present and can be initialized:
   
   if (!SD.begin(SDCARD_CS)) {
-    DEBUG_PRINTLN("Card failed, or not present");
+    DEBUG_PRINTLN(F("Card failed, or not present"));
     // don't do anything more:
     while (1) ;
   }
-  DEBUG_PRINTLN("card initialized.");
+  DEBUG_PRINTLN(F("card initialized."));
 
   selETH();
   if (Ethernet.begin(mac) == 0) {
     // no point in carrying on, so do nothing forevermore:
     while (1) {
-      DEBUG_PRINTLN("Failed to configure Ethernet using DHCP");
+      DEBUG_PRINTLN(F("Failed to configure Ethernet using DHCP"));
       delay(10000);
     }
   }
   Udp.begin(localPort);
 
-  DEBUG_PRINTLN("IP number assigned by DHCP is ");
+  DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
   DEBUG_PRINTLN(Ethernet.localIP());
 
   // Run timer2 interrupt every 15 ms 
@@ -1603,7 +1607,6 @@ void loop() {
 
   if (alarmIsrWasCalled){
      if (RTC.alarm(ALARM_1)) {
-        Serial.println("ERRRRRROR!!!!");
         uvFurnaceStateMachine.immediateTransitionTo(offState);
      }
      alarmIsrWasCalled = false;
@@ -1742,7 +1745,7 @@ int readInternalTemperature(){
   }
   
   if(RTC.temperature() / 4.0 > 40) {
-    Serial.println("ERROR");
+    DEBUG_PRINTLN(F("ERROR"));
     uvFurnaceStateMachine.immediateTransitionTo(offState);
   }
 }
@@ -1799,7 +1802,7 @@ void SaveParameters()
 {
    if (Setpoint != EEPROM_readDouble(SpAddress))
    {
-      DEBUG_PRINTLN("Save any parameter changes to EEPROM");
+      DEBUG_PRINTLN(F("Save any parameter changes to EEPROM"));
       EEPROM_writeDouble(SpAddress, Setpoint);
    }
    if (Kp != EEPROM_readDouble(KpAddress))
@@ -1823,7 +1826,7 @@ void SaveParameters()
 *******************************************************************************/
 void LoadParameters()
 {
-   DEBUG_PRINTLN("Load parameters from EEPROM");
+   DEBUG_PRINTLN(F("Load parameters from EEPROM"));
 
    // Load from EEPROM
    Setpoint = EEPROM_readDouble(SpAddress);
@@ -1857,7 +1860,7 @@ void LoadParameters()
 *******************************************************************************/
 void EEPROM_writeDouble(int address, double value)
 {
-   DEBUG_PRINTLN("EEPROM_writeDouble");
+   DEBUG_PRINTLN(F("EEPROM_writeDouble"));
    
    byte* p = (byte*)(void*)&value;
    for (int i = 0; i < sizeof(value); i++)
@@ -1873,7 +1876,7 @@ void EEPROM_writeDouble(int address, double value)
 *******************************************************************************/
 double EEPROM_readDouble(int address)
 {
-   //DEBUG_PRINTLN(F("EEPROM_readDouble"));
+   DEBUG_PRINTLN(F("EEPROM_readDouble"));
 
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
@@ -2132,8 +2135,8 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
   
   // Open the configuration file.
   if (!cfg.begin(CONFIG_FILE, CONFIG_LINE_LENGTH)) {
-    Serial.print(F("Failed to open configuration file: "));
-    Serial.println(CONFIG_preset1);
+    DEBUG_PRINT(F("Failed to open configuration file: "));
+    DEBUG_PRINTLN(CONFIG_preset1);
     return false;
   }
   
@@ -2146,74 +2149,74 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
     if (cfg.nameIs("myBoolean.bLED1State")) {
       
       myBoolean.bLED1State = cfg.getBooleanValue();
-      Serial.print(F("Read myBoolean.bLED1State: "));
+      DEBUG_PRINT(F("Read myBoolean.bLED1State: "));
       if (myBoolean.bLED1State) {
-        Serial.println("true");
+        DEBUG_PRINTLN(F("true"));
       } else {
-        Serial.println("false");
+        DEBUG_PRINTLN(F("false"));
       }
     
     // waitMs integer
     } else if (cfg.nameIs("myBoolean.bLED2State")) {
       
       myBoolean.bLED2State = cfg.getBooleanValue();
-      Serial.print(F("Read myBoolean.bLED2State: "));
+      DEBUG_PRINT(F("Read myBoolean.bLED2State: "));
       if (myBoolean.bLED2State) {
-        Serial.println("true");
+        DEBUG_PRINTLN(F("true"));
       } else {
-        Serial.println("false");
+        DEBUG_PRINTLN(F("false"));
       }
     } else if (cfg.nameIs("myBoolean.bLED3State")) {
       
       myBoolean.bLED1State = cfg.getBooleanValue();
-      Serial.print(F("Read myBoolean.bLED3State: "));
+      DEBUG_PRINT(F("Read myBoolean.bLED3State: "));
       if (myBoolean.bLED3State) {
-        Serial.println("true");
+        DEBUG_PRINTLN(F("true"));
       } else {
-        Serial.println("false");
+        DEBUG_PRINTLN(F("false"));
       }
     } else if (cfg.nameIs("temp")) {
       
       Setpoint = cfg.getIntValue();
-      Serial.print("Read Setpoint: ");
-      Serial.println(Setpoint);
+      DEBUG_PRINT(F("Read Setpoint: "));
+      DEBUG_PRINTLN(Setpoint);
 
     // hello string (char *)
     } else if (cfg.nameIs("LED1_intensity")) {
 
       LED1_intensity = cfg.getIntValue();
-      Serial.print("Read LED1_intensity: ");
-      Serial.println(LED1_intensity);
+      DEBUG_PRINT(F("Read LED1_intensity: "));
+      DEBUG_PRINTLN(LED1_intensity);
       
     } else if (cfg.nameIs("LED2_intensity")) {
 
       LED2_intensity = cfg.getIntValue();
-      Serial.print("Read LED2_intensity: ");
-      Serial.println(LED2_intensity);
+      DEBUG_PRINT(F("Read LED2_intensity: "));
+      DEBUG_PRINTLN(LED2_intensity);
     
     } else if (cfg.nameIs("LED3_intensity")) {
 
       LED1_intensity = cfg.getIntValue();
-      Serial.print("Read LED3_intensity: ");
-      Serial.println(LED3_intensity);
+      DEBUG_PRINT(F("Read LED3_intensity: "));
+      DEBUG_PRINTLN(LED3_intensity);
 
     } else if (cfg.nameIs("hours_oven")) {
 
       hours_oven = cfg.getIntValue();
-      Serial.print("Read hours_oven: ");
-      Serial.println(hours_oven);
+      DEBUG_PRINT(F("Read hours_oven: "));
+      DEBUG_PRINTLN(hours_oven);
 
     } else if (cfg.nameIs("minutes_oven")) {
 
       minutes_oven = cfg.getIntValue();
-      Serial.print("Read minutes_oven: ");
-      Serial.println(minutes_oven);
+      DEBUG_PRINT(F("Read minutes_oven: "));
+      DEBUG_PRINTLN(minutes_oven);
 
     }
     else {
       // report unrecognized names.
-      Serial.print("Unknown name in config: ");
-      Serial.println(cfg.getName());
+      DEBUG_PRINT(F("Unknown name in config: "));
+      DEBUG_PRINTLN(cfg.getName());
     }
   }
   
@@ -2256,7 +2259,7 @@ void initEnterFunction(){
     DEBUG_PRINTLN(secsSince1900);
 
     // now convert NTP time into everyday time:
-    DEBUG_PRINT("Unix time = ");
+    DEBUG_PRINT(F("Unix time = "));
     // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
     const unsigned long seventyYears = 2208988800UL;
     // subtract seventy years:
@@ -2266,18 +2269,18 @@ void initEnterFunction(){
 
 
     // print the hour, minute and second:
-    DEBUG_PRINT("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
+    DEBUG_PRINT(F("The UTC time is "));       // UTC is the time at Greenwich Meridian (GMT)
     DEBUG_PRINT((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
     DEBUG_PRINT(F(":"));
     if ( ((epoch % 3600) / 60) < 10 ) {
       // In the first 10 minutes of each hour, we'll want a leading '0'
-      DEBUG_PRINT('0');
+      DEBUG_PRINT(F("0"));
     }
     DEBUG_PRINT((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
     DEBUG_PRINT(F(":"));
     if ( (epoch % 60) < 10 ) {
       // In the first 10 seconds of each minute, we'll want a leading '0'
-      DEBUG_PRINT('0');
+      DEBUG_PRINT(F("0"));
     }
     DEBUG_PRINTLN(epoch % 60); // print the second
 
@@ -2288,15 +2291,15 @@ void initEnterFunction(){
     tmElements_t tm;
     RTC.read(tm);
     DEBUG_PRINT(tm.Day, DEC);
-    DEBUG_PRINT('.');
+    DEBUG_PRINT(F("."));
     DEBUG_PRINT(tm.Month, DEC);
-    DEBUG_PRINT('.');
+    DEBUG_PRINT(F("."));
     DEBUG_PRINT(year(), DEC);
-    DEBUG_PRINT(' ');
+    DEBUG_PRINT(F(" "));
     DEBUG_PRINT(tm.Hour, DEC);
-    DEBUG_PRINT(':');
+    DEBUG_PRINT(F(":"));
     DEBUG_PRINT(tm.Minute,DEC);
-    DEBUG_PRINT(':');
+    DEBUG_PRINT(F(":"));
     DEBUG_PRINTLN(tm.Second,DEC);   
   }
 }
@@ -2401,13 +2404,13 @@ void setTempUpdateFunction(){
   
 }
 void setTempExitFunction(){
-  DEBUG_PRINTLN("setTempExit");
+  DEBUG_PRINTLN(F("setTempExit"));
   selETH();
   Blynk.virtualWrite(V1, Setpoint);
 }
 
 void setTimerEnterFunction(){
-  DEBUG_PRINTLN("setTimerEnter");
+  DEBUG_PRINTLN(F("setTimerEnter"));
   page4.show();
   tOvenMinuteT.setText(intToChar(minutes_oven));
   tOvenHourT.setText(intToChar(hours_oven));
@@ -2420,11 +2423,11 @@ void setTimerUpdateFunction(){
   //DEBUG_PRINTLN(F("setTimerUpdate"));
 }
 void setTimerExitFunction(){
-  DEBUG_PRINTLN("setTimerExit");
+  DEBUG_PRINTLN(F("setTimerExit"));
 }
 
 void setPIDEnterFunction(){
-  DEBUG_PRINTLN("setPIDEnter");
+  DEBUG_PRINTLN(F("setPIDEnter"));
   page6.show();
   sendCommand("ref 0");
 }
@@ -2432,11 +2435,11 @@ void setPIDUpdateFunction(){
   //DEBUG_PRINTLN(F("setPIDUpdate"));
 }
 void setPIDExitFunction(){
-  DEBUG_PRINTLN("setPIDExit");
+  DEBUG_PRINTLN(F("setPIDExit"));
 }
 
 void runEnterFunction(){
-   DEBUG_PRINTLN("runEnter");
+   DEBUG_PRINTLN(F("runEnter"));
  
    //set alarm
    setDS3231Alarm(minutes_oven, hours_oven);
@@ -2449,6 +2452,8 @@ void runEnterFunction(){
 
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
+
+   InfluxdbUpdateInterval = 0;
 }
 
 void runUpdateFunction(){
@@ -2469,6 +2474,13 @@ void runUpdateFunction(){
    
    fadePowerLED();
    refreshCountdown();
+
+  if(InfluxdbUpdateInterval > INFLUXDB_UPDATE_INTERVAL){
+    String line = "UV Tset=" + String(Setpoint, 0) + ",T=" + String(currentTemperature, 1);
+    Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
+    Udp.print(line);
+    Udp.endPacket();
+  }
 }
 
 void runExitFunction(){
@@ -2489,7 +2501,7 @@ void errorEnterFunction(){
   Blynk.notify("Error occured!");
 }
 void errorUpdateFunction(){
-  DEBUG_PRINTLN("errorUpdate");
+  DEBUG_PRINTLN(F("errorUpdate"));
   blinkPowerLED();
 }
 void errorExitFunction(){
@@ -2497,7 +2509,7 @@ void errorExitFunction(){
 }
 
 void offEnterFunction(){
-    DEBUG_PRINTLN("offEnter");
+    DEBUG_PRINTLN(F("offEnter"));
 
     page1.show();
     hour_uv.setText(intToChar(hours_oven));
@@ -2509,10 +2521,8 @@ void offEnterFunction(){
     digitalWrite(RelayPin, HIGH);  // make sure it is off
 }
 
-void offUpdateFunction(){
-  
+void offUpdateFunction(){ 
 }
 
 void offExitFunction(){
-  
 }
