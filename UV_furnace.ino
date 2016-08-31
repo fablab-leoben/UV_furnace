@@ -2490,7 +2490,7 @@ void runExitFunction(){
 }
 
 void errorEnterFunction(){
-  DEBUG_PRINTLN("errorEnter");
+  DEBUG_PRINTLN(F("errorEnter"));
   //Turn off LEDs
   myPID.SetMode(MANUAL);
   controlLEDs(0,0,0);
