@@ -209,7 +209,10 @@ Docker is the world’s leading software containerization platform. I use it to 
 
 I am using the UDP protocol to send the data from the furnace to my database. The User Datagram Protocol (UDP) is a connectionless  transportation protocol. UDP is mostly used for streaming type applications, where if you lose some data you don't need to try to send it again. That is why it is also called "fire and forget" protocol.
 
-Just insert your choosen database port and server adsress into the [access.h](https://github.com/fablab-leoben/UV_furnace/blob/master/access.h) file.
+Just insert your choosen database port and server adsress into the [access.h](https://github.com/fablab-leoben/UV_furnace/blob/master/access.h) file:
+
+>char INFLUXDB_HOST[] = "yourdynddns.com";
+>int INFLUXDB_PORT = 4444;
 
 ### 11. To Do
 * preheat function
