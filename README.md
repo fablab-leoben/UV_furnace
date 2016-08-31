@@ -16,7 +16,12 @@
 #### 8.2 [Firmware]( "")
 ### 9. [Smartphone app](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "Smartphone app")
 #### 9.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
-### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
+### 10. [Logging to InfluxDB and Grafana]( "")
+#### 10.1 [Requirements]( "Requirements")
+#### 10.2 [Install InfluxDB]( "Install InfluxDB")
+#### 10.3 [Install Grafana]( "Install Grafana")
+#### 10.4 [Arduino configuration]( "Arduino configuration")
+### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
 
@@ -77,7 +82,7 @@ To protect the electronics from overheating in a case of malfunction the firmwar
 |  39  |   1    |  []  | USB-Einbaubuchsen vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
 |  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
 |  41  |   1    |  []  | Netzkabel, C13 auf Stecker mit Schutzleiterkontakt, 2,5m, 16 A, 250 V     |                           |
-|  42  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
+|  42  |   5    |  []  | mirror tile 200 x 200 mm                                             | metallised with Aluminium |
 |  43  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
 |  44  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
 |  45  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              |                           |
@@ -177,8 +182,38 @@ Download and install the Blynk app for your [Android](https://play.google.com/st
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
 
-### 10. To Do
+### 10. Logging to InfluxDB and Grafana
+
+About [InfluxDB](influxdata.com) and [Grafana](http://grafana.org/):
+>InfluxDB is an open source database written in Go specifically to handle time series data with high availability and high performance requirements.
+>Grafana provides a powerful and elegant way to create, explore, and share dashboards and data with your team and the world.
+
+Docker is the world’s leading software containerization platform. I use it to set up software for experiments in a fast and easy way without messing up the whole system. In my example the data is stored in local folders so you do not lose your data when you delete or update the software.
+
+### 10.1 Requirements
+
+* Computer running Ubuntu or similar distribution
+* install [Docker](https://www.docker.com/)
+* exisiting folder /media/nas/data/influxdb
+* existing folder /media/nas/data/grafana
+
+### 10.2 Install InfluxDB 
+
+>sudo docker run -d -p 8083:8083 -p 8086:8086 --name influxdb -p 4444:4444/udp --expose 4444 -e UDP_DB="my_db" -v /media/nas/data/influxdb:/data --restart=unless-stopped tutum/influxdb:0.13
+
+### 10.3 Install Grafana
+>docker run -d -v /media/nas/data/grafana --name grafana-storage busybox:latest
+>docker run -d -p 3000:3000 --name=grafana --volumes-from grafana-storage --restart=unless-stopped grafana/grafana:3.1.1
+
+### 10.4 Arduino configuration
+
+I am using the UDP protocol to send the data from the furnace to my database. The User Datagram Protocol (UDP) is a connectionless  transportation protocol. UDP is mostly used for streaming type applications, where if you lose some data you don't need to try to send it again. That is why it is also called "fire and forget" protocol.
+
+Just insert your choosen database port and server adsress into the [access.h](https://github.com/fablab-leoben/UV_furnace/blob/master/access.h) file.
+
+### 11. To Do
 * preheat function
 * PID finetuning
 * PID tuning without reflashing the sketch
 * improve App
+* Aluminium plate instead of the mirror tile on the bottom
