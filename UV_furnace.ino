@@ -61,8 +61,6 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
 
-
-
 typedef struct myBoolStruct
 {
    uint8_t preset1: 1;
@@ -270,6 +268,12 @@ int periode = 2000;
 elapsedMillis GraphUpdateInterval;
 
 /*******************************************************************************
+ InfluxDB
+*******************************************************************************/
+#define INFLUXDB_UPDATE_INTERVAL   5000
+elapsedMillis InfluxdbUpdateInterval;
+
+/*******************************************************************************
  Blynk
  Here you decide if you want to use Blynk or not
  Your blynk token goes in another file to avoid sharing it by mistake
@@ -424,7 +428,7 @@ NexTouch *nex_listen_list[] =
 //Page1
 void bSettingsPopCallback(void *ptr)
 { 
-  Serial.println(F("transition to settings")); 
+  DEBUG_PRINTLN(F("transition to settings")); 
   uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
@@ -435,14 +439,13 @@ void bOnOffPopCallback(void *ptr)
      if(picNum == 1) {
       picNum = 2;
 
-      uvFurnaceStateMachine.immediateTransitionTo(runState);
+      uvFurnaceStateMachine.transitionTo(runState);
 
     } else {
       picNum = 1;
 
-      controlLEDs(0, 0, 0);
-      
-      uvFurnaceStateMachine.immediateTransitionTo(idleState);
+      //controlLEDs(0, 0, 0);
+      uvFurnaceStateMachine.transitionTo(offState);
     }
     bOnOff.setPic(picNum);
     sendCommand("ref bOnOff");
@@ -608,7 +611,7 @@ void bPIDSetupPopCallback(void *ptr)
 
 void bHomeSetPopCallback(void *ptr)
 {
-    uvFurnaceStateMachine.transitionTo(idleState);    
+    uvFurnaceStateMachine.transitionTo(offState);    
 }
 
 void bCreditsPopCallback(void *ptr)
@@ -1396,7 +1399,7 @@ void setup() {
 //  Serial2.begin(9600);
 
   pinMode(reedSwitch, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, RISING);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
@@ -1479,7 +1482,9 @@ void setup() {
   
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
-
+  RTC.alarm(ALARM_1);
+  RTC.alarmInterrupt(ALARM_1, false);
+  
   pinMode(SQW_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
 
@@ -1495,7 +1500,7 @@ void setup() {
   
   selSD();
   //Initializing SD Card
-  DEBUG_PRINTLN("Initializing SD card...");
+  DEBUG_PRINTLN(F("Initializing SD card..."));
   // make sure that the default chip select pin is set to
   // output, even if you don't use it:
   //pinMode(4, OUTPUT);
@@ -1503,23 +1508,23 @@ void setup() {
     // see if the card is present and can be initialized:
   
   if (!SD.begin(SDCARD_CS)) {
-    DEBUG_PRINTLN("Card failed, or not present");
+    DEBUG_PRINTLN(F("Card failed, or not present"));
     // don't do anything more:
     while (1) ;
   }
-  DEBUG_PRINTLN("card initialized.");
+  DEBUG_PRINTLN(F("card initialized."));
 
   selETH();
   if (Ethernet.begin(mac) == 0) {
     // no point in carrying on, so do nothing forevermore:
     while (1) {
-      DEBUG_PRINTLN("Failed to configure Ethernet using DHCP");
+      DEBUG_PRINTLN(F("Failed to configure Ethernet using DHCP"));
       delay(10000);
     }
   }
   Udp.begin(localPort);
 
-  DEBUG_PRINTLN("IP number assigned by DHCP is ");
+  DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
   DEBUG_PRINTLN(Ethernet.localIP());
 
   // Run timer2 interrupt every 15 ms 
@@ -1543,7 +1548,7 @@ void setup() {
 ************************************************/
 SIGNAL(TIMER2_OVF_vect) 
 {
-  if (uvFurnaceStateMachine.isInState(idleState) == true)
+  if (uvFurnaceStateMachine.isInState(offState) == true)
   {
     digitalWrite(RelayPin, HIGH);  // make sure relay is off
   }
@@ -1619,7 +1624,7 @@ void loop() {
  *******************************************************************************/
 void updateCurrentTemperature()
 {   
-    if(currentTemperature != lastTemperature && (uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(idleState))) {
+    if(currentTemperature != lastTemperature && (uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(offState))) {
       memset(buffer, 0, sizeof(buffer));
       itoa(int(currentTemperature), buffer, 10);
       tTemp.setText(buffer);
@@ -1739,8 +1744,9 @@ int readInternalTemperature(){
     return 0;
   }
   
-  if(RTC.temperature() / 4.0 > 35) {
-    uvFurnaceStateMachine.immediateTransitionTo(errorState);
+  if(RTC.temperature() / 4.0 > 40) {
+    DEBUG_PRINTLN(F("ERROR"));
+    uvFurnaceStateMachine.immediateTransitionTo(offState);
   }
 }
 
@@ -1820,7 +1826,7 @@ void SaveParameters()
 *******************************************************************************/
 void LoadParameters()
 {
-   DEBUG_PRINTLN("Load parameters from EEPROM");
+   DEBUG_PRINTLN(F("Load parameters from EEPROM"));
 
    // Load from EEPROM
    Setpoint = EEPROM_readDouble(SpAddress);
@@ -1870,7 +1876,7 @@ void EEPROM_writeDouble(int address, double value)
 *******************************************************************************/
 double EEPROM_readDouble(int address)
 {
-   //DEBUG_PRINTLN(F("EEPROM_readDouble"));
+   DEBUG_PRINTLN(F("EEPROM_readDouble"));
 
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
@@ -2129,8 +2135,8 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
   
   // Open the configuration file.
   if (!cfg.begin(CONFIG_FILE, CONFIG_LINE_LENGTH)) {
-    Serial.print(F("Failed to open configuration file: "));
-    Serial.println(CONFIG_preset1);
+    DEBUG_PRINT(F("Failed to open configuration file: "));
+    DEBUG_PRINTLN(CONFIG_preset1);
     return false;
   }
   
@@ -2143,74 +2149,74 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
     if (cfg.nameIs("myBoolean.bLED1State")) {
       
       myBoolean.bLED1State = cfg.getBooleanValue();
-      Serial.print(F("Read myBoolean.bLED1State: "));
+      DEBUG_PRINT(F("Read myBoolean.bLED1State: "));
       if (myBoolean.bLED1State) {
-        Serial.println(F("true"));
+        DEBUG_PRINTLN(F("true"));
       } else {
-        Serial.println(F("false"));
+        DEBUG_PRINTLN(F("false"));
       }
     
     // waitMs integer
     } else if (cfg.nameIs("myBoolean.bLED2State")) {
       
       myBoolean.bLED2State = cfg.getBooleanValue();
-      Serial.print(F("Read myBoolean.bLED2State: "));
+      DEBUG_PRINT(F("Read myBoolean.bLED2State: "));
       if (myBoolean.bLED2State) {
-        Serial.println(F("true"));
+        DEBUG_PRINTLN(F("true"));
       } else {
-        Serial.println(F("false"));
+        DEBUG_PRINTLN(F("false"));
       }
     } else if (cfg.nameIs("myBoolean.bLED3State")) {
       
       myBoolean.bLED1State = cfg.getBooleanValue();
-      Serial.print(F("Read myBoolean.bLED3State: "));
+      DEBUG_PRINT(F("Read myBoolean.bLED3State: "));
       if (myBoolean.bLED3State) {
-        Serial.println(F("true"));
+        DEBUG_PRINTLN(F("true"));
       } else {
-        Serial.println(F("false"));
+        DEBUG_PRINTLN(F("false"));
       }
     } else if (cfg.nameIs("temp")) {
       
       Setpoint = cfg.getIntValue();
-      Serial.print(F("Read Setpoint: "));
-      Serial.println(Setpoint);
+      DEBUG_PRINT(F("Read Setpoint: "));
+      DEBUG_PRINTLN(Setpoint);
 
     // hello string (char *)
     } else if (cfg.nameIs("LED1_intensity")) {
 
       LED1_intensity = cfg.getIntValue();
-      Serial.print(F("Read LED1_intensity: "));
-      Serial.println(LED1_intensity);
+      DEBUG_PRINT(F("Read LED1_intensity: "));
+      DEBUG_PRINTLN(LED1_intensity);
       
     } else if (cfg.nameIs("LED2_intensity")) {
 
       LED2_intensity = cfg.getIntValue();
-      Serial.print(F("Read LED2_intensity: "));
-      Serial.println(LED2_intensity);
+      DEBUG_PRINT(F("Read LED2_intensity: "));
+      DEBUG_PRINTLN(LED2_intensity);
     
     } else if (cfg.nameIs("LED3_intensity")) {
 
       LED1_intensity = cfg.getIntValue();
-      Serial.print(F("Read LED3_intensity: "));
-      Serial.println(LED3_intensity);
+      DEBUG_PRINT(F("Read LED3_intensity: "));
+      DEBUG_PRINTLN(LED3_intensity);
 
     } else if (cfg.nameIs("hours_oven")) {
 
       hours_oven = cfg.getIntValue();
-      Serial.print(F("Read hours_oven: "));
-      Serial.println(hours_oven);
+      DEBUG_PRINT(F("Read hours_oven: "));
+      DEBUG_PRINTLN(hours_oven);
 
     } else if (cfg.nameIs("minutes_oven")) {
 
       minutes_oven = cfg.getIntValue();
-      Serial.print(F("Read minutes_oven: "));
-      Serial.println(minutes_oven);
+      DEBUG_PRINT(F("Read minutes_oven: "));
+      DEBUG_PRINTLN(minutes_oven);
 
     }
     else {
       // report unrecognized names.
-      Serial.print(F("Unknown name in config: "));
-      Serial.println(cfg.getName());
+      DEBUG_PRINT(F("Unknown name in config: "));
+      DEBUG_PRINTLN(cfg.getName());
     }
   }
   
@@ -2294,7 +2300,7 @@ void initEnterFunction(){
     DEBUG_PRINT(F(":"));
     DEBUG_PRINT(tm.Minute,DEC);
     DEBUG_PRINT(F(":"));
-    DEBUG_PRINTLN(tm.Second,DEC);
+    DEBUG_PRINTLN(tm.Second,DEC);   
   }
 }
 
@@ -2349,11 +2355,11 @@ void settingsUpdateFunction(){
   //DEBUG_PRINTLN(F("settingsUpdate"));
 }
 void settingsExitFunction(){
-  DEBUG_PRINTLN(F("settingsExit"));
+  DEBUG_PRINTLN("settingsExit");
 }
 
 void setLEDsEnterFunction(){
-  DEBUG_PRINTLN(F("setLEDsEnter"));
+  DEBUG_PRINTLN("setLEDsEnter");
   page5.show();
 
   tLED1.setText(intToChar(LED1_intens));
@@ -2381,11 +2387,11 @@ void setLEDsUpdateFunction(){
   //DEBUG_PRINTLN(F("setLEDsUpdate"));
 }
 void setLEDsExitFunction(){
-  DEBUG_PRINTLN(F("setLEDsExit"));
+  DEBUG_PRINTLN("setLEDsExit");
 }
 
 void setTempEnterFunction(){
-  DEBUG_PRINTLN(F("setTempEnter"));
+  DEBUG_PRINTLN("setTempEnter");
   page3.show();
 
   tTempSetup.setText(intToChar(Setpoint));
@@ -2446,6 +2452,8 @@ void runEnterFunction(){
 
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
+
+   InfluxdbUpdateInterval = 0;
 }
 
 void runUpdateFunction(){
@@ -2466,6 +2474,13 @@ void runUpdateFunction(){
    
    fadePowerLED();
    refreshCountdown();
+
+  if(InfluxdbUpdateInterval > INFLUXDB_UPDATE_INTERVAL){
+    String line = "UV Tset=" + String(Setpoint, 0) + ",T=" + String(currentTemperature, 1);
+    Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
+    Udp.print(line);
+    Udp.endPacket();
+  }
 }
 
 void runExitFunction(){
@@ -2475,7 +2490,7 @@ void runExitFunction(){
 }
 
 void errorEnterFunction(){
-  DEBUG_PRINTLN(F("errorEnter"));
+  DEBUG_PRINTLN("errorEnter");
   //Turn off LEDs
   myPID.SetMode(MANUAL);
   controlLEDs(0,0,0);
@@ -2494,7 +2509,7 @@ void errorExitFunction(){
 }
 
 void offEnterFunction(){
-    DEBUG_PRINTLN(F("offExit"));
+    DEBUG_PRINTLN(F("offEnter"));
 
     page1.show();
     hour_uv.setText(intToChar(hours_oven));
@@ -2504,14 +2519,10 @@ void offEnterFunction(){
     myPID.SetMode(MANUAL);
     controlLEDs(0,0,0);
     digitalWrite(RelayPin, HIGH);  // make sure it is off
-    RTC.alarm(ALARM_1);
-    RTC.alarmInterrupt(ALARM_1, false);
 }
 
-void offUpdateFunction(){
-  
+void offUpdateFunction(){ 
 }
 
 void offExitFunction(){
-  
 }
