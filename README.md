@@ -29,10 +29,12 @@
 ##### 9.3.2 [Grafana](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#932-grafana "Grafana")
 #### 9.4 [Demonstration](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#94-demonstration-1 "Demonstration")
 ### 10. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#10-app-1 "App")
-#### 10.1 [App installation]( "App installation")
+#### 10.1 [App installation](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "App installation")
 ### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
+
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/UV_furnace.jpg)
 
 3D printing is an advanced and environmentally friendly manufacturing method. It is a rapidly growing market both private and commercial. It is not just that they help you to act out your creativity or building prototypes, you are also able to repair things where you will not get any spare parts. They are also used in the medical and aerospace industry!
 [SLA](https://en.wikipedia.org/wiki/Selective_laser_sintering) and [DLP](https://en.wikipedia.org/wiki/Digital_Light_Processing) printer are growing increasingly from an expensive niche to a consumer product.
