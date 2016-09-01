@@ -1360,7 +1360,6 @@ void bHomeCreditsPopCallback(void *ptr)
 volatile boolean alarmIsrWasCalled = false;
 
 void alarmIsr(){
-    DEBUG_PRINTLN("ALARM");
     alarmIsrWasCalled = true;
 }
 
@@ -1482,7 +1481,8 @@ void setup() {
   
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
-  
+  RTC.alarm(ALARM_1);                   //ensure RTC interrupt flag is cleared
+
   pinMode(SQW_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
 
@@ -1605,7 +1605,7 @@ void loop() {
 
   if (alarmIsrWasCalled){
      if (RTC.alarm(ALARM_1)) {
-        uvFurnaceStateMachine.immediateTransitionTo(offState);
+        uvFurnaceStateMachine.transitionTo(offState);
      }
      alarmIsrWasCalled = false;
   }
@@ -2025,6 +2025,17 @@ void updateGraph(){
   GraphUpdateInterval = 0;
 }
 
+void sendToInfluxDB(){
+  if(InfluxdbUpdateInterval < INFLUXDB_UPDATE_INTERVAL){
+    return;
+  }
+  String line = "UV Tset=" + String(Setpoint, 0) + ",T=" + String(currentTemperature, 1);
+  Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
+  Udp.print(line);
+  Udp.endPacket();
+  InfluxdbUpdateInterval = 0;
+}
+
 /*******************************************************************************
  * Function Name  : sendNTPpacket
  * Description    : send an NTP request to the time server at the given address
@@ -2265,6 +2276,7 @@ void initEnterFunction(){
     // print Unix time:
     DEBUG_PRINTLN(epoch);
 
+    Udp.stop();
 
     // print the hour, minute and second:
     DEBUG_PRINT(F("The UTC time is "));       // UTC is the time at Greenwich Meridian (GMT)
@@ -2315,13 +2327,13 @@ void initExitFunction(){
 
 void idleEnterFunction(){
   
-  DEBUG_PRINTLN(F("idleEnter"));
+  //DEBUG_PRINTLN(F("idleEnter"));
 }
 void idleUpdateFunction(){
   //DEBUG_PRINTLN(F("idleUpdate"));
 }
 void idleExitFunction(){
-  DEBUG_PRINTLN(F("idleExit"));
+  //DEBUG_PRINTLN(F("idleExit"));
 }
 
 void settingsEnterFunction(){
@@ -2451,6 +2463,7 @@ void runEnterFunction(){
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
 
+   Udp.begin(INFLUXDB_PORT);
    InfluxdbUpdateInterval = 0;
 }
 
@@ -2472,21 +2485,13 @@ void runUpdateFunction(){
    
    fadePowerLED();
    refreshCountdown();
-
-  /*
-  if(InfluxdbUpdateInterval > INFLUXDB_UPDATE_INTERVAL){
-    String line = "UV Tset=" + String(Setpoint, 0) + ",T=" + String(currentTemperature, 1);
-    Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
-    Udp.print(line);
-    Udp.endPacket();
-  }
-  */
+   sendToInfluxDB();
 }
 
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
   selETH();
-  Blynk.notify("Hey, I am ready!");
+  Blynk.notify("Curing finished!");
 }
 
 void errorEnterFunction(){
