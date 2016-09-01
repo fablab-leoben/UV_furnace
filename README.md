@@ -132,6 +132,9 @@ Wire everything like on the picture below and check everything at least twice to
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
 
+Everything mounted in the furnace:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Electronics.jpg "Electronics")
+
 ### 6. Human Machine Interface (HMI)
 
 The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI prototyping tool that's available for ALL platforms. The interface is based on the [Material Design Guidelines](https://material.google.com/) from Google for better useability.
