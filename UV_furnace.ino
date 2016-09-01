@@ -2029,6 +2029,7 @@ void sendToInfluxDB(){
   if(InfluxdbUpdateInterval < INFLUXDB_UPDATE_INTERVAL){
     return;
   }
+  selETH();
   char msg[30];
   sprintf(msg, "UV Tset=%.0f,T=%.2f", Setpoint, currentTemperature);
   Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
