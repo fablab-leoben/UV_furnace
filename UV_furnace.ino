@@ -2030,10 +2030,18 @@ void sendToInfluxDB(){
     return;
   }
   selETH();
+  int a = Setpoint;
+  int b = Setpoint * 100;
+  b = b % 100;
+  int c = currentTemperature;
+  int d = currentTemperature * 100;
+  d = d % 100;  
+  
   char msg[30];
-  sprintf(msg, "UV Tset=%.0f,T=%.2f", Setpoint, currentTemperature);
+  sprintf(msg, "UV Tset=%d.%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d", a, b, c, d, LED1_intens, LED2_intens, LED3_intens);
+  DEBUG_PRINTLN(msg);
   Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
-  UDP.write(msg);
+  Udp.write(msg);
   Udp.endPacket();
   InfluxdbUpdateInterval = 0;
 }
