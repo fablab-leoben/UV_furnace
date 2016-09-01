@@ -69,13 +69,13 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  36  |   1    |  []  | MakerBeam M3 cap nuts                                                     |                           |
 |  37  |   1    |  []  | USB 2.0 Anschlusskabel USB 2.0 Stecker A - USB 2.0 Stecker B 1.80 m       |                           |
 |  38  |   1    |  []  | USB 2.0 Anschlusskabel USB 2.0 Stecker A - USB 2.0 Stecker B 0.50 m       |                           |
-|  39  |   1    |  []  | USB-Einbaubuchsen vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
+|  39  |   1    |  []  | USB-Einbaubuchse vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
 |  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
 |  41  |   1    |  []  | Netzkabel, C13 auf Stecker mit Schutzleiterkontakt, 2,5m, 16 A, 250 V     |                           |
 |  42  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
 |  43  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
 |  44  |   1    |  []  | [Arduino Mega Screw Shield](http://www.crossroadsfencing.com/BobuinoRev17/)| optional                 |
-|  45  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              |                           |
+|  45  |   2    |  []  | Fan SUNON PF80321B1-000U-S99                                              | optional                  |
 |  46  |   3    |  []  | Resistor 4,7 kOhm                                                         |                           |
 |  47  |   1    |  []  | shrink tubing                                                             |                           |
 |  48  |   1    |  []  | bell wire or other wires in different colors                              |                           |
@@ -84,6 +84,9 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  51  |   5    | [m]  | eight-pole bell wire | or other wires with different colors |
 |  52  |   1    |  []  | Female/Male 'Extension' Jumper Wires - 40 x 6"                            | to wire the sensors       |
 |  53  |   1,5  | [m²] | plywood 12x1000x1500 mm                                                   |                           |
+
+Estimated costs: **~1000 €**
+It really depends on your manufacturing possibilities and the shops where you buy the components. Also be aware that we are using a 300 nm UV LED for **~260 €/piece**! Try to recycle parts when you have a low budget and drop expensive nice to have parts like the "USB-Einbaubuchse" and "RJ45-Einbaubuchse" which cost ~40 € each. So there is enough room to cut the costs down :)
 
 ### 3. Required tools
 
@@ -112,7 +115,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 
 The CAD Design was done with [Onshape](https://www.onshape.com/cad-pricing "Onshape"). It is free for Hobbyists, Makers.
 
-You can find, modify and download the UV furnace design [here](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80 "UV furnace design").
+You can find, modify and download the UV furnace design [here](https://cad.onshape.com/documents/65acaf65361afb5a9c027038/w/3b13638207107c108fe9135d/e/915e14169c92d702a1d86d80 "UV furnace design"). Feel free to modify the housing to fit your budget. 
 
 ### 5. Circuit
 
@@ -265,4 +268,4 @@ Download and install the Blynk app for your [Android](https://play.google.com/st
 * preheat function
 * PID finetuning
 * PID tuning without reflashing the sketch
-* improve App
+* improving the app
