@@ -134,6 +134,7 @@ Download and install the Blynk app for your [Android](https://play.google.com/st
 
 ### 8. To Do
 * screensaver
+* better display bezel
 * preheat function
 * PID finetuning
 * PID tuning without reflashing the sketch
