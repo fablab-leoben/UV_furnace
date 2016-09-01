@@ -172,10 +172,23 @@ URL: yourserveraddress:8086
 Access: Proxy
 Database: my_db
 User and Password you have created in the step before
+Save and Test
 
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_data_source.JPG)
 
+Create a new dashboard:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_new_dashboard.JPG)
+
+Add a new query:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_query.JPG)
+
+Save your dashboard and configure the time range in the right corner:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_time_range.JPG)
+
 #### 9.4 Demonstration
+
+Start your furnace and you will see the incoming data in you graph:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_demonstration.JPG)
 
 ### 8. To Do
 * screensaver
