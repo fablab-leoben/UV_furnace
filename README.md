@@ -40,7 +40,7 @@ During our DLP printer build and because of our experience with the Form One we 
 Broken parts printed with a Formlabs Form One SLA printer:
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/broken_parts.jpg)
 
-During the last few months I have designed and built this furnace. It is already working but still under heavy development to include new features and fix small bugs. We have also started to build a second one to support a resin project at the University of Leoben. Therefor we got financial support to buy the hardware under the prerequisite that the complete furnace design will be open source.
+During the last few months I have designed and built this furnace. It is already working but still under heavy development to include new features and fix small bugs. 
 
 ### 2. Bill of materials
 
@@ -214,15 +214,15 @@ During startup the furnace requests the current time via the Network Time Protoc
 
 #### 8.4 Relay
 
-The UV furnace has a high thermal mass, so the response time is slow. Therefor it is possible to use a cheap relay instead of a solid state relay to control the heating pad. In our case the response time will be 0,1 Hz or once every 10 seconds.
+The UV furnace has a high thermal mass, so the response time is slow. Therefore it is possible to use a cheap relay instead of a solid state relay to control the heating pad. In our case the response time will be 0,1 Hz or once every 10 seconds.
 Take care of yourself when you wire the relay because there is mains voltage involved!
 
 #### 8.5 LEDs
 
-I use Meanwell LDD-500H LED driver to control the LEDs. They offer a wide input voltage range from 9 ~ 56 VDC and a high output voltage range from 2 ~ 52 VDC. Hence you are very flexible when you would like to use other LEDs with a different wavelength in your furnace. You only need to change the power supply if necessary. At the moment I am using three LEDs (red, green, white) in the visable light spectrum. Due to the fact that the furnace is under heavy development it is much more comfortable to add features, fix small bugs and test the workflow.
+I use Meanwell LDD-500H LED driver to control the LEDs. They offer a wide input voltage range from 9 ~ 56 VDC and a high output voltage range from 2 ~ 52 VDC. Hence you are very flexible when you would like to use other LEDs with a different wavelength in your furnace. You only need to change the power supply if necessary. At the moment I am using three LEDs (red, green, white) in the visible light spectrum. Due to the fact that the furnace is under heavy development it is much more comfortable to add features, fix small bugs and test the workflow.
 This shows the flexibility of the LED setup. Switching to UV LEDs is only a matter of minutes.
 
-To be able to cure the 3D printed parts the UV light needs to shine into the curing area. We do not want to stress our light source with unnecessary heat when we cure our prints. Regular glass blocks most of the UV radiation. Because of that we use a quarz glass plate below the LEDs.
+To be able to cure the 3D printed parts the UV light needs to light the curing area. We do not want to stress our light source with unnecessary heat when we cure our prints. Regular glass blocks most of the UV radiation. Because of that we use a quartz glass plate below the LEDs.
 
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/mounted_LEDs_with_heatsinks.jpg)
 
@@ -281,7 +281,7 @@ Save your dashboard and configure the time range in the right corner:
 
 #### 9.4 Demonstration
 
-Start your furnace and you will see the incoming data in you graph:
+Start your furnace and you will see the incoming data in your graph:
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_demonstration.JPG)
 
 ### 10. App
@@ -292,7 +292,7 @@ The smartphone app makes it possible to monitor your furnace when you are not ne
 
 #### 10.1 App installation
 
-Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
+Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will be added in the future.
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
 
