@@ -10,12 +10,17 @@
 ### 6. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
 #### 6.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
 #### 6.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
-### 7. [Arduino]( "Arduino")
+### 7. [Arduino MEGA 2560]( "Arduino MEGA 2560")
 #### 7.1 [Arduino IDE]( "Arduino IDE")
 #### 7.2 [Installing the libraries]( "Installing the libraries")
 #### 7.3 [Flashing the code]( "Flashing the code")
 ### 8. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
 #### 8.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
+#### 8.2 [Measuring the temperature]( "Measuring the temperature")
+#### 8.3 [Time and alarms]( "Time and alarms")
+#### 8.4 [Relay]( "Relay")
+#### 8.5 [LEDs]( "LEDs")
+#### 8.6 [Persistant data]( "Persistant data")
 ### 9. [Logging and visualization]( "Logging and visualization")
 #### 9.1 [Requirements]( "Requirements")
 #### 9.2 [Install InfluxDB & Grafana]( "Install InfluxDB & Grafana")
@@ -174,11 +179,12 @@ If you do not have this folder do not hesitate to create it.
 Open the Arduino IDE and connect your Arduino via USB to your computer. Under Tools/Board select Arduino Mega and choose the right serial port. 
 Open the sketch UV_furnace.ino and click on the compile & flash button. The compiler now translates the code and writes it to your microcontroller.  
 
-### 8. Code specials
+### 8. Noteworthy things
 
-My code uses a finite state machine (FSM) to make reading and understanding such a massive amount of code easier for everyone.
 
 #### 8.1. Finite State Machine
+
+My code uses a finite state machine (FSM) to make reading and understanding such a massive amount of code easier for everyone.
 
 Definition of a Finite State Machine:
 >A finite-state machine (FSM) or finite-state automaton (FSA, plural: automata), or simply a state machine, is a mathematical model of >computation used to design both computer programs and sequential logic circuits. It is conceived as an abstract machine that can be >in one of a finite number of states. The machine is in only one state at a time; the state it is in at any given time is called the >current state. It can change from one state to another when initiated by a triggering event or condition; this is called a >transition. A particular FSM is defined by a list of its states, and the triggering condition for each transition.
@@ -194,6 +200,20 @@ The furnace uses a MAX31855 thermocouple amplifier to measure the temperature. Y
 During startup the furnace requests the current time via the Network Time Protocol (NTP) to set the time of the DS3231 realtime clock. The realtime clock is used to generate an alarm when the furnace has finished. The integrated temperature compensation is also used to check the temperature of the electronics and acts as a safety feature.
 
 #### 8.4 Relay
+
+The UV furnace has a high thermal mass, so the response time is slow. Therefor it is possible to use a cheap relay instead of a solid state relay to control the heating pad. In our case the response time will be 0,1 Hz or once every 10 seconds.
+Take care of yourself when you wire the relay because there is mains voltage involved!
+
+#### 8.5 LEDs
+
+I use Meanwell LDD-500H LED driver to control the LEDs. They offer a wide input voltage range from 9 ~ 56 VDC and a high output voltage range from 2 ~ 52 VDC. Hence you are very flexible when you would like to use other LEDs with a different wavelength in your furnace. You only need to change the power supply if necessary. At the moment I am using three LEDs (red, green, white) in the visable light spectrum. Due to the fact that the furnace is under heavy development it is much more comfortable to add features, fix small bugs and test the workflow.
+This shows the flexibility of the LED setup. Switching to UV LEDs is only a matter of minutes.
+
+To be able to cure the 3D printed parts the UV light needs to shine into the curing area. We do not want to stress our light source with unnecessary heat when we cure our prints. Regular glass blocks most of the UV radiation. Because of that we use a quarz glass plate below the LEDs.
+
+#### 8.6 Persistant data
+
+The tuning parameters for the PID controller are saved in the Arduino's EEPROM. Thus the UV furnace will remember the settings from the last time. EEPROM can only be written a finite number of times so we compare the contents before writing.
 
 ### 9. Logging and visualization
 
@@ -213,8 +233,6 @@ Install command for InfluxDB
 Install command for Grafana
 >docker run -d -v /media/nas/data/grafana --name grafana-storage busybox:latest
 >docker run -d -p 3000:3000 --name=grafana --volumes-from grafana-storage --restart=unless-stopped grafana/grafana:3.1.1
-
-
 
 #### 9.3 Configuration
 ##### 9.3.1 InfluxDB
