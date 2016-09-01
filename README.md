@@ -40,6 +40,7 @@ During our DLP printer build and because of our experience with the Form One we 
 Broken parts printed with a Formlabs Form One SLA printer:
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/broken_parts.jpg)
 
+During the last few months I have designed and built this furnace. It is already working but still under heavy development to include new features and fix small bugs. We have also started to build a second one to support a resin project at the University of Leoben. Therefor we got financial support to buy the hardware under the prerequisite that the complete furnace design will be open source.
 
 ### 2. Bill of materials
 
