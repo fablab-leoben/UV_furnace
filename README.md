@@ -32,7 +32,14 @@
 
 ### 1. Introduction
 
-This UV furnace is an open source oven for curing DLP Resin 3D prints.
+3D printing is an advanced and environmentally friendly manufacturing method. It is a rapidly growing market both private and commercial. It is not just that they help you to act out your creativity or building prototypes, you are also able to repair things where you will not get any spare parts. They are also used in the medical and aerospace industry!
+SLA and DLP printer are growing increasingly from an expensive niche to a consumer product.
+The [Fablab in Leoben](http://www.fablab-leoben.at/) has a commercial [Form One](http://formlabs.com/de/produkte/3d-printers/form-1-plus/) and a **self built** [DLP printer](https://github.com/fablab-leoben/Fab-dlp). These printers usually need some form of post curing with additional UV light and heat to strengthen the printed parts.
+During our DLP printer build and because of our experience with the Form One we tried several methods to post-cure the parts after printing. The perfect solution was not found in our experiments so we decided to build our own UV furnace.
+
+Broken parts printed with a Formlabs Form One SLA printer:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/broken_parts.jpg)
+
 
 ### 2. Bill of materials
 
