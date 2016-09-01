@@ -1398,8 +1398,8 @@ void setup() {
   #endif
 //  Serial2.begin(9600);
 
-  pinMode(reedSwitch, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
+  //pinMode(reedSwitch, INPUT_PULLUP);
+  //attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
@@ -1482,8 +1482,6 @@ void setup() {
   
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
-  RTC.alarm(ALARM_1);
-  RTC.alarmInterrupt(ALARM_1, false);
   
   pinMode(SQW_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
@@ -2475,12 +2473,14 @@ void runUpdateFunction(){
    fadePowerLED();
    refreshCountdown();
 
+  /*
   if(InfluxdbUpdateInterval > INFLUXDB_UPDATE_INTERVAL){
     String line = "UV Tset=" + String(Setpoint, 0) + ",T=" + String(currentTemperature, 1);
     Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
     Udp.print(line);
     Udp.endPacket();
   }
+  */
 }
 
 void runExitFunction(){
