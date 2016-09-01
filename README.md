@@ -39,7 +39,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |   6  |   2    |  []  | Kingston 8 GB Micro-SDHC Class10 Speicherkarte                            | any Micro-SD card is ok   |
 |   7  |   1    |  []  | Adafruit ChronoDot - Ultra-precise Real Time Clock - v2.1                 |                           |
 |   8  |   1    |  []  | Adafruit VEML6070 UV Index Sensor Breakout                                | optional                  |
-|   9  |   1    |  []  | Adafruit Rugged Metal Pushbutton with Red LED Ring                        |                           |
+|   9  |   1    |  []  | Adafruit Rugged Metal Pushbutton with LED Ring                            |                           |
 |  10  |   1    |  []  | Male DC Power adapter - 2.1mm plug to screw terminal block                |                           |
 |  11  |   1    |  []  | 5V 1 channel relay shield for Arduino                                     |                           |
 |  12  |   1    |  []  | MEAN WELL RS-25-12                                                        |                           |
