@@ -117,6 +117,7 @@ You can find, modify and download the UV furnace design [here](https://cad.onsha
 ### 5. Circuit
 
 I have designed the circuit with [Fritzing](http://fritzing.org/download/). Download the free software to be able to modify the [circuit](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.fzz).
+Wire everything like on the picture below and check everything at least twice to make sure everything is wired correctly! Otherwise you can destroy your hardware and jeopardise your health.
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/circuit/UV_furnace_circuit.png "Circuit")
 
@@ -167,6 +168,27 @@ If you do not have this folder do not hesitate to create it.
 
 Open the Arduino IDE and connect your Arduino via USB to your computer. Under Tools/Board select Arduino Mega and choose the right serial port. 
 Open the sketch UV_furnace.ino and click on the compile & flash button. The compiler now translates the code and writes it to your microcontroller.  
+
+### 8. Code specials
+
+My code uses a finite state machine (FSM) to make reading and understanding such a massive amount of code easier for everyone.
+
+#### 8.1. Finite State Machine
+
+Definition of a Finite State Machine:
+<A finite-state machine (FSM) or finite-state automaton (FSA, plural: automata), or simply a state machine, is a mathematical model of <computation used to design both computer programs and sequential logic circuits. It is conceived as an abstract machine that can be <in one of a finite number of states. The machine is in only one state at a time; the state it is in at any given time is called the <current state. It can change from one state to another when initiated by a triggering event or condition; this is called a <transition. A particular FSM is defined by a list of its states, and the triggering condition for each transition.
+
+The FSM serves as a manager that organizes the states of the UV furnace.
+
+#### 8.2 Measuring the temperature
+
+The furnace uses a MAX31855 thermocouple amplifier to measure the temperature. You can use thermocouples also for temperatures over 1000 °C. Only the thermocouple is in the hot part of the furnace so you do not need to worry about damaging the amplifier.
+
+#### 8.3 Time and alarms
+
+During startup the furnace requests the current time via the Network Time Protocol (NTP) to set the time of the DS3231 realtime clock. The realtime clock is used to generate an alarm when the furnace has finished. The integrated temperature compensation is also used to check the temperature of the electronics and acts as a safety feature.
+
+#### 8.4 Relay
 
 ### 9. Logging and visualization
 
