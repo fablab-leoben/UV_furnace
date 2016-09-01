@@ -86,6 +86,7 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  53  |   1,5  | [m²] | plywood 12x1000x1500 mm                                                   |                           |
 
 Estimated costs: **~1000 €**
+
 It really depends on your manufacturing possibilities and the shops where you buy the components. Also be aware that we are using a 300 nm UV LED for **~260 €/piece**! Try to recycle parts when you have a low budget and drop expensive nice to have parts like the "USB-Einbaubuchse" and "RJ45-Einbaubuchse" which cost ~40 € each. So there is enough room to cut the costs down :)
 
 ### 3. Required tools
