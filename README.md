@@ -131,16 +131,6 @@ The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI
 Save the [UV_furnace.tft](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.tft) file on a micro SD card, insert it into the display and supply it with power. The flash process starts automatically. After that remove the micro SD card and repower the display.
 If you would like to make changes to the interface just open [UV_furnace.HMI](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.HMI) with the [Nextion editor](http://nextion.itead.cc/download.html).
 
-### 7. App
-
-Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
-
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
-
-#### 7.1 Screenshot
-
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
-
 ### 9. Logging and visualization
 
 
@@ -190,7 +180,19 @@ Save your dashboard and configure the time range in the right corner:
 Start your furnace and you will see the incoming data in you graph:
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_demonstration.JPG)
 
-### 8. To Do
+### 10. App
+
+The smartphone app makes it possible to monitor your furnace when you are not nearby. You will also get a notification when it has finished or if there is an error.
+
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
+
+#### 10.1 App installation
+
+Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will come in the future.
+
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
+
+### 11. To Do
 * screensaver
 * better display bezel
 * preheat function
