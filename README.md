@@ -49,7 +49,7 @@ It looks great but you have to be very careful because the resin is not fully cu
 
 During the last few months I have designed and built this furnace. It is already working but still under heavy development to include new features and fix small bugs. 
 
-[![UV furnace video](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
+[![UV furnace video](http://img.youtube.com/vi/noe39QOHljc/0.jpg)](http://www.youtube.com/watch?v=noe39QOHljc)
 
 
 ### 2. Bill of materials
