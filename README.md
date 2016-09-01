@@ -134,7 +134,7 @@ If you would like to make changes to the interface just open [UV_furnace.HMI](ht
 ### 7. Arduino Mega 2560
 
 Because of the comprehensive features I had to use an Arduino Mega for this project.
-Visit the https://www.arduino.cc/en/Guide/HomePage
+Visit the [Getting started page](https://www.arduino.cc/en/Guide/HomePage) for more information on how to configure your board.
 
 | Technical specification |              |
 |-------------------------|--------------|
