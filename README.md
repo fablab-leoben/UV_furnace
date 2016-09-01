@@ -211,6 +211,8 @@ This shows the flexibility of the LED setup. Switching to UV LEDs is only a matt
 
 To be able to cure the 3D printed parts the UV light needs to shine into the curing area. We do not want to stress our light source with unnecessary heat when we cure our prints. Regular glass blocks most of the UV radiation. Because of that we use a quarz glass plate below the LEDs.
 
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/mounted_LEDs_with_heatsinks.jpg)
+
 #### 8.6 Persistant data
 
 The tuning parameters for the PID controller are saved in the Arduino's EEPROM. Thus the UV furnace will remember the settings from the last time. EEPROM can only be written a finite number of times so we compare the contents before writing.
