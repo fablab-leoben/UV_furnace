@@ -135,8 +135,8 @@ If you would like to make changes to the interface just open [UV_furnace.HMI](ht
 
 Because of the comprehensive features I had to use an Arduino Mega for this project.
 
-| Technical specification |
-|-------------------------|
+| Technical specification |              |
+|-------------------------|--------------|
 | Microcontroller   |	ATmega2560 |
 | Operating Voltage |	5V |
 | Input Voltage (recommended) |	7-12V |
