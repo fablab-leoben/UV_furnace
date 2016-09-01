@@ -45,7 +45,7 @@ DLP Printer of the Fablab Leoben:
 
 Successfull print of [Aria the Dragon](https://www.youmagine.com/designs/aria-the-dragon)
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Aria_the_dragon.jpg)
-It looks great but you have to be very careful because the resin is not fully cured and an ideal candidate for the UV furnace.
+It looks great but you have to be very careful because the resin is not fully cured. So it is an ideal candidate for the UV furnace.
 
 During the last few months I have designed and built this furnace. It is already working but still under heavy development to include new features and fix small bugs. 
 
