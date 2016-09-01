@@ -40,7 +40,7 @@
 #include <Timezone.h>
 #include <SPI.h>
 #include <SD.h>
-// So we can save and retrieve settings
+ // So we can save and retrieve settings
 #include <EEPROM.h>
 #include <Adafruit_MAX31855.h>
 #include <elapsedMillis.h>
