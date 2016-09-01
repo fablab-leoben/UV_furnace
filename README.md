@@ -193,7 +193,7 @@ First of all download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 
 #### 7.2 Installing the libraries
 
-Download the libraries and extract them into your Arduino libraries folder. The path for Windows computer is: 
+Download the libraries.zip file and extract them into your Arduino libraries folder. The path for Windows computer is: 
 >C:\Users\YourName\Documents\Arduino\libraries
 If you do not have this folder do not hesitate to create it.
 
@@ -203,7 +203,6 @@ Open the Arduino IDE and connect your Arduino via USB to your computer. Under To
 Open the sketch UV_furnace.ino and click on the compile & flash button. The compiler now translates the code and writes it to your microcontroller.  
 
 ### 8. Noteworthy things
-
 
 #### 8.1. Finite State Machine
 
