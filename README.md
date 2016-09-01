@@ -14,8 +14,8 @@
 #### 7.1 [Arduino IDE](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#71-arduino-ide-1 "Arduino IDE")
 #### 7.2 [Installing the libraries](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#72-installing-the-libraries-1 "Installing the libraries")
 #### 7.3 [Flashing the code](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#73-flashing-the-code-1 "Flashing the code")
-### 8. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
-#### 8.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
+### 8. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#8-app-1 "App")
+#### 8.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#81-screenshot-1 "Screenshot")
 #### 8.2 [Measuring the temperature](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#82-measuring-the-temperature-1 "Measuring the temperature")
 #### 8.3 [Time and alarms](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#83-time-and-alarms-1 "Time and alarms")
 #### 8.4 [Relay](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#84-relay-1 "Relay")
@@ -30,7 +30,7 @@
 #### 9.4 [Demonstration](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#94-demonstration-1 "Demonstration")
 ### 10. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#10-app-1 "App")
 #### 10.1 [App installation](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "App installation")
-### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
+### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#11-to-do-1 "To Do")
 
 ### 1. Introduction
 
