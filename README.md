@@ -69,8 +69,8 @@ This UV furnace is an open source oven for curing DLP Resin 3D prints.
 |  36  |   1    |  []  | MakerBeam M3 cap nuts                                                     |                           |
 |  37  |   1    |  []  | USB 2.0 Anschlusskabel USB 2.0 Stecker A - USB 2.0 Stecker B 1.80 m       |                           |
 |  38  |   1    |  []  | USB 2.0 Anschlusskabel USB 2.0 Stecker A - USB 2.0 Stecker B 0.50 m       |                           |
-|  39  |   1    |  []  | USB-Einbaubuchse vorne USB-Buchse Typ B · hinten USB-Buchse Typ A        |                           |
-|  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   |                           |
+|  39  |   1    |  []  | USB-Einbaubuchse vorne USB-Buchse Typ B · hinten USB-Buchse Typ A         | optional                  |
+|  40  |   1    |  []  | RJ45-Einbaubuchse Buchse, Einbau, Stecker, gerade Pole: 8P8C RRJVA_RJ45   | optional                  |
 |  41  |   1    |  []  | Netzkabel, C13 auf Stecker mit Schutzleiterkontakt, 2,5m, 16 A, 250 V     |                           |
 |  42  |   5    |  []  | mirror flagstone 200 x 200 mm                                             | metallised with Aluminium |
 |  43  |   1    |  []  | Nextion 4,3" Touch Display NX4827T043                                     |                           |
