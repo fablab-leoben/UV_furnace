@@ -131,9 +131,10 @@ The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI
 Save the [UV_furnace.tft](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.tft) file on a micro SD card, insert it into the display and supply it with power. The flash process starts automatically. After that remove the micro SD card and repower the display.
 If you would like to make changes to the interface just open [UV_furnace.HMI](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.HMI) with the [Nextion editor](http://nextion.itead.cc/download.html).
 
-### 7. Arduino Mega
+### 7. Arduino Mega 2560
 
 Because of the comprehensive features I had to use an Arduino Mega for this project.
+Visit the https://www.arduino.cc/en/Guide/HomePage
 
 | Technical specification |              |
 |-------------------------|--------------|
