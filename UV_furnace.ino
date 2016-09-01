@@ -2029,9 +2029,10 @@ void sendToInfluxDB(){
   if(InfluxdbUpdateInterval < INFLUXDB_UPDATE_INTERVAL){
     return;
   }
-  String line = "UV Tset=" + String(Setpoint, 0) + ",T=" + String(currentTemperature, 1);
+  char msg[30];
+  sprintf(msg, "UV Tset=%.0f,T=%.2f", Setpoint, currentTemperature);
   Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
-  Udp.print(line);
+  UDP.write(msg);
   Udp.endPacket();
   InfluxdbUpdateInterval = 0;
 }
