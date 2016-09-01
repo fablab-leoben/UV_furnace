@@ -10,9 +10,18 @@
 ### 6. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
 #### 6.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
 #### 6.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
-### 7. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
-#### 7.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
-### 8. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
+### 7. Arduino
+#### 7.1 Arduino IDE
+#### 7.2 Installing the libraries
+#### 7.3 Flashing the code
+### 8. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
+#### 8.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
+### 9. Logging and visualization
+#### 9.1 Requirements
+#### 9.2 Install InfluxDB & Grafana
+#### 9.3 Configuration
+#### 9.4 Demonstration
+### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
 
@@ -131,6 +140,42 @@ Download and install the Blynk app for your [Android](https://play.google.com/st
 #### 7.1 Screenshot
 
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
+
+### 9. Logging and visualization
+
+
+
+#### 9.1 Requirements
+  * Computer running Ubuntu 
+  * Install [Docker](docker.com)
+  * create directory
+  * create directory
+  * 
+#### 9.2 Install InfluxDB & Grafana
+
+
+
+#### 9.3 Configuration
+##### 9.3.1 InfluxDB
+In your browser got to yourserver:8083
+Change Database to my_db
+Under Query Templates create a new user and password for the next step
+
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/InfluxDB_config.JPG)
+
+##### 9.3.2 Grafana
+
+In your browser got to yourserver:3000 and add a new data source:
+Name: Influxdb UDP
+Type:InfluxDB
+URL: yourserveraddress:8086
+Access: Proxy
+Database: my_db
+User and Password you have created in the step before
+
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Grafana_data_source.JPG)
+
+#### 9.4 Demonstration
 
 ### 8. To Do
 * screensaver
