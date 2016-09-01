@@ -161,7 +161,8 @@ First of all download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 
 #### 7.2 Installing the libraries
 
-Download the libraries and extract them into your Arduino libraries folder. The path for Windows computer is: >C:\Users\YourName\Documents\Arduino\libraries
+Download the libraries and extract them into your Arduino libraries folder. The path for Windows computer is: 
+>C:\Users\YourName\Documents\Arduino\libraries
 If you do not have this folder do not hesitate to create it.
 
 #### 7.3 Flashing the code
