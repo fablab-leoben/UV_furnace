@@ -161,7 +161,7 @@ First of all download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 
 #### 7.2 Installing the libraries
 
-Download the libraries and extract them into your Arduino libraries folder. The path for Windows computer is: C:\Users\YourName\Documents\Arduino\libraries
+Download the libraries and extract them into your Arduino libraries folder. The path for Windows computer is: >C:\Users\YourName\Documents\Arduino\libraries
 If you do not have this folder do not hesitate to create it.
 
 #### 7.3 Flashing the code
@@ -176,7 +176,7 @@ My code uses a finite state machine (FSM) to make reading and understanding such
 #### 8.1. Finite State Machine
 
 Definition of a Finite State Machine:
-<A finite-state machine (FSM) or finite-state automaton (FSA, plural: automata), or simply a state machine, is a mathematical model of <computation used to design both computer programs and sequential logic circuits. It is conceived as an abstract machine that can be <in one of a finite number of states. The machine is in only one state at a time; the state it is in at any given time is called the <current state. It can change from one state to another when initiated by a triggering event or condition; this is called a <transition. A particular FSM is defined by a list of its states, and the triggering condition for each transition.
+>A finite-state machine (FSM) or finite-state automaton (FSA, plural: automata), or simply a state machine, is a mathematical model of >computation used to design both computer programs and sequential logic circuits. It is conceived as an abstract machine that can be >in one of a finite number of states. The machine is in only one state at a time; the state it is in at any given time is called the >current state. It can change from one state to another when initiated by a triggering event or condition; this is called a >transition. A particular FSM is defined by a list of its states, and the triggering condition for each transition.
 
 The FSM serves as a manager that organizes the states of the UV furnace.
 
@@ -203,11 +203,11 @@ There are many use cases where data logging and visualization can be very useful
 #### 9.2 Install InfluxDB & Grafana
 
 Install command for InfluxDB
-<sudo docker run -d -p 8083:8083 -p 8086:8086 --name influxdb -p 4444:4444/udp --expose 4444 -e UDP_DB="my_db" -v /media/nas/data/influxdb:/data --restart=unless-stopped tutum/influxdb:0.13
+>sudo docker run -d -p 8083:8083 -p 8086:8086 --name influxdb -p 4444:4444/udp --expose 4444 -e UDP_DB="my_db" -v /media/nas/data/influxdb:/data --restart=unless-stopped tutum/influxdb:0.13
 
 Install command for Grafana
-<docker run -d -v /media/nas/data/grafana --name grafana-storage busybox:latest
-<docker run -d -p 3000:3000 --name=grafana --volumes-from grafana-storage --restart=unless-stopped grafana/grafana:3.1.1
+>docker run -d -v /media/nas/data/grafana --name grafana-storage busybox:latest
+>docker run -d -p 3000:3000 --name=grafana --volumes-from grafana-storage --restart=unless-stopped grafana/grafana:3.1.1
 
 
 
