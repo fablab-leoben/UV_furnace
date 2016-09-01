@@ -131,9 +131,44 @@ The HMI was designed with [Pencil](http://pencil.evolus.vn/), an open-source GUI
 Save the [UV_furnace.tft](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.tft) file on a micro SD card, insert it into the display and supply it with power. The flash process starts automatically. After that remove the micro SD card and repower the display.
 If you would like to make changes to the interface just open [UV_furnace.HMI](https://github.com/fablab-leoben/UV_furnace/blob/master/HMI/UV_furnace.HMI) with the [Nextion editor](http://nextion.itead.cc/download.html).
 
+### 7. Arduino Mega
+
+Because of the comprehensive features I had to use an Arduino Mega for this project.
+
+Technical specification:
+| Microcontroller |	ATmega2560 |
+| Operating Voltage |	5V |
+| Input Voltage (recommended) |	7-12V |
+| Input Voltage (limit) |	6-20V |
+| Digital I/O Pins |	54 (of which 15 provide PWM output) |
+| Analog Input Pins |	16 |
+| DC Current per I/O Pin |	20 mA |
+| DC Current for 3.3V Pin |	50 mA |
+| Flash Memory |	256 KB of which 8 KB used by bootloader |
+| SRAM	| 8 KB |
+| EEPROM	| 4 KB |
+| Clock Speed	| 16 MHz |
+| Length |	101.52 mm |
+| Width |	53.3 mm |
+| Weight |	37 g |
+
+#### 7.1 Arduino IDE
+
+First of all download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) and install it on your computer. It is available for Windows, Linux and Mac.
+
+#### 7.2 Installing the libraries
+
+Download the libraries and extract them into your Arduino libraries folder. The path for Windows computer is: C:\Users\YourName\Documents\Arduino\libraries
+If you do not have this folder do not hesitate to create it.
+
+#### 7.3 Flashing the code
+
+Open the Arduino IDE and connect your Arduino via USB to your computer. Under Tools/Board select Arduino Mega and choose the right serial port. 
+Open the sketch UV_furnace.ino and click on the compile & flash button. The compiler now translates the code and writes it to your microcontroller.  
+
 ### 9. Logging and visualization
 
-
+There are many use cases where data logging and visualization can be very useful so I have made an easy setup to achieve this functionality.
 
 #### 9.1 Requirements
   * Computer running Ubuntu 
@@ -141,6 +176,7 @@ If you would like to make changes to the interface just open [UV_furnace.HMI](ht
   * create directory
   * create directory
   * 
+  
 #### 9.2 Install InfluxDB & Grafana
 
 
