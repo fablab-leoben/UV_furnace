@@ -40,6 +40,13 @@ During our DLP printer build and because of our experience with the Form One we 
 Broken parts printed with a Formlabs Form One SLA printer:
 ![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/broken_parts.jpg)
 
+DLP Printer of the Fablab Leoben:
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Fablab_Leoben_DLP.jpg)
+
+Successfull print of [Aria the Dragon](https://www.youmagine.com/designs/aria-the-dragon)
+![alt-text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/Aria_the_dragon.jpg)
+It looks great but you have to be very careful because the resin is not fully cured and an ideal candidate for the UV furnace.
+
 During the last few months I have designed and built this furnace. It is already working but still under heavy development to include new features and fix small bugs. 
 
 ### 2. Bill of materials
