@@ -1484,9 +1484,6 @@ void setup() {
 
   //declare and init pins
   
-  //Disable the default square wave of the SQW pin.
-  RTC.squareWave(SQWAVE_NONE);
-
   // Initialize the PID and related variables
   LoadParameters();
   myPID.SetTunings(Kp,Ki,Kd);
@@ -1755,6 +1752,8 @@ int setDS3231Alarm(byte minutes, byte hours) {
   if(hourAlarm >= 24) {
     hourAlarm = hourAlarm - 24;
   }
+  //Disable the default square wave of the SQW pin.
+  RTC.squareWave(SQWAVE_NONE);
   
   RTC.setAlarm(ALM1_MATCH_HOURS, secondAlarm, minuteAlarm, hourAlarm, 1);
   RTC.alarm(ALARM_1);
