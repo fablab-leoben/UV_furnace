@@ -197,11 +197,17 @@ There are many use cases where data logging and visualization can be very useful
 #### 9.1 Requirements
   * Computer running Ubuntu 
   * Install [Docker](docker.com)
-  * create directory
-  * create directory
-  * 
+  * create directory /media/nas/data/influxdb/
+  * create directory /media/nas/data/grafana/
   
 #### 9.2 Install InfluxDB & Grafana
+
+Install command for InfluxDB
+<sudo docker run -d -p 8083:8083 -p 8086:8086 --name influxdb -p 4444:4444/udp --expose 4444 -e UDP_DB="my_db" -v /media/nas/data/influxdb:/data --restart=unless-stopped tutum/influxdb:0.13
+
+Install command for Grafana
+<docker run -d -v /media/nas/data/grafana --name grafana-storage busybox:latest
+<docker run -d -p 3000:3000 --name=grafana --volumes-from grafana-storage --restart=unless-stopped grafana/grafana:3.1.1
 
 
 
