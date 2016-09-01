@@ -10,17 +10,17 @@
 ### 6. [Human Machine Interface (HMI)](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-human-machine-interface-hmi-1 "Human Machine Interface (HMI)")
 #### 6.1 [HMI Screenshots](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-hmi-screenshots-1 "HMI Screenshots")
 #### 6.2 [Flashing the display](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#62-flashing-the-display-1 "Flashing the display")
-### 7. Arduino
-#### 7.1 Arduino IDE
-#### 7.2 Installing the libraries
-#### 7.3 Flashing the code
+### 7. [Arduino]( "Arduino")
+#### 7.1 [Arduino IDE]( "Arduino IDE")
+#### 7.2 [Installing the libraries]( "Installing the libraries")
+#### 7.3 [Flashing the code]( "Flashing the code")
 ### 8. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#6-app-1 "App")
 #### 8.1 [Screenshot](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#61-screenshot-1 "Screenshot")
-### 9. Logging and visualization
-#### 9.1 Requirements
-#### 9.2 Install InfluxDB & Grafana
-#### 9.3 Configuration
-#### 9.4 Demonstration
+### 9. [Logging and visualization]( "Logging and visualization")
+#### 9.1 [Requirements]( "Requirements")
+#### 9.2 [Install InfluxDB & Grafana]( "Install InfluxDB & Grafana")
+#### 9.3 [Configuration]( "Configuration")
+#### 9.4 [Demonstration]( "Demonstration")
 ### 10. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#7-to-do-1 "To Do")
 
 ### 1. Introduction
