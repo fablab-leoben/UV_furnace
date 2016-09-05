@@ -1525,7 +1525,7 @@ void setup() {
   //Timer2 Overflow Interrupt Enable
   TIMSK2 |= 1<<TOIE2;
   
-   #ifdef Blynk
+   #ifdef USE_Blynk
     //init Blynk
     Blynk.begin(auth);
    #endif
@@ -1585,7 +1585,7 @@ void DriveOutput()
 
 void loop() {
   nexLoop(nex_listen_list);
-  #ifdef Blynk
+  #ifdef USE_Blynk
     //all the Blynk magic happens here
     Blynk.run();
   #endif  
@@ -1599,6 +1599,9 @@ void loop() {
         DEBUG_PRINTLN("Alarm");
         uvFurnaceStateMachine.transitionTo(offState);
         DEBUG_PRINTLN("Alarm_2");
+     }
+     if (RTC.alarm(ALARM_2)){
+      
      }
      alarmIsrWasCalled = false;
   }
@@ -1812,6 +1815,13 @@ int updateBlynk(){
    //DEBUG_PRINTLN(F("updating Blynk"));
    selETH();
    Blynk.virtualWrite(V0, averageTemperature);
+   Blynk.virtualWrite(V1, Setpoint);
+   Blynk.virtualWrite(V2, LED1_intens);
+   Blynk.virtualWrite(V3, LED2_intens);
+   Blynk.virtualWrite(V4, LED3_intens);
+   Blynk.virtualWrite(V6, map(myBoolean.bLED1State, 0, 1, 0, 1023));
+   Blynk.virtualWrite(V7, map(myBoolean.bLED2State, 0, 1, 0, 1023));
+   Blynk.virtualWrite(V8, map(myBoolean.bLED3State, 0, 1, 0, 1023));
 }
 
 /*******************************************************************************
@@ -2445,8 +2455,6 @@ void setTempUpdateFunction(){
 }
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
-  selETH();
-  Blynk.virtualWrite(V1, Setpoint);
 }
 
 void setTimerEnterFunction(){

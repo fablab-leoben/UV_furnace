@@ -15,7 +15,7 @@
 
 #define InfluxDB
 
-//#define Blynk
+#define USE_Blynk
 
   
 
