@@ -84,6 +84,7 @@ State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunct
 State runState = State( runEnterFunction, runUpdateFunction, runExitFunction );
 State errorState = State( errorEnterFunction, errorUpdateFunction, errorExitFunction );
 State offState = State ( offEnterFunction, offUpdateFunction, offExitFunction );
+State preheatState = State ( preheatEnterFunction, preheatUpdateFunction, preheatExitFunction );
 
 //initialize state machine, start in state: Idle
 FSM uvFurnaceStateMachine = FSM(initState);
@@ -283,6 +284,16 @@ const int SDCARD_CS = 4;
 File dataFile;
 #define SD_CARD_SAMPLE_INTERVAL   1000
 elapsedMillis sdCard;
+
+/*******************************************************************************
+ interrupt service routine for DS3231 clock
+*******************************************************************************/
+volatile boolean alarmIsrWasCalled = false;
+
+void alarmIsr(){
+    alarmIsrWasCalled = true;
+}
+
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -691,6 +702,7 @@ void bTempMinus10PopCallback(void *ptr)
     
     tTempSetup.setText(intToChar(Setpoint));
 }
+
 
 void bHomeTempPopCallback(void *ptr)
 {
@@ -1346,15 +1358,6 @@ void bHomeCreditsPopCallback(void *ptr)
 //End Page8
 
 /*******************************************************************************
- interrupt service routine for DS3231 clock
-*******************************************************************************/
-volatile boolean alarmIsrWasCalled = false;
-
-void alarmIsr(){
-    alarmIsrWasCalled = true;
-}
-
-/*******************************************************************************
  IO mapping
 *******************************************************************************/
 void setup() {
@@ -1365,7 +1368,7 @@ void setup() {
   controlLEDs(0, 0, 0);
   // Initialize Relay Control:
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
-  digitalWrite(RelayPin, HIGH);  // make sure it is off to start
+  digitalWrite(RelayPin, LOW);  // make sure it is off to start
 
   //reset samples array to default so we fill it up with new samples
   uint8_t i;
@@ -1541,7 +1544,7 @@ SIGNAL(TIMER2_OVF_vect)
 {
   if (uvFurnaceStateMachine.isInState(offState) == true)
   {
-    digitalWrite(RelayPin, HIGH);  // make sure relay is off
+    digitalWrite(RelayPin, LOW);  // make sure relay is off
   }
   else
   {
@@ -1575,11 +1578,11 @@ void DriveOutput()
   }
   if((onTime > 100) && (onTime > (now - windowStartTime)))
   {
-     digitalWrite(RelayPin,LOW);
+     digitalWrite(RelayPin, HIGH);
   }
   else
   {
-     digitalWrite(RelayPin,HIGH);
+     digitalWrite(RelayPin, LOW);
   }
 }
 
@@ -2540,7 +2543,7 @@ void errorEnterFunction(){
   myPID.SetMode(MANUAL);
   //Turn off LEDs
   controlLEDs(0, 0, 0);
-  digitalWrite(RelayPin, HIGH);  // make sure it is off
+  digitalWrite(RelayPin, LOW);  // make sure it is off
   RTC.alarm(ALARM_1);
   RTC.alarmInterrupt(ALARM_1, false);
   selETH();
@@ -2573,4 +2576,43 @@ void offUpdateFunction(){
 
 void offExitFunction(){
 
+}
+
+void preheatEnterFunction(){
+    DEBUG_PRINTLN(F("preheatEnter"));
+
+    //turn the PID on
+   myPID.SetMode(AUTOMATIC);
+   windowStartTime = millis();
+
+   SaveParameters();
+   myPID.SetTunings(Kp,Ki,Kd);
+
+   selETH();
+   Udp.begin(INFLUXDB_PORT);
+   InfluxdbUpdateInterval = 0;
+}
+
+void preheatUpdateFunction(){ 
+    //DEBUG_PRINTLN(F("preheatUpdate"));
+    DoControl();
+      
+   float pct = map(Output, 0, WindowSize, 0, 1000);
+   
+   updateGraph();
+   updateTemperature();
+   fadePowerLED();
+   refreshCountdown();
+   #ifdef InfluxDB
+       sendToInfluxDB();
+   #endif
+
+   if(averageTemperature >= (Setpoint * 0,975) && averageTemperature <= (Setpoint * 1,025)){
+          uvFurnaceStateMachine.transitionTo(runState);
+   }
+   
+}
+
+void preheatExitFunction(){
+    
 }
