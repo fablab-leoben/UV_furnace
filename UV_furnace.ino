@@ -106,7 +106,8 @@ elapsedMillis initTimer;
 #define RelayPin 32
 
 // Reed switch
-#define reedSwitch 19
+#define reedSwitch 30
+volatile boolean doorIsOpen;
 
 // ON/OFF Button LED
 #define onOffButton 12
@@ -448,6 +449,7 @@ void bOnOffPopCallback(void *ptr)
     } else {
       picNum = 1;
       uvFurnaceStateMachine.transitionTo(offState);
+     
     }
     bOnOff.setPic(picNum);
     sendCommand("ref bOnOff");
@@ -1392,13 +1394,6 @@ void setup() {
 
   myBoolean.didReadConfig = false;
   
-  //pinMode(reedSwitch, INPUT_PULLUP);
-  //attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, FALLING);
-
-  pinMode(onOffButton, OUTPUT);
-  digitalWrite(onOffButton, onOffState);
-
-
   /* Register the pop event callback function of the current button component. */
   //Page1
   bOnOff.attachPop(bOnOffPopCallback, &bOnOff);
@@ -1477,6 +1472,12 @@ void setup() {
   
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
+
+  pinMode(reedSwitch, INPUT_PULLUP);
+  //attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
+
+  pinMode(onOffButton, OUTPUT);
+  digitalWrite(onOffButton, onOffState);
 
   pinMode(SQW_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
@@ -1557,11 +1558,7 @@ SIGNAL(TIMER2_OVF_vect)
  Timer Interrupt Handler
 ************************************************/
 void furnaceDoor() {
-  if(uvFurnaceStateMachine.isInState(runState) == true){
-      uvFurnaceStateMachine.immediateTransitionTo(errorState);
-  }else {
-    return;
-  }
+ doorIsOpen = !doorIsOpen;
 }
 
 /************************************************
@@ -1593,10 +1590,10 @@ void loop() {
     Blynk.run();
   #endif  
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
+  checkDoor();
   readTemperature();
   readInternalTemperature();
   updateBlynk();
-
   if (alarmIsrWasCalled){
      if (RTC.alarm(ALARM_1)) {
         DEBUG_PRINTLN("Alarm");
@@ -1612,6 +1609,19 @@ void loop() {
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
+}
+
+/*******************************************************************************
+ * Function Name  : checkDoor
+ * Description    : updates the value of target temperature of the uv furnace
+ * Return         : none
+ *******************************************************************************/
+void checkDoor(){
+  if(digitalRead(reedSwitch) == HIGH){
+    //DEBUG_PRINTLN("door open");
+  }else if(digitalRead(reedSwitch) == LOW){
+    //DEBUG_PRINTLN("door closed");
+  }
 }
 
 /*******************************************************************************
@@ -1825,6 +1835,12 @@ int updateBlynk(){
    Blynk.virtualWrite(V6, map(myBoolean.bLED1State, 0, 1, 0, 1023));
    Blynk.virtualWrite(V7, map(myBoolean.bLED2State, 0, 1, 0, 1023));
    Blynk.virtualWrite(V8, map(myBoolean.bLED3State, 0, 1, 0, 1023));
+   if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
+    Blynk.virtualWrite(V5, 1);
+   }else if(uvFurnaceStateMachine.isInState(offState)){
+    Blynk.virtualWrite(V5, 0);
+   }
+   BlynkInterval = 0;
 }
 
 /*******************************************************************************
@@ -2130,13 +2146,18 @@ void refreshCountdown(){
         calcHours = hourAlarm - hour();
       }
          
-      char temp[10] = {0};
-      utoa(calcHours, temp, 10);
-      hour_uv.setText(temp);
-      
-      temp[10] = {0};
-      utoa(calcMinutes, temp, 10);
-      min_uv.setText(temp);
+      //char temp[10] = {0};
+      //utoa(calcHours, temp, 10);
+      //hour_uv.setText(temp);
+
+      utoa(calcHours, buffer, 10);
+      hour_uv.setText(buffer);
+
+      //temp[10] = {0};
+      //utoa(calcMinutes, temp, 10);
+      //min_uv.setText(temp);
+      utoa(calcMinutes, buffer, 10);
+      min_uv.setText(buffer);
 
       CountdownUpdateInterval = 0;
 }
@@ -2512,23 +2533,16 @@ void runEnterFunction(){
 void runUpdateFunction(){
    //DEBUG_PRINTLN(F("runUpdate"));
     
-   DoControl();
-      
-   float pct = map(Output, 0, WindowSize, 0, 1000);
-      
-   // periodically log to serial port in csv format
-   //if (millis() - lastLogTime > logInterval)  
-   //{
-    //  DEBUG_PRINT(Input);
-    //  DEBUG_PRINT(",");
-    //  DEBUG_PRINTLN(Output);
-   //}
+   DoControl(); 
+   float pct = map(Output, 0, WindowSize, 0, 1000); 
    updateGraph();
    updateTemperature();
    fadePowerLED();
    refreshCountdown();
+
    #ifdef InfluxDB
        sendToInfluxDB();
+
    #endif
 }
 
