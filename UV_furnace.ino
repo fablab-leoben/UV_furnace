@@ -101,6 +101,7 @@ elapsedMillis initTimer;
 #define LED1 5
 #define LED2 6
 #define LED3 7
+#define LEDlight 8
 
 // Output relay
 #define RelayPin 32
@@ -1473,6 +1474,9 @@ void setup() {
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
 
+  pinMode(LEDlight, OUTPUT);
+  digitalWrite(LEDlight, 0);
+
   pinMode(reedSwitch, INPUT_PULLUP);
   //attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
 
@@ -1618,9 +1622,15 @@ void loop() {
  *******************************************************************************/
 void checkDoor(){
   if(digitalRead(reedSwitch) == HIGH){
-    //DEBUG_PRINTLN("door open");
+      digitalWrite(LEDlight, 255);
+      controlLEDs(0,0,0);
+      DEBUG_PRINTLN("door open");
   }else if(digitalRead(reedSwitch) == LOW){
-    //DEBUG_PRINTLN("door closed");
+      if(uvFurnaceStateMachine.isInState(runState)){
+        controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity);
+      }
+      digitalWrite(LEDlight, 0);
+      DEBUG_PRINTLN("door open");
   }
 }
 
