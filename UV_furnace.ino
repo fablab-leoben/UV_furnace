@@ -279,6 +279,9 @@ char msg[30];
 #define BLYNK_INTERVAL   10000
 elapsedMillis BlynkInterval;
 
+int pushNotification = 0;
+int emailNotification = 0;
+
 /*******************************************************************************
  SD-Card
 *******************************************************************************/
@@ -1602,10 +1605,9 @@ void loop() {
      if (RTC.alarm(ALARM_1)) {
         DEBUG_PRINTLN("Alarm");
         uvFurnaceStateMachine.transitionTo(offState);
-        DEBUG_PRINTLN("Alarm_2");
      }
      if (RTC.alarm(ALARM_2)){
-      
+        DEBUG_PRINTLN("Alarm_2");
      }
      alarmIsrWasCalled = false;
   }
@@ -1630,7 +1632,7 @@ void checkDoor(){
         controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity);
       }
       digitalWrite(LEDlight, 0);
-      DEBUG_PRINTLN("door open");
+      //DEBUG_PRINTLN("door closed");
   }
 }
 
@@ -1850,6 +1852,8 @@ int updateBlynk(){
    }else if(uvFurnaceStateMachine.isInState(offState)){
     Blynk.virtualWrite(V5, 0);
    }
+   Blynk.syncVirtual(V9);
+   Blynk.syncVirtual(V10);
    BlynkInterval = 0;
 }
 
@@ -2055,19 +2059,19 @@ void selMAX31855(){
 void controlLEDs(byte intensity1, byte intensity2, byte intensity3){
   if(myBoolean.bLED1State == true){
     analogWrite(LED1, intensity1);
-    DEBUG_PRINTLN(intensity1);
+    //DEBUG_PRINTLN(intensity1);
   }else {
     analogWrite(LED1, 0);
   }
   if(myBoolean.bLED2State == true){
     analogWrite(LED2, intensity2);
-    DEBUG_PRINTLN(intensity2);
+    //DEBUG_PRINTLN(intensity2);
   }else {
     analogWrite(LED2, 0);
   }
   if(myBoolean.bLED3State == true){
     analogWrite(LED3, intensity3);
-    DEBUG_PRINTLN(intensity3);
+    //DEBUG_PRINTLN(intensity3);
   }else {
     analogWrite(LED3, 0);
   }
@@ -2307,6 +2311,19 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
   
   // clean up
   cfg.end();
+}
+
+BLYNK_WRITE(V9)
+{
+   pushNotification = param.asInt();
+   //DEBUG_PRINT(F("push notification: "));
+   //DEBUG_PRINTLN(pushNotification);
+}
+BLYNK_WRITE(V10)
+{
+   emailNotification = param.asInt();
+   //DEBUG_PRINT(F("Email notification: "));
+   //DEBUG_PRINTLN(emailNotification);
 }
 
 /*******************************************************************************
@@ -2552,14 +2569,15 @@ void runUpdateFunction(){
 
    #ifdef InfluxDB
        sendToInfluxDB();
-
    #endif
 }
 
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
   selETH();
-  Blynk.notify("Curing finished!");
+  if(pushNotification == 1){
+    Blynk.notify("Curing finished!");
+  }
 }
 
 void errorEnterFunction(){
@@ -2571,7 +2589,9 @@ void errorEnterFunction(){
   RTC.alarm(ALARM_1);
   RTC.alarmInterrupt(ALARM_1, false);
   selETH();
-  Blynk.notify("Error occured!");
+  if(pushNotification == 1){
+     Blynk.notify("Error occured!");
+  }
 }
 void errorUpdateFunction(){
   DEBUG_PRINTLN(F("errorUpdate"));
@@ -2633,8 +2653,13 @@ void preheatUpdateFunction(){
 
    if(averageTemperature >= (Setpoint * 0,975) && averageTemperature <= (Setpoint * 1,025)){
           uvFurnaceStateMachine.transitionTo(runState);
-   }
-   
+          if(pushNotification == 1){
+             Blynk.notify("Preheating done!");
+          }
+          if(emailNotification == 1){
+            Blynk.email("UV furnace", "Preheating done!");
+          }
+   }   
 }
 
 void preheatExitFunction(){
