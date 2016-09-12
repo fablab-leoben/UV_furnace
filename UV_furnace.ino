@@ -152,7 +152,6 @@ EthernetUDP Udp;
 /************************************************
  PID Variables and constants
 ************************************************/
-
 //Define Variables we'll be connecting to
 double Setpoint;
 double Input;
@@ -240,6 +239,9 @@ float averageTemperature;
 #define SQW_PIN 3
 #define DS3231_TEMP_INTERVAL   2000
 elapsedMillis DS3231TempInterval;
+
+byte calcMinutes = 0;
+byte calcHours = 0;
 
 /*******************************************************************************
  Countdown
@@ -1838,7 +1840,6 @@ int updateBlynk(){
     return 0;
    }
    //DEBUG_PRINTLN(F("updating Blynk"));
-   selETH();
    Blynk.virtualWrite(V0, averageTemperature);
    Blynk.virtualWrite(V1, Setpoint);
    Blynk.virtualWrite(V2, LED1_intens);
@@ -1851,6 +1852,11 @@ int updateBlynk(){
     Blynk.virtualWrite(V5, 1);
    }else if(uvFurnaceStateMachine.isInState(offState)){
     Blynk.virtualWrite(V5, 0);
+   }
+   if(uvFurnaceStateMachine.isInState(errorState)){
+     Blynk.virtualWrite(V14, 255);
+   }else {
+     Blynk.virtualWrite(V14, 0);
    }
    Blynk.syncVirtual(V9);
    Blynk.syncVirtual(V10);
@@ -2150,8 +2156,6 @@ void refreshCountdown(){
         return;
       }
       
-      byte calcMinutes = 0;
-      byte calcHours = 0;
       if(minuteAlarm < minute()) {
         calcMinutes = 60 - (minute() - minuteAlarm);
         calcHours = hourAlarm - hour() - 1;
@@ -2160,18 +2164,13 @@ void refreshCountdown(){
         calcHours = hourAlarm - hour();
       }
          
-      //char temp[10] = {0};
-      //utoa(calcHours, temp, 10);
-      //hour_uv.setText(temp);
-
       utoa(calcHours, buffer, 10);
       hour_uv.setText(buffer);
 
-      //temp[10] = {0};
-      //utoa(calcMinutes, temp, 10);
-      //min_uv.setText(temp);
       utoa(calcMinutes, buffer, 10);
       min_uv.setText(buffer);
+      Blynk.virtualWrite(V12, calcMinutes);
+      Blynk.virtualWrite(V13, calcHours);
 
       CountdownUpdateInterval = 0;
 }
