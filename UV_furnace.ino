@@ -283,6 +283,9 @@ elapsedMillis BlynkInterval;
 
 int pushNotification = 0;
 int emailNotification = 0;
+#define BLYNK_GREEN     "#23C48E"
+#define BLYNK_YELLOW    "#ED9D00"
+#define BLYNK_RED       "#D3435C"
 
 /*******************************************************************************
  SD-Card
@@ -2402,6 +2405,8 @@ void initEnterFunction(){
     DEBUG_PRINT(F(":"));
     DEBUG_PRINTLN(tm.Second,DEC);  
   }
+  selETH();
+  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void initUpdateFunction(){
@@ -2450,7 +2455,10 @@ void settingsEnterFunction(){
   }
  
   sendCommand("ref 0");
+  selETH();
+  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
+
 void settingsUpdateFunction(){
   //DEBUG_PRINTLN(F("settingsUpdate"));
 }
@@ -2482,10 +2490,14 @@ void setLEDsEnterFunction(){
     bLED3.setPic(9);
   } 
   sendCommand("ref 0");
+  selETH();
+  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
+
 void setLEDsUpdateFunction(){
   //DEBUG_PRINTLN(F("setLEDsUpdate"));
 }
+
 void setLEDsExitFunction(){
   DEBUG_PRINTLN("setLEDsExit");
 }
@@ -2497,6 +2509,8 @@ void setTempEnterFunction(){
   tTempSetup.setText(intToChar(Setpoint));
 
   sendCommand("ref 0");
+  selETH();
+  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void setTempUpdateFunction(){
@@ -2528,6 +2542,8 @@ void setPIDEnterFunction(){
   DEBUG_PRINTLN(F("setPIDEnter"));
   page6.show();
   sendCommand("ref 0");
+  selETH();
+  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 void setPIDUpdateFunction(){
   //DEBUG_PRINTLN(F("setPIDUpdate"));
@@ -2554,6 +2570,9 @@ void runEnterFunction(){
    selETH();
    Udp.begin(INFLUXDB_PORT);
    InfluxdbUpdateInterval = 0;
+   
+   selETH();
+   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void runUpdateFunction(){
@@ -2573,8 +2592,8 @@ void runUpdateFunction(){
 
 void runExitFunction(){
   //DEBUG_PRINTLN(F("runExit"));
-  selETH();
   if(pushNotification == 1){
+    selETH();
     Blynk.notify("Curing finished!");
   }
 }
@@ -2591,11 +2610,13 @@ void errorEnterFunction(){
   if(pushNotification == 1){
      Blynk.notify("Error occured!");
   }
+  Blynk.setProperty(V14, "color", "BLYNK_RED");
 }
 void errorUpdateFunction(){
   DEBUG_PRINTLN(F("errorUpdate"));
   blinkPowerLED();
 }
+
 void errorExitFunction(){
   //DEBUG_PRINTLN(F("errorExit"));
 }
@@ -2610,6 +2631,8 @@ void offEnterFunction(){
     controlLEDs(0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
     RTC.alarmInterrupt(ALARM_1, false);
+    selETH();
+    Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void offUpdateFunction(){ 
@@ -2634,6 +2657,9 @@ void preheatEnterFunction(){
    selETH();
    Udp.begin(INFLUXDB_PORT);
    InfluxdbUpdateInterval = 0;
+
+   selETH();
+   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void preheatUpdateFunction(){ 
