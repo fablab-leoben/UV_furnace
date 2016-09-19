@@ -1,5 +1,4 @@
-/*----------------------------------------------------------------------*
- * UV furnace                                                           *
+ /* UV furnace                                                          *
  *                                                                      *
  * Copyright 2016 Thomas Rockenbauer, Fablab Leoben,                    *
  * rockenbauer.thomas@gmail.com                                         *
@@ -1856,13 +1855,17 @@ int updateBlynk(){
    }else if(uvFurnaceStateMachine.isInState(offState)){
     Blynk.virtualWrite(V5, 0);
    }
-   if(uvFurnaceStateMachine.isInState(errorState)){
-     Blynk.virtualWrite(V14, 255);
-   }else {
-     Blynk.virtualWrite(V14, 0);
-   }
    Blynk.syncVirtual(V9);
    Blynk.syncVirtual(V10);
+   if(uvFurnaceStateMachine.isInState(errorState)){
+      Blynk.setProperty(V14, "color", BLYNK_RED);
+      Blynk.virtualWrite(V14, BLYNK_RED);
+      Blynk.virtualWrite(V14, 255);
+   } else{
+      Blynk.setProperty(V14, "color", BLYNK_GREEN);
+      Blynk.virtualWrite(V14, BLYNK_GREEN);
+      Blynk.virtualWrite(V14, 255);
+   }
    BlynkInterval = 0;
 }
 
@@ -2405,8 +2408,6 @@ void initEnterFunction(){
     DEBUG_PRINT(F(":"));
     DEBUG_PRINTLN(tm.Second,DEC);  
   }
-  selETH();
-  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void initUpdateFunction(){
@@ -2509,8 +2510,6 @@ void setTempEnterFunction(){
   tTempSetup.setText(intToChar(Setpoint));
 
   sendCommand("ref 0");
-  selETH();
-  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void setTempUpdateFunction(){
@@ -2542,8 +2541,6 @@ void setPIDEnterFunction(){
   DEBUG_PRINTLN(F("setPIDEnter"));
   page6.show();
   sendCommand("ref 0");
-  selETH();
-  Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 void setPIDUpdateFunction(){
   //DEBUG_PRINTLN(F("setPIDUpdate"));
@@ -2570,9 +2567,6 @@ void runEnterFunction(){
    selETH();
    Udp.begin(INFLUXDB_PORT);
    InfluxdbUpdateInterval = 0;
-   
-   selETH();
-   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void runUpdateFunction(){
@@ -2631,8 +2625,6 @@ void offEnterFunction(){
     controlLEDs(0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
     RTC.alarmInterrupt(ALARM_1, false);
-    selETH();
-    Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void offUpdateFunction(){ 
@@ -2657,9 +2649,6 @@ void preheatEnterFunction(){
    selETH();
    Udp.begin(INFLUXDB_PORT);
    InfluxdbUpdateInterval = 0;
-
-   selETH();
-   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
 
 void preheatUpdateFunction(){ 
