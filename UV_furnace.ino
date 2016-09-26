@@ -1810,9 +1810,11 @@ int setDS3231Alarm(byte minutes, byte hours) {
   tmElements_t tm;
   RTC.read(tm);
 
-  hourAlarm = hour() + hours;
-  minuteAlarm = minute() + minutes;
-  secondAlarm = second();
+  hourAlarm, minuteAlarm, secondAlarm = 0;
+  
+  hourAlarm = tm.Hour + hours;
+  minuteAlarm = tm.Minute + minutes;
+  secondAlarm = tm.Second;
 
   if(minuteAlarm >= 60){
     minuteAlarm = minuteAlarm - 60;
@@ -1821,6 +1823,7 @@ int setDS3231Alarm(byte minutes, byte hours) {
   if(hourAlarm >= 24) {
     hourAlarm = hourAlarm - 24;
   }
+  DEBUG_PRINTLN(F("Alarm"));
   DEBUG_PRINTLN(secondAlarm);
   DEBUG_PRINTLN(minuteAlarm);
   DEBUG_PRINTLN(hourAlarm);
@@ -2161,13 +2164,15 @@ void refreshCountdown(){
       if(CountdownUpdateInterval < COUNTDOWN_UPDATE_INTERVAL){
         return;
       }
+      tmElements_t tm;
+      RTC.read(tm);
       
-      if(minuteAlarm < minute()) {
-        calcMinutes = 60 - (minute() - minuteAlarm);
-        calcHours = hourAlarm - hour() - 1;
+      if(minuteAlarm < tm.Minute) {
+        calcMinutes = 60 - (tm.Minute - minuteAlarm);
+        calcHours = hourAlarm - tmHour - 1;
       } else {
-        calcMinutes = minuteAlarm - minute();
-        calcHours = hourAlarm - hour();
+        calcMinutes = minuteAlarm - tm.Minute;
+        calcHours = hourAlarm - tm.Hour;
       }
          
       utoa(calcHours, buffer, 10);
@@ -2392,7 +2397,7 @@ void initEnterFunction(){
 
     DEBUG_PRINTLN(RTC.set(epoch));
 
-    setSyncProvider(RTC.get);   // the function to get the time from the RTC
+    setSyncProvider(RTC.get());   // the function to get the time from the RTC
 
     tmElements_t tm;
     RTC.read(tm);
