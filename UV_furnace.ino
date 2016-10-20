@@ -2590,7 +2590,11 @@ void runUpdateFunction(){
 }
 
 void runExitFunction(){
-  //DEBUG_PRINTLN(F("runExit"));
+  DEBUG_PRINTLN(F("runExit"));
+  
+  minutes_oven = 0;
+  hours_oven = 0;
+  
   if(pushNotification == 1){
     selETH();
     Blynk.notify("Curing finished!");
