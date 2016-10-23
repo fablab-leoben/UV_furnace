@@ -454,13 +454,15 @@ void bOnOffPopCallback(void *ptr)
       picNum = 2;
       uvFurnaceStateMachine.transitionTo(runState);
 
-    } else {
-      picNum = 1;
-      uvFurnaceStateMachine.transitionTo(offState);
-     
-    }
-    bOnOff.setPic(picNum);
-    sendCommand("ref bOnOff");
+     } else if (picNum == 1 && myBoolean.preheat == 1) {
+       picNum = 2;
+       uvFurnaceStateMachine.transitionTo(preheatState);
+     } else {
+       picNum = 1;
+       uvFurnaceStateMachine.transitionTo(offState);
+     }
+     bOnOff.setPic(picNum);
+     sendCommand("ref bOnOff");
 }
 
 //End Page1
