@@ -66,6 +66,8 @@ typedef struct myBoolStruct
 }; 
 myBoolStruct myBoolean;
 
+int xy = 850;
+
 //compatibility with Arduino IDE 1.6.9
 void dummy(){}
 
@@ -144,6 +146,7 @@ const unsigned int localPort = 8888;       // local port to listen for UDP packe
 char timeServer[] = "time.nist.gov"; // time.nist.gov NTP server
 const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
 byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
+bool ethernetAvailable = false;
 
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
@@ -179,11 +182,11 @@ unsigned long windowStartTime;
 // ************************************************
 // Auto Tune Variables and constants
 // ************************************************
-byte ATuneModeRemember=2;
+byte ATuneModeRemember = 2;
  
-double aTuneStep=500;
-double aTuneNoise=1;
-unsigned int aTuneLookBack=20;
+double aTuneStep = 500;
+double aTuneNoise = 1;
+unsigned int aTuneLookBack = 20;
  
 boolean tuning = false;
  
@@ -403,6 +406,7 @@ NexText tLED3 = NexText(5, 19, "tLED3");
 //Page6
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
 NexButton bAutotune = NexButton(6, 2, "bAutotune");
+NexNumber nP = NexNumber(6, 4, "nP");
 
 //Page7
 NexButton bReset = NexButton(7, 1, "bReset");
@@ -431,7 +435,7 @@ NexTouch *nex_listen_list[] =
     &bLED3plus1, &bLED3plus10, &bLED3minus1, &bLED3minus10,
     &bHomeLED,
     
-    &bHomePID, &bAutotune,
+    &bHomePID, &bAutotune, &nP,
 
     &bReset,
 
@@ -1516,24 +1520,21 @@ void setup() {
   
   if (!SD.begin(SDCARD_CS)) {
     DEBUG_PRINTLN(F("Card failed, or not present"));
-    // don't do anything more:
-    while (1) ;
+    // ToDo: disable reading preset from sd card
+  } else{
+    DEBUG_PRINTLN(F("card initialized."));
   }
-  DEBUG_PRINTLN(F("card initialized."));
 
   selETH();
-  if (Ethernet.begin(mac) == 0) {
-    // no point in carrying on, so do nothing forevermore:
-    while (1) {
-      DEBUG_PRINTLN(F("Failed to configure Ethernet using DHCP"));
-      delay(10000);
-    }
+  if ( !Ethernet.begin(mac) ) {
+    ethernetAvailable = false;
+    DEBUG_PRINTLN(F("Ethernet not available"));
+  } else {
+    ethernetAvailable = true;
+    Udp.begin(localPort); 
+    DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
+    DEBUG_PRINTLN(Ethernet.localIP());
   }
-
-  Udp.begin(localPort);
-
-  DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
-  DEBUG_PRINTLN(Ethernet.localIP());
 
   // Run timer2 interrupt every 15 ms 
   TCCR2A = 0;
@@ -1544,7 +1545,9 @@ void setup() {
   
    #ifdef USE_Blynk
     //init Blynk
-    Blynk.begin(auth);
+    if(ethernetAvailable){
+      Blynk.begin(auth);
+    }
    #endif
 
   DEBUG_PRINTLN(F("setup ready"));
@@ -2055,7 +2058,6 @@ void selSD() {
   digitalWrite(cs_MAX31855, HIGH); 
 }
 
-
 /*******************************************************************************
  * Function Name  : selMAX31855
  * Description    : selects the MAX31855 thermocouple sensor to make 
@@ -2109,7 +2111,7 @@ void updateGraph(){
 }
 
 void sendToInfluxDB(){
-  if(InfluxdbUpdateInterval < INFLUXDB_UPDATE_INTERVAL){
+  if(InfluxdbUpdateInterval < INFLUXDB_UPDATE_INTERVAL || ethernetAvailable == false){
     return;
   }
   selETH();
@@ -2134,7 +2136,7 @@ void sendToInfluxDB(){
  * Return         : timestamp
  *******************************************************************************/ 
 unsigned long sendNTPpacket(char* address)
-{
+{ 
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
@@ -2352,69 +2354,70 @@ void initEnterFunction(){
   initTimer = 0;
   page0.show();
   tVersion.setText(VERSION); 
-  
-  sendNTPpacket(timeServer); // send an NTP packet to a time server
-  selETH();
-  // wait to see if a reply is available
-  delay(1000);
-  if ( Udp.parsePacket() ) {
-    // We've received a packet, read the data from it
-    Udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+  if(ethernetAvailable){
+    sendNTPpacket(timeServer); // send an NTP packet to a time server
+    selETH();
 
-    //the timestamp starts at byte 40 of the received packet and is four bytes,
-    // or two words, long. First, esxtract the two words:
+    // wait to see if a reply is available
+    delay(1000);
+    if ( Udp.parsePacket() ) {
+      // We've received a packet, read the data from it
+      Udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+
+      //the timestamp starts at byte 40 of the received packet and is four bytes,
+      // or two words, long. First, extract the two words:
  
-    unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
-    unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
-    // combine the four bytes (two words) into a long integer
-    // this is NTP time (seconds since Jan 1 1900):
-    unsigned long secsSince1900 = highWord << 16 | lowWord;
-    DEBUG_PRINT(F("Seconds since Jan 1 1900 = " ));
-    DEBUG_PRINTLN(secsSince1900);
+      unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
+      unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
+      // combine the four bytes (two words) into a long integer
+      // this is NTP time (seconds since Jan 1 1900):
+      unsigned long secsSince1900 = highWord << 16 | lowWord;
+      DEBUG_PRINT(F("Seconds since Jan 1 1900 = " ));
+      DEBUG_PRINTLN(secsSince1900);
 
-    // now convert NTP time into everyday time:
-    DEBUG_PRINT(F("Unix time = "));
-    // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-    const unsigned long seventyYears = 2208988800UL;
-    // subtract seventy years:
-    unsigned long epoch = secsSince1900 - seventyYears;
-    // print Unix time:
-    DEBUG_PRINTLN(epoch);
+      // now convert NTP time into everyday time:
+      DEBUG_PRINT(F("Unix time = "));
+      // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
+      const unsigned long seventyYears = 2208988800UL;
+      // subtract seventy years:
+      unsigned long epoch = secsSince1900 - seventyYears;
+      // print Unix time:
+      DEBUG_PRINTLN(epoch);
     
-    // print the hour, minute and second:
-    DEBUG_PRINT(F("The UTC time is "));       // UTC is the time at Greenwich Meridian (GMT)
-    DEBUG_PRINT((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
-    DEBUG_PRINT(F(":"));
-    if ( ((epoch % 3600) / 60) < 10 ) {
-      // In the first 10 minutes of each hour, we'll want a leading '0'
-      DEBUG_PRINT(F("0"));
-    }
-    DEBUG_PRINT((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
-    DEBUG_PRINT(F(":"));
-    if ( (epoch % 60) < 10 ) {
-      // In the first 10 seconds of each minute, we'll want a leading '0'
-      DEBUG_PRINT(F("0"));
-    }
-    DEBUG_PRINTLN(epoch % 60); // print the second
+      // print the hour, minute and second:
+      DEBUG_PRINT(F("The UTC time is "));       // UTC is the time at Greenwich Meridian (GMT)
+      DEBUG_PRINT((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
+      DEBUG_PRINT(F(":"));
+      if ( ((epoch % 3600) / 60) < 10 ) {
+        // In the first 10 minutes of each hour, we'll want a leading '0'
+        DEBUG_PRINT(F("0"));
+      }
+      DEBUG_PRINT((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
+      DEBUG_PRINT(F(":"));
+      if ( (epoch % 60) < 10 ) {
+        // In the first 10 seconds of each minute, we'll want a leading '0'
+        DEBUG_PRINT(F("0"));
+      }
+      DEBUG_PRINTLN(epoch % 60); // print the second
 
-    DEBUG_PRINTLN(RTC.set(epoch));
-
+      DEBUG_PRINTLN(RTC.set(epoch)); 
+    }
     setSyncProvider(RTC.get());   // the function to get the time from the RTC
-
-    tmElements_t tm;
-    RTC.read(tm);
-    DEBUG_PRINT(tm.Day, DEC);
-    DEBUG_PRINT(F("."));
-    DEBUG_PRINT(tm.Month, DEC);
-    DEBUG_PRINT(F("."));
-    DEBUG_PRINT(year(), DEC);
-    DEBUG_PRINT(F(" "));
-    DEBUG_PRINT(tm.Hour, DEC);
-    DEBUG_PRINT(F(":"));
-    DEBUG_PRINT(tm.Minute,DEC);
-    DEBUG_PRINT(F(":"));
-    DEBUG_PRINTLN(tm.Second,DEC);  
   }
+ 
+  tmElements_t tm;
+  RTC.read(tm);
+  DEBUG_PRINT(tm.Day, DEC);
+  DEBUG_PRINT(F("."));
+  DEBUG_PRINT(tm.Month, DEC);
+  DEBUG_PRINT(F("."));
+  DEBUG_PRINT(year(), DEC);
+  DEBUG_PRINT(F(" "));
+  DEBUG_PRINT(tm.Hour, DEC);
+  DEBUG_PRINT(F(":"));
+  DEBUG_PRINT(tm.Minute,DEC);
+  DEBUG_PRINT(F(":"));
+  DEBUG_PRINTLN(tm.Second,DEC);  
 }
 
 void initUpdateFunction(){
@@ -2547,6 +2550,7 @@ void setTimerExitFunction(){
 void setPIDEnterFunction(){
   DEBUG_PRINTLN(F("setPIDEnter"));
   page6.show();
+  nP.setValue(xy);
   sendCommand("ref 0");
 }
 void setPIDUpdateFunction(){
