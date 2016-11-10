@@ -66,8 +66,6 @@ typedef struct myBoolStruct
 }; 
 myBoolStruct myBoolean;
 
-int xy = 850;
-
 //compatibility with Arduino IDE 1.6.9
 void dummy(){}
 
@@ -335,6 +333,7 @@ NexText min_uv = NexText(1, 4, "min_uv");
 NexWaveform s0 = NexWaveform(1, 3, "s0");
 NexButton bSettings = NexButton(1, 1, "bSettings");
 NexButton bOnOff = NexButton(1, 2, "bOnOff");
+NexText tSetpoint = NexText(1, 7, "tSetpoint");
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -352,10 +351,6 @@ NexButton bCredits = NexButton(2, 12, "bCredits");
 
 //Page3
 NexText tTempSetup = NexText(3, 1, "tTempSetup");
-NexButton bTempPlus1 = NexButton(3, 2, "bTempPlus1");
-NexButton bTempPlus10 = NexButton(3, 4, "bTempPlus10");
-NexButton bTempMinus1 = NexButton(3, 3, "bTempMinus1");
-NexButton bTempMinus10 = NexButton(3, 5, "bTempMinus10");
 NexButton bHomeTemp = NexButton(3, 6, "bHomeTemp");
 NexButton bPreheat = NexButton(3, 7 , "bPreheat");
 
@@ -424,7 +419,7 @@ NexTouch *nex_listen_list[] =
     
     &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits,
     
-    &bTempPlus1, &bTempPlus10, &bTempMinus1, &bTempMinus10, &bHomeTemp, &bPreheat,
+    &bHomeTemp, &bPreheat,
     
     &bOHourPlus1, &bOHourPlus10, &bOHourMinus1, &bOHourMinus10, &bOMinPlus1, &bOMinPlus10, &bOMinMinus1, &bOMinMinus10,
     &bLHourPlus1, &bLHourPlus10, &bLHourMinus1, &bLHourMinus10, &bLMinPlus1, &bLMinPlus10, &bLMinMinus1, &bLMinMinus10, &bHomeTimer,
@@ -640,7 +635,13 @@ void bCreditsPopCallback(void *ptr)
 //End Page2
 
 //Page3
-void bTempPlus1PopCallback(void *ptr)
+char* intToChar(int variable){
+    memset(buffer, 0, sizeof(buffer));
+    itoa(variable, buffer, 10);    
+    return buffer;
+}
+
+void bHomeTempPopCallback(void *ptr)
 {
     dbSerialPrintln("bTempPlus1PopCallback");
 
@@ -648,80 +649,8 @@ void bTempPlus1PopCallback(void *ptr)
     tTempSetup.getText(buffer, sizeof(buffer));
 
     Setpoint = atoi(buffer);
-    Setpoint += 1;
-
-    if (Setpoint > 100)
-    {
-        Setpoint = 100;
-    }
-
+    DEBUG_PRINTLN(Setpoint);
     tTempSetup.setText(intToChar(Setpoint));
-}
-
-char* intToChar(int variable){
-    memset(buffer, 0, sizeof(buffer));
-    itoa(variable, buffer, 10);
-    
-    return buffer;
-}
-
-void bTempPlus10PopCallback(void *ptr)
-{
-    dbSerialPrintln("bTempPlus10PopCallback");
-
-    memset(buffer, 0, sizeof(buffer));
-    tTempSetup.getText(buffer, sizeof(buffer));
-
-    Setpoint = atoi(buffer);
-    Setpoint += 10;
-
-    if (Setpoint > 100)
-    {
-        Setpoint = 100;
-    }
-    
-   tTempSetup.setText(intToChar(Setpoint));
-}
-
-void bTempMinus1PopCallback(void *ptr)
-{
-    dbSerialPrintln("bTempMinus1PopCallback");
-
-    memset(buffer, 0, sizeof(buffer));
-    tTempSetup.getText(buffer, sizeof(buffer));
-
-    Setpoint = atoi(buffer);
-    Setpoint -= 1;
-
-    if (Setpoint < 0)
-    {
-        Setpoint = 0;
-    }
-   
-    tTempSetup.setText(intToChar(Setpoint));
-}
-
-void bTempMinus10PopCallback(void *ptr)
-{
-    dbSerialPrintln("bTempMinus10PopCallback");
-
-    memset(buffer, 0, sizeof(buffer));
-    tTempSetup.getText(buffer, sizeof(buffer));
-
-    Setpoint = atoi(buffer);
-    Setpoint -= 10;
-
-    if (Setpoint < 0)
-    {
-        Setpoint = 0;
-    }
-    
-    tTempSetup.setText(intToChar(Setpoint));
-}
-
-
-void bHomeTempPopCallback(void *ptr)
-{
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 
@@ -1428,10 +1357,6 @@ void setup() {
   bCredits.attachPop(bCreditsPopCallback, &bCredits);
 
   //Page3
-  bTempPlus1.attachPop(bTempPlus1PopCallback, &bTempPlus1);
-  bTempPlus10.attachPop(bTempPlus10PopCallback, &bTempPlus10);
-  bTempMinus1.attachPop(bTempMinus1PopCallback, &bTempMinus1);
-  bTempMinus10.attachPop(bTempMinus10PopCallback, &bTempMinus10);
   bHomeTemp.attachPop(bHomeTempPopCallback, &bHomeTemp);
   bPreheat.attachPop(bPreheatPopCallback, &bPreheat);
 
@@ -2550,7 +2475,7 @@ void setTimerExitFunction(){
 void setPIDEnterFunction(){
   DEBUG_PRINTLN(F("setPIDEnter"));
   page6.show();
-  nP.setValue(xy);
+  nP.setValue(int(Kp));
   sendCommand("ref 0");
 }
 void setPIDUpdateFunction(){
@@ -2635,6 +2560,7 @@ void offEnterFunction(){
     page1.show();
     hour_uv.setText(intToChar(hours_oven));
     min_uv.setText(intToChar(minutes_oven));
+    tSetpoint.setText(intToChar(Setpoint));
     sendCommand("ref 0");
     myPID.SetMode(MANUAL);
     controlLEDs(0, 0, 0);
