@@ -204,11 +204,11 @@ byte secondAlarm = 0;
 /************************************************
  time settings variables for heating and leds
 ************************************************/
-byte hours_oven = 0;
-byte minutes_oven = 0;
+uint32_t hours_oven = 0;
+uint32_t minutes_oven = 0;
 
-byte hours_LED = 0;
-byte minutes_LED = 0;
+uint32_t hours_LED = 0;
+uint32_t minutes_LED = 0;
 
 /************************************************
  chart definitions for Nextion 4,3" display
@@ -337,6 +337,10 @@ NexWaveform s0 = NexWaveform(1, 3, "s0");
 NexButton bSettings = NexButton(1, 1, "bSettings");
 NexButton bOnOff = NexButton(1, 2, "bOnOff");
 NexText tSetpoint = NexText(1, 7, "tSetpoint");
+NexCrop cLED1 = NexCrop(1, 8, "cLED1");
+NexCrop cLED2 = NexCrop(1, 9, "cLED2");
+NexCrop cLED3 = NexCrop(1, 10, "cLED3");
+NexCrop cLED4 = NexCrop(1, 11, "cLED4");
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -359,12 +363,10 @@ NexButton bPreheat = NexButton(3, 7 , "bPreheat");
 
 //Page4
 NexButton bHomeTimer = NexButton(4, 17, "bHomeTimer");
-NexText tOvenHourT = NexText(4, 18, "tOvenHourT");
-NexText tOvenMinuteT = NexText(4, 19, "tOvenMinuteT");
+NexNumber tOvenHourT = NexNumber(4, 22, "tOvenHourT");
+NexNumber tOvenMinuteT = NexNumber(4, 23, "tOvenMinuteT");
 NexText tLEDsHourT = NexText(4, 20, "tLEDsHourT");
 NexText tLEDsMinuteT = NexText(4, 21, "tLEDsMinuteT");
-NexVariable ovenMinute = NexVariable(4, 23, "ovenMinute");
-NexVariable ovenHour = NexVariable(4, 22, "ovenHour");
 
 //Page5
 NexButton bLED1 = NexButton(5, 1, "bLED1");
@@ -394,7 +396,7 @@ NexTouch *nex_listen_list[] =
 {
     &tVersion,
     
-    &bSettings, &bOnOff,
+    &bSettings, &bOnOff, &cLED1, &cLED2, &cLED3, &cLED4,
     
     &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits,
     
@@ -422,7 +424,7 @@ void bSettingsPopCallback(void *ptr)
 void bOnOffPopCallback(void *ptr)
 {
     uint32_t picNum = 0;
-    bOnOff.getPic(&picNum);
+    bOnOff.Get_background_crop_picc(&picNum);
      if(picNum == 1) {
       picNum = 2;
       uvFurnaceStateMachine.transitionTo(runState);
@@ -434,7 +436,7 @@ void bOnOffPopCallback(void *ptr)
        picNum = 1;
        uvFurnaceStateMachine.transitionTo(offState);
      }
-     bOnOff.setPic(picNum);
+     bOnOff.Set_background_crop_picc(picNum);
      sendCommand("ref bOnOff");
 }
 
@@ -444,7 +446,7 @@ void bOnOffPopCallback(void *ptr)
 void bPreSet1PopCallback(void *ptr)
 {   
   uint32_t picNum = 0;
-  bPreSet1.getPic(&picNum);
+  bPreSet1.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
     picNum = 4;
     turnOffPresetButtons();
@@ -458,14 +460,14 @@ void bPreSet1PopCallback(void *ptr)
     }
     //DEBUG_PRINTLN(picNum);
 
-    bPreSet1.setPic(picNum);
+    bPreSet1.Set_background_crop_picc(picNum);
     sendCommand("ref 0");
 }
 
 void bPreSet2PopCallback(void *ptr)
 {
    uint32_t picNum = 0;
-  bPreSet2.getPic(&picNum);
+  bPreSet2.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
       picNum = 4;
       turnOffPresetButtons();
@@ -478,14 +480,14 @@ void bPreSet2PopCallback(void *ptr)
 
     }
     //DEBUG_PRINTLN(picNum);
-    bPreSet2.setPic(picNum);
+    bPreSet2.Set_background_crop_picc(picNum);
     sendCommand("ref bPreSet2");
 }
 
 void bPreSet3PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
-  bPreSet3.getPic(&picNum);
+  bPreSet3.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
       picNum = 4;
       turnOffPresetButtons();
@@ -498,13 +500,13 @@ void bPreSet3PopCallback(void *ptr)
   
     }
     //DEBUG_PRINTLN(picNum);
-    bPreSet3.setPic(picNum);
+    bPreSet3.Set_background_crop_picc(picNum);
     sendCommand("ref bPreSet3");}
 
 void bPreSet4PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
-  bPreSet4.getPic(&picNum);
+  bPreSet4.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
       picNum = 4;
       turnOffPresetButtons();
@@ -517,13 +519,13 @@ void bPreSet4PopCallback(void *ptr)
          
     }
     //DEBUG_PRINTLN(picNum);
-    bPreSet4.setPic(picNum);
+    bPreSet4.Set_background_crop_picc(picNum);
     sendCommand("ref bPreSet4");}
 
 void bPreSet5PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
-  bPreSet5.getPic(&picNum);
+  bPreSet5.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
       picNum = 4;
       turnOffPresetButtons();
@@ -536,13 +538,13 @@ void bPreSet5PopCallback(void *ptr)
       myBoolean.preset5 = 0; 
     }
     //DEBUG_PRINTLN(picNum);
-    bPreSet5.setPic(picNum);
+    bPreSet5.Set_background_crop_picc(picNum);
     sendCommand("ref bPreSet5");}
 
 void bPreSet6PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
-  bPreSet6.getPic(&picNum);
+  bPreSet6.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
       picNum = 4;
       turnOffPresetButtons();
@@ -555,17 +557,17 @@ void bPreSet6PopCallback(void *ptr)
       
     }
     //DEBUG_PRINTLN(picNum);
-    bPreSet6.setPic(picNum);
+    bPreSet6.Set_background_crop_picc(picNum);
     sendCommand("ref bPreSet6");
 }
 
 void turnOffPresetButtons(){
-    bPreSet1.setPic(3);
-    bPreSet2.setPic(3);
-    bPreSet3.setPic(3);
-    bPreSet4.setPic(3);
-    bPreSet5.setPic(3);
-    bPreSet6.setPic(3);
+    bPreSet1.Set_background_crop_picc(3);
+    bPreSet2.Set_background_crop_picc(3);
+    bPreSet3.Set_background_crop_picc(3);
+    bPreSet4.Set_background_crop_picc(3);
+    bPreSet5.Set_background_crop_picc(3);
+    bPreSet6.Set_background_crop_picc(3);
     myBoolean.preset1 = 0;
     myBoolean.preset2 = 0;
     myBoolean.preset3 = 0;
@@ -631,7 +633,7 @@ void bHomeTempPopCallback(void *ptr)
 void bPreheatPopCallback(void *ptr)
 {
     uint32_t picNum = 0;
-    bPreheat.getPic(&picNum);
+    bPreheat.Get_background_crop_picc(&picNum);
     DEBUG_PRINTLN(picNum);
     if(picNum == 5) {
       picNum = 7;
@@ -644,16 +646,19 @@ void bPreheatPopCallback(void *ptr)
       myBoolean.preheat = 0;
     }
     DEBUG_PRINTLN(myBoolean.preheat);
-    bPreheat.setPic(picNum);
+    bPreheat.Set_background_crop_picc(picNum);
     sendCommand("ref bPreheat");
 }
 //End Page3
 
 //Page4
 void bHomeTimerPopCallback(void *ptr)
-{   
-  minutes_oven = ovenMinute.getValue();
-  hours_oven = ovenHour.getValue();
+{ 
+  uint32_t number;
+  tOvenMinuteT.getValue(&number);
+  minutes_oven = number;
+  hours_oven = tOvenHourT.getValue(&number);
+  hours_oven = number;
   uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 //End Page4
@@ -662,7 +667,7 @@ void bHomeTimerPopCallback(void *ptr)
 void bLED1PopCallback(void *ptr)
 { 
   uint32_t picNum = 0;
-  bLED1.getPic(&picNum);
+  bLED1.Get_background_crop_picc(&picNum);
   if(picNum == 9) {
       picNum = 11;
 
@@ -675,7 +680,7 @@ void bLED1PopCallback(void *ptr)
 
     }
     //DEBUG_PRINTLN(picNum);
-    bLED1.setPic(picNum);
+    bLED1.Set_background_crop_picc(picNum);
     sendCommand("ref bLED1");
 }
 
@@ -684,7 +689,7 @@ void bLED1PopCallback(void *ptr)
 void bLED2PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
-    bLED2.getPic(&picNum);
+    bLED2.Get_background_crop_picc(&picNum);
      if(picNum == 9) {
       picNum = 11;
 
@@ -696,14 +701,14 @@ void bLED2PopCallback(void *ptr)
       myBoolean.bLED2State = false;
     }
     //DEBUG_PRINTLN(picNum);
-    bLED2.setPic(picNum);
+    bLED2.Set_background_crop_picc(picNum);
     sendCommand("ref bLED2");
 }
 
 void bLED3PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
-    bLED3.getPic(&picNum);
+    bLED3.Get_background_crop_picc(&picNum);
     if(picNum == 9) {
       picNum = 11;
 
@@ -716,14 +721,14 @@ void bLED3PopCallback(void *ptr)
 
     }
     //DEBUG_PRINTLN(picNum);
-    bLED3.setPic(picNum);
+    bLED3.Set_background_crop_picc(picNum);
     sendCommand("ref bLED3");
 }
 
 void bLED4PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
-    bLED4.Get_background_image_pic(&picNum);
+    bLED4.Get_background_crop_picc(&picNum);
     if(picNum == 9) {
       picNum = 11;
 
@@ -736,7 +741,7 @@ void bLED4PopCallback(void *ptr)
 
     }
     //DEBUG_PRINTLN(picNum);
-    bLED4.setPic(picNum);
+    bLED4.Set_background_crop_picc(picNum);
     sendCommand("ref bLED4");
 }
 
@@ -1472,28 +1477,36 @@ void selMAX31855(){
  *******************************************************************************/
 void controlLEDs(byte intensity1, byte intensity2, byte intensity3, byte intensity4){
   if(myBoolean.bLED1State == true){
+    cLED1.Set_background_crop_picc(1);
     analogWrite(LED1, intensity1);
     //DEBUG_PRINTLN(intensity1);
   }else {
     analogWrite(LED1, 0);
+    cLED1.Set_background_crop_picc(2);
   }
   if(myBoolean.bLED2State == true){
+    cLED2.Set_background_crop_picc(1);
     analogWrite(LED2, intensity2);
     //DEBUG_PRINTLN(intensity2);
   }else {
     analogWrite(LED2, 0);
+    cLED2.Set_background_crop_picc(2);
   }
   if(myBoolean.bLED3State == true){
+    cLED3.Set_background_crop_picc(1);
     analogWrite(LED3, intensity3);
     //DEBUG_PRINTLN(intensity3);
   }else {
     analogWrite(LED3, 0);
+    cLED3.Set_background_crop_picc(2);
   }
   if(myBoolean.bLED4State == true){
+    cLED4.Set_background_crop_picc(1);
     analogWrite(LED4, intensity4);
     //DEBUG_PRINTLN(intensity3);
   }else {
     analogWrite(LED4, 0);
+    cLED4.Set_background_crop_picc(2);
   }
 }
 
@@ -1728,8 +1741,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
       DEBUG_PRINT(F("Unknown name in config: "));
       DEBUG_PRINTLN(cfg.getName());
     }
-  }
-  
+  } 
   // clean up
   cfg.end();
 }
@@ -1854,22 +1866,22 @@ void settingsEnterFunction(){
   page2.show();
   
   if(myBoolean.preset1 == 1){
-      bPreSet1.setPic(4);
+      bPreSet1.Set_background_crop_picc(4);
   }
   if(myBoolean.preset2 == 1){
-      bPreSet2.setPic(4);
+      bPreSet2.Set_background_crop_picc(4);
   }
   if(myBoolean.preset3 == 1){
-      bPreSet3.setPic(4);
+      bPreSet3.Set_background_crop_picc(4);
   }
   if(myBoolean.preset4 == 1){
-      bPreSet4.setPic(4);
+      bPreSet4.Set_background_crop_picc(4);
   }
   if(myBoolean.preset5 == 1){
-      bPreSet5.setPic(4);
+      bPreSet5.Set_background_crop_picc(4);
   }
   if(myBoolean.preset6 == 1){
-      bPreSet6.setPic(4);
+      bPreSet6.Set_background_crop_picc(4);
   }
  
   sendCommand("ref 0");
@@ -1894,24 +1906,24 @@ void setLEDsEnterFunction(){
   tLED4.setText(intToChar(LED4_intens));
 
   if(myBoolean.bLED1State == true){
-    bLED1.setPic(11);
+    bLED1.Set_background_crop_picc(11);
   }else{
-    bLED1.setPic(9);
+    bLED1.Set_background_crop_picc(9);
   }
   if(myBoolean.bLED2State == true){
-    bLED2.setPic(11);
+    bLED2.Set_background_crop_picc(11);
   }else{
-    bLED2.setPic(9);
+    bLED2.Set_background_crop_picc(9);
   }
   if(myBoolean.bLED3State == true){
-    bLED3.setPic(11);
+    bLED3.Set_background_crop_picc(11);
   }else{
-    bLED3.setPic(9);
+    bLED3.Set_background_crop_picc(9);
   } 
   if(myBoolean.bLED4State == true){
-    bLED4.setPic(11);
+    bLED4.Set_background_crop_picc(11);
   }else{
-    bLED4.setPic(9);
+    bLED4.Set_background_crop_picc(9);
   } 
   sendCommand("ref 0");
   selETH();
@@ -1946,8 +1958,8 @@ void setTempExitFunction(){
 void setTimerEnterFunction(){
   DEBUG_PRINTLN(F("setTimerEnter"));
   page4.show();
-  tOvenMinuteT.setText(intToChar(minutes_oven));
-  tOvenHourT.setText(intToChar(hours_oven));
+  tOvenMinuteT.setValue(minutes_oven);
+  tOvenHourT.setValue(hours_oven);
   tLEDsMinuteT.setText(intToChar(minutes_LED));
   tLEDsHourT.setText(intToChar(hours_LED));
   
@@ -2046,6 +2058,7 @@ void errorExitFunction(){
 void offEnterFunction(){
     DEBUG_PRINTLN(F("offEnter"));
     page1.show();
+    DEBUG_PRINTLN(hours_oven);
     hour_uv.setText(intToChar(hours_oven));
     min_uv.setText(intToChar(minutes_oven));
     tSetpoint.setText(intToChar(Setpoint));
