@@ -1255,10 +1255,8 @@ int updateBlynk(){
    Blynk.virtualWrite(V2, LED1_intens);
    Blynk.virtualWrite(V3, LED2_intens);
    Blynk.virtualWrite(V4, LED3_intens);
-   Blynk.virtualWrite(V6, map(myBoolean.bLED1State, 0, 1, 0, 1023));
-   Blynk.virtualWrite(V7, map(myBoolean.bLED2State, 0, 1, 0, 1023));
-   Blynk.virtualWrite(V8, map(myBoolean.bLED3State, 0, 1, 0, 1023));
-   if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
+   Blynk.virtualWrite(V6, LED4_intens);
+   if(uvFurnaceStateMachine.isInState(rubinnState) || uvFurnaceStateMachine.isInState(preheatState)){
     Blynk.virtualWrite(V5, 1);
    }else if(uvFurnaceStateMachine.isInState(offState)){
     Blynk.virtualWrite(V5, 0);
