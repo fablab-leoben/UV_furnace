@@ -108,8 +108,8 @@ elapsedMillis initTimer;
 #define RelayPin 32
 
 // Reed switch
-#define reedSwitch 30
-volatile boolean doorIsOpen;
+#define reedSwitch 19
+volatile boolean doorChanged;
 
 // ON/OFF Button LED
 #define onOffButton 12
@@ -117,15 +117,15 @@ volatile boolean doorIsOpen;
 /************************************************
  LED variables
 ************************************************/
-byte LED1_intensity = 0;
-byte LED2_intensity = 0;
-byte LED3_intensity = 0;
-byte LED4_intensity = 0;
+uint32_t LED1_intensity = 0;
+uint32_t LED2_intensity = 0;
+uint32_t LED3_intensity = 0;
+uint32_t LED4_intensity = 0;
 
-byte LED1_intens = 100;
-byte LED2_intens = 100;
-byte LED3_intens = 100;
-byte LED4_intens = 100;
+uint32_t LED1_intens = 100;
+uint32_t LED2_intens = 100;
+uint32_t LED3_intens = 100;
+uint32_t LED4_intens = 100;
 
 /************************************************
 Config files
@@ -230,6 +230,7 @@ Adafruit_MAX31855 thermocouple(cs_MAX31855);
 elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
 float lastTemperature;
+bool newTemperature = false;
 
 const int NUMBER_OF_SAMPLES = 10;
 #define DUMMY -100
@@ -341,6 +342,7 @@ NexCrop cLED1 = NexCrop(1, 8, "cLED1");
 NexCrop cLED2 = NexCrop(1, 9, "cLED2");
 NexCrop cLED3 = NexCrop(1, 10, "cLED3");
 NexCrop cLED4 = NexCrop(1, 11, "cLED4");
+NexText tToast = NexText(1, 12, "tToast");
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -363,21 +365,21 @@ NexButton bPreheat = NexButton(3, 7 , "bPreheat");
 
 //Page4
 NexButton bHomeTimer = NexButton(4, 17, "bHomeTimer");
-NexNumber tOvenHourT = NexNumber(4, 22, "tOvenHourT");
-NexNumber tOvenMinuteT = NexNumber(4, 23, "tOvenMinuteT");
-NexText tLEDsHourT = NexText(4, 20, "tLEDsHourT");
-NexText tLEDsMinuteT = NexText(4, 21, "tLEDsMinuteT");
+NexNumber tOvenHourT = NexNumber(4, 18, "tOvenHourT");
+NexNumber tOvenMinuteT = NexNumber(4, 19, "tOvenMinuteT");
+NexNumber tLEDsHourT = NexNumber(4, 20, "tLEDsHourT");
+NexNumber tLEDsMinuteT = NexNumber(4, 21, "tLEDsMinuteT");
 
 //Page5
 NexButton bLED1 = NexButton(5, 1, "bLED1");
 NexButton bLED2 = NexButton(5, 2, "bLED2");
 NexButton bLED3 = NexButton(5, 3, "bLED3");
-NexButton bLED4 = NexButton(5, 20, "bLED4");
+NexButton bLED4 = NexButton(5, 17, "bLED4");
 NexButton bHomeLED = NexButton(5, 16, "bHomeLED");
-NexText tLED1 = NexText(5, 17, "tLED1");
-NexText tLED2 = NexText(5, 18, "tLED2");
-NexText tLED3 = NexText(5, 19, "tLED3");
-NexText tLED4 = NexText(5, 21, "tLED4");
+NexNumber tLED1 = NexNumber(5, 26, "tLED1");
+NexNumber tLED2 = NexNumber(5, 27, "tLED2");
+NexNumber tLED3 = NexNumber(5, 28, "tLED3");
+NexNumber tLED4 = NexNumber(5, 29, "tLED4");
 
 //Page6
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
@@ -394,9 +396,8 @@ char buffer[5] = {0};
 
 NexTouch *nex_listen_list[] = 
 {
-    &tVersion,
     
-    &bSettings, &bOnOff, &cLED1, &cLED2, &cLED3, &cLED4,
+    &bSettings, &bOnOff,
     
     &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits,
     
@@ -406,7 +407,7 @@ NexTouch *nex_listen_list[] =
     
     &bLED1, &bLED2, &bLED3, &bLED4, &bHomeLED,
     
-    &bHomePID, &bAutotune, &nP,
+    &bHomePID, &bAutotune,
 
     &bReset,
 
@@ -747,21 +748,10 @@ void bLED4PopCallback(void *ptr)
 
 void bHomeLEDPopCallback(void *ptr)
 {   
-    memset(buffer, 0, sizeof(buffer));
-    tLED1.getText(buffer, sizeof(buffer));
-    LED1_intensity = atoi(buffer);
-
-    memset(buffer, 0, sizeof(buffer));
-    tLED2.getText(buffer, sizeof(buffer));
-    LED2_intensity = atoi(buffer);
-    
-    memset(buffer, 0, sizeof(buffer));
-    tLED3.getText(buffer, sizeof(buffer));
-    LED3_intensity = atoi(buffer);
-
-    memset(buffer, 0, sizeof(buffer));
-    tLED4.getText(buffer, sizeof(buffer));
-    LED4_intensity = atoi(buffer);
+    tLED1.getValue(&LED1_intensity);
+    tLED2.getValue(&LED2_intensity);
+    tLED3.getValue(&LED3_intensity);
+    tLED4.getValue(&LED4_intensity);
 
     LED1_intens = LED1_intensity;
     LED2_intens = LED2_intensity;
@@ -891,7 +881,7 @@ void setup() {
   digitalWrite(LEDlight, 0);
 
   pinMode(reedSwitch, INPUT_PULLUP);
-  //attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, RISING);
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
@@ -974,7 +964,8 @@ SIGNAL(TIMER2_OVF_vect)
  Timer Interrupt Handler
 ************************************************/
 void furnaceDoor() {
- doorIsOpen = !doorIsOpen;
+ doorChanged = !doorChanged;
+ DEBUG_PRINTLN(F("Furnace Door changed"));
 }
 
 /************************************************
@@ -1006,7 +997,12 @@ void loop() {
     Blynk.run();
   #endif  
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
-  checkDoor();
+
+  if(doorChanged == true){
+    checkDoor();
+  }
+  doorChanged = false;
+  
   readTemperature();
   readInternalTemperature();
   updateBlynk();
@@ -1052,11 +1048,13 @@ void checkDoor(){
  *******************************************************************************/
 void updateTemperature()
 {      
-    if(averageTemperature != lastTemperature)  {
+    if(averageTemperature != lastTemperature && newTemperature == true)  {
       dtostrf(averageTemperature, 5, 1, buffer);
       tTemp.setText(buffer);
+      lastTemperature = averageTemperature;
     }
-    lastTemperature = averageTemperature;
+    
+    newTemperature = false;
 }
 
 /*******************************************************************************
@@ -1187,6 +1185,7 @@ int readTemperature(){
         temperatureSamples[i] = DUMMY;
     }
     DEBUG_PRINTLN(averageTemperature);
+    newTemperature = true;
 }
 
 /*******************************************************************************
@@ -1256,7 +1255,7 @@ int updateBlynk(){
    Blynk.virtualWrite(V3, LED2_intens);
    Blynk.virtualWrite(V4, LED3_intens);
    Blynk.virtualWrite(V6, LED4_intens);
-   if(uvFurnaceStateMachine.isInState(rubinnState) || uvFurnaceStateMachine.isInState(preheatState)){
+   if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
     Blynk.virtualWrite(V5, 1);
    }else if(uvFurnaceStateMachine.isInState(offState)){
     Blynk.virtualWrite(V5, 0);
@@ -1898,11 +1897,6 @@ void setLEDsEnterFunction(){
   DEBUG_PRINTLN("setLEDsEnter");
   page5.show();
 
-  tLED1.setText(intToChar(LED1_intens));
-  tLED2.setText(intToChar(LED2_intens)); 
-  tLED3.setText(intToChar(LED3_intens));
-  tLED4.setText(intToChar(LED4_intens));
-
   if(myBoolean.bLED1State == true){
     bLED1.Set_background_crop_picc(11);
   }else{
@@ -1924,6 +1918,12 @@ void setLEDsEnterFunction(){
     bLED4.Set_background_crop_picc(9);
   } 
   sendCommand("ref 0");
+
+  tLED1.setValue(LED1_intens);
+  tLED2.setValue(LED2_intens); 
+  tLED3.setValue(LED3_intens);
+  tLED4.setValue(LED4_intens);
+
   selETH();
   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
 }
@@ -1958,8 +1958,8 @@ void setTimerEnterFunction(){
   page4.show();
   tOvenMinuteT.setValue(minutes_oven);
   tOvenHourT.setValue(hours_oven);
-  tLEDsMinuteT.setText(intToChar(minutes_LED));
-  tLEDsHourT.setText(intToChar(hours_LED));
+  tLEDsMinuteT.setValue(minutes_LED);
+  tLEDsHourT.setValue(hours_LED);
   
   sendCommand("ref 0");
 }
@@ -2077,7 +2077,7 @@ void offExitFunction(){
 }
 
 void preheatEnterFunction(){
-    DEBUG_PRINTLN(F("preheatEnter"));
+   DEBUG_PRINTLN(F("preheatEnter"));
 
     //turn the PID on
    myPID.SetMode(AUTOMATIC);
@@ -2085,6 +2085,9 @@ void preheatEnterFunction(){
 
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
+
+   tToast.setText("preheating");
+   tToast.Set_background_crop_picc(1);
 
    selETH();
    Udp.begin(INFLUXDB_PORT);
@@ -2117,5 +2120,6 @@ void preheatUpdateFunction(){
 }
 
 void preheatExitFunction(){
-    
+  tToast.setText("");
+  tToast.Set_background_crop_picc(2);
 }
