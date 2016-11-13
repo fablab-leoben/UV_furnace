@@ -1585,7 +1585,7 @@ void refreshCountdown(){
       
       if(minuteAlarm < tm.Minute) {
         calcMinutes = 60 - (tm.Minute - minuteAlarm);
-        calcHours = hourAlarm - tmHour - 1;
+        calcHours = hourAlarm - tm.Hour - 1;
       } else {
         calcMinutes = minuteAlarm - tm.Minute;
         calcHours = hourAlarm - tm.Hour;
@@ -1683,7 +1683,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
       }
     } else if (cfg.nameIs("myBoolean.bLED3State")) {
       
-      myBoolean.bLED1State = cfg.getBooleanValue();
+      myBoolean.bLED3State = cfg.getBooleanValue();
       DEBUG_PRINT(F("Read myBoolean.bLED3State: "));
       if (myBoolean.bLED3State) {
         DEBUG_PRINTLN(F("true"));
@@ -2057,7 +2057,6 @@ void errorExitFunction(){
 void offEnterFunction(){
     DEBUG_PRINTLN(F("offEnter"));
     page1.show();
-    DEBUG_PRINTLN(hours_oven);
     hour_uv.setText(intToChar(hours_oven));
     min_uv.setText(intToChar(minutes_oven));
     tSetpoint.setText(intToChar(Setpoint));
