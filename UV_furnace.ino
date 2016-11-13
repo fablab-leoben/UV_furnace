@@ -359,9 +359,9 @@ NexButton bHomeSet = NexButton(2, 11, "bHomeSet");
 NexButton bCredits = NexButton(2, 12, "bCredits");
 
 //Page3
-NexText tTempSetup = NexText(3, 1, "tTempSetup");
-NexButton bHomeTemp = NexButton(3, 6, "bHomeTemp");
-NexButton bPreheat = NexButton(3, 7 , "bPreheat");
+NexNumber tTempSetup = NexNumber(3, 7, "tTempSetup");
+NexButton bHomeTemp = NexButton(3, 5, "bHomeTemp");
+NexButton bPreheat = NexButton(3, 6 , "bPreheat");
 
 //Page4
 NexButton bHomeTimer = NexButton(4, 17, "bHomeTimer");
@@ -569,6 +569,7 @@ void turnOffPresetButtons(){
     bPreSet4.Set_background_crop_picc(3);
     bPreSet5.Set_background_crop_picc(3);
     bPreSet6.Set_background_crop_picc(3);
+    
     myBoolean.preset1 = 0;
     myBoolean.preset2 = 0;
     myBoolean.preset3 = 0;
@@ -619,15 +620,15 @@ char* intToChar(int variable){
 }
 
 void bHomeTempPopCallback(void *ptr)
-{
+{   
+    uint32_t number;
     dbSerialPrintln("bTempPlus1PopCallback");
 
-    memset(buffer, 0, sizeof(buffer));
-    tTempSetup.getText(buffer, sizeof(buffer));
-
-    Setpoint = atoi(buffer);
+    tTempSetup.getValue(&number);
+    Setpoint = number;
+    
     DEBUG_PRINTLN(Setpoint);
-    tTempSetup.setText(intToChar(Setpoint));
+
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 
@@ -1940,7 +1941,7 @@ void setTempEnterFunction(){
   DEBUG_PRINTLN("setTempEnter");
   page3.show();
 
-  tTempSetup.setText(intToChar(Setpoint));
+  tTempSetup.setValue(int(Setpoint));
 
   sendCommand("ref 0");
 }
