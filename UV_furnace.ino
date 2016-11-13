@@ -1038,7 +1038,7 @@ void checkDoor(){
         controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
       }
       digitalWrite(LEDlight, 0);
-      //DEBUG_PRINTLN("door closed");
+      DEBUG_PRINTLN("door closed");
   }
 }
 
@@ -1054,7 +1054,6 @@ void updateTemperature()
       tTemp.setText(buffer);
       lastTemperature = averageTemperature;
     }
-    
     newTemperature = false;
 }
 
@@ -1155,9 +1154,6 @@ int readTemperature(){
       b7 * pow(voltageSum, 7.0) +
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
-
-    //DEBUG_PRINT(currentTemperature);
-    //DEBUG_PRINTLN(F(" C"));
     
     uint8_t i;
     for (i=0; i< NUMBER_OF_SAMPLES; i++) {
@@ -1180,6 +1176,8 @@ int readTemperature(){
         averageTemperature += temperatureSamples[i];
     }
     averageTemperature /= NUMBER_OF_SAMPLES;
+    averageTemperature = int((averageTemperature + 0.05) * 10);
+    averageTemperature /= 10;
 
     //reset samples array to default so we fill it up again with new samples
     for (i=0; i<NUMBER_OF_SAMPLES; i++) {
