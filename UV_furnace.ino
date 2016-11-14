@@ -44,6 +44,7 @@
 #include <elapsedMillis.h>
 #include <FiniteStateMachine.h>
 #include <SDConfigFile.h>
+#include "NexUpload.h"
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
@@ -93,9 +94,9 @@ FSM uvFurnaceStateMachine = FSM(initState);
 #define INIT_TIMEOUT 5000
 elapsedMillis initTimer;
 
-// ************************************************
-// Pin definitions
-// ************************************************
+/************************************************
+ Pin definitions
+************************************************/
 
 // LEDs
 #define LED1 5
@@ -181,9 +182,9 @@ PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 const int WindowSize = 10000; 
 unsigned long windowStartTime;
  
-// ************************************************
-// Auto Tune Variables and constants
-// ************************************************
+/************************************************
+ Auto Tune Variables and constants
+************************************************/
 byte ATuneModeRemember = 2;
  
 double aTuneStep = 500;
@@ -301,6 +302,11 @@ File dataFile;
 elapsedMillis sdCard;
 
 /*******************************************************************************
+ Display
+*******************************************************************************/
+NexUpload nex_download("nex.tft", SDCARD_CS, 115200);
+
+/*******************************************************************************
  interrupt service routine for DS3231 clock
 *******************************************************************************/
 volatile boolean alarmIsrWasCalled = false;
@@ -357,6 +363,7 @@ NexButton bLEDSetup   = NexButton(2, 9, "bLEDSetup");
 NexButton bPIDSetup   = NexButton(2, 10, "bPIDSetup");
 NexButton bHomeSet = NexButton(2, 11, "bHomeSet");
 NexButton bCredits = NexButton(2, 12, "bCredits");
+NexButton bUpdateDisplay = NexButton(2, 13, "bUpdateDisplay");
 
 //Page3
 NexNumber tTempSetup = NexNumber(3, 7, "tTempSetup");
@@ -598,6 +605,11 @@ void bLEDSetupPopCallback(void *ptr)
 void bPIDSetupPopCallback(void *ptr)
 {
     uvFurnaceStateMachine.transitionTo(setPID);
+}
+
+void bUpdateDisplayPopCallback(void *ptr)
+{
+    updateDisplay();
 }
 
 void bHomeSetPopCallback(void *ptr)
@@ -1753,6 +1765,10 @@ BLYNK_WRITE(V10)
    emailNotification = param.asInt();
    //DEBUG_PRINT(F("Email notification: "));
    //DEBUG_PRINTLN(emailNotification);
+}
+
+void updateDisplay(){
+  nex_download.upload();
 }
 
 /*******************************************************************************
