@@ -1940,6 +1940,11 @@ void setTempEnterFunction(){
   page3.show();
 
   tTempSetup.setValue(int(Setpoint));
+  if(myBoolean.preheat == true){
+    bPreheat.Set_background_crop_picc(7);
+  }else{
+    bPreheat.Set_background_crop_picc(5);
+  }
 
   sendCommand("ref 0");
 }
