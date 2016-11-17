@@ -281,7 +281,6 @@ char msg[30];
 
 /*******************************************************************************
  Blynk
- Here you decide if you want to use Blynk or not
  Your blynk token goes in another file to avoid sharing it by mistake
 *******************************************************************************/
 #define BLYNK_INTERVAL   10000
@@ -304,7 +303,7 @@ elapsedMillis sdCard;
 /*******************************************************************************
  Display
 *******************************************************************************/
-NexUpload nex_download("nex.tft", SDCARD_CS, 115200);
+//NexUpload nex_download("nex.tft", 4, 115200);
 
 /*******************************************************************************
  interrupt service routine for DS3231 clock
@@ -349,6 +348,7 @@ NexCrop cLED2 = NexCrop(1, 9, "cLED2");
 NexCrop cLED3 = NexCrop(1, 10, "cLED3");
 NexCrop cLED4 = NexCrop(1, 11, "cLED4");
 NexText tToast = NexText(1, 12, "tToast");
+NexCrop cPreheat = NexCrop(1, 11, "cPreheat");
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -363,7 +363,7 @@ NexButton bLEDSetup   = NexButton(2, 9, "bLEDSetup");
 NexButton bPIDSetup   = NexButton(2, 10, "bPIDSetup");
 NexButton bHomeSet = NexButton(2, 11, "bHomeSet");
 NexButton bCredits = NexButton(2, 12, "bCredits");
-NexButton bUpdateDisplay = NexButton(2, 13, "bUpdateDisplay");
+NexButton bUpdate = NexButton(2, 13, "bUpdate");
 
 //Page3
 NexNumber tTempSetup = NexNumber(3, 7, "tTempSetup");
@@ -406,7 +406,8 @@ NexTouch *nex_listen_list[] =
     
     &bSettings, &bOnOff,
     
-    &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits,
+    &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, 
+    &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits, &bUpdate,
     
     &bHomeTemp, &bPreheat,
     
@@ -607,9 +608,13 @@ void bPIDSetupPopCallback(void *ptr)
     uvFurnaceStateMachine.transitionTo(setPID);
 }
 
-void bUpdateDisplayPopCallback(void *ptr)
-{
-    updateDisplay();
+void bUpdatePopCallback(void *ptr)
+{ 
+  selSD();
+  SD.end();
+  DEBUG_PRINTLN(F("updating..."));
+  NexUpload nex_download("furnace.tft", 4, 115200);
+  nex_download.upload();
 }
 
 void bHomeSetPopCallback(void *ptr)
@@ -860,7 +865,8 @@ void setup() {
   bPIDSetup.attachPop(bPIDSetupPopCallback, &bPIDSetup);
   bHomeSet.attachPop(bHomeSetPopCallback, &bHomeSet);
   bCredits.attachPop(bCreditsPopCallback, &bCredits);
-
+  bUpdate.attachPop(bUpdatePopCallback, &bUpdate);
+  
   //Page3
   bHomeTemp.attachPop(bHomeTempPopCallback, &bHomeTemp);
   bPreheat.attachPop(bPreheatPopCallback, &bPreheat);
@@ -1767,10 +1773,6 @@ BLYNK_WRITE(V10)
    //DEBUG_PRINTLN(emailNotification);
 }
 
-void updateDisplay(){
-  nex_download.upload();
-}
-
 /*******************************************************************************
 ********************************************************************************
 ********************************************************************************
@@ -2084,6 +2086,12 @@ void offEnterFunction(){
     controlLEDs(0, 0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
     RTC.alarmInterrupt(ALARM_1, false);
+    
+    if(myBoolean.preheat == 1){
+      cPreheat.Set_background_crop_picc(1);
+    } else{
+        cPreheat.Set_background_crop_picc(2);
+    }
 }
 
 void offUpdateFunction(){ 
