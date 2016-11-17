@@ -288,9 +288,12 @@ elapsedMillis BlynkInterval;
 
 int pushNotification = 0;
 int emailNotification = 0;
+int twitterNotification = 0;
 #define BLYNK_GREEN     "#23C48E"
 #define BLYNK_YELLOW    "#ED9D00"
 #define BLYNK_RED       "#D3435C"
+
+WidgetTerminal terminal(V7);
 
 /*******************************************************************************
  SD-Card
@@ -1760,17 +1763,50 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
   cfg.end();
 }
 
-BLYNK_WRITE(V9)
-{
+BLYNK_WRITE(V9){
    pushNotification = param.asInt();
    //DEBUG_PRINT(F("push notification: "));
    //DEBUG_PRINTLN(pushNotification);
 }
-BLYNK_WRITE(V10)
-{
+BLYNK_WRITE(V10){
    emailNotification = param.asInt();
    //DEBUG_PRINT(F("Email notification: "));
    //DEBUG_PRINTLN(emailNotification);
+}
+
+BLYNK_WRITE(V11){
+  twitterNotification = param.asInt();
+}
+
+BLYNK_WRITE(V7)
+{
+
+  // if you type "Marco" into Terminal Widget - it will respond: "Polo:"
+  if (String("Marco") == param.asStr()) {
+    terminal.println("You said: 'Marco'") ;
+    terminal.println("I said: 'Polo'") ;
+  } else {
+
+    // Send it back
+    terminal.print("You said:");
+    terminal.write(param.getBuffer(), param.getLength());
+    terminal.println();
+  }
+
+  // Ensure everything is sent
+  terminal.flush();
+}
+
+void notifyUser(String message){
+  if(pushNotification == 1){
+     Blynk.notify(message);
+  }
+  if(emailNotification == 1){
+     Blynk.email("your_email@mail.com", "UV furnace", message);
+  }
+  if(twitterNotification == 1){
+     Blynk.tweet(message);
+  }
 }
 
 /*******************************************************************************
@@ -2045,11 +2081,8 @@ void runExitFunction(){
   
   minutes_oven = 0;
   hours_oven = 0;
-  
-  if(pushNotification == 1){
-    selETH();
-    Blynk.notify("Curing finished!");
-  }
+
+  notifyUser("Curing finished");
 }
 
 void errorEnterFunction(){
@@ -2061,9 +2094,7 @@ void errorEnterFunction(){
   RTC.alarm(ALARM_1);
   RTC.alarmInterrupt(ALARM_1, false);
   selETH();
-  if(pushNotification == 1){
-     Blynk.notify("Error occured!");
-  }
+  notifyUser("Error occured");
   Blynk.setProperty(V14, "color", "BLYNK_RED");
 }
 void errorUpdateFunction(){
@@ -2137,12 +2168,8 @@ void preheatUpdateFunction(){
 
    if(averageTemperature >= (Setpoint * 0,975) && averageTemperature <= (Setpoint * 1,025)){
           uvFurnaceStateMachine.transitionTo(runState);
-          if(pushNotification == 1){
-             Blynk.notify("Preheating done!");
-          }
-          if(emailNotification == 1){
-            Blynk.email("UV furnace", "Preheating done!");
-          }
+          
+          notifyUser("Preheating done!");
    }   
 }
 
