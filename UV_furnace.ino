@@ -938,7 +938,7 @@ void setup() {
   }
 
   selETH();
-  if ( !Ethernet.begin(mac) ) {
+  if (Ethernet.begin(mac) == 0) {
     ethernetAvailable = false;
     DEBUG_PRINTLN(F("Ethernet not available"));
   } else {
@@ -1566,8 +1566,7 @@ void sendToInfluxDB(){
  * Description    : send an NTP request to the time server at the given address
  * Return         : timestamp
  *******************************************************************************/ 
-unsigned long sendNTPpacket(char* address)
-{ 
+unsigned long sendNTPpacket(char* address){ 
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
@@ -1778,31 +1777,12 @@ BLYNK_WRITE(V11){
   twitterNotification = param.asInt();
 }
 
-BLYNK_WRITE(V7)
-{
-
-  // if you type "Marco" into Terminal Widget - it will respond: "Polo:"
-  if (String("Marco") == param.asStr()) {
-    terminal.println("You said: 'Marco'") ;
-    terminal.println("I said: 'Polo'") ;
-  } else {
-
-    // Send it back
-    terminal.print("You said:");
-    terminal.write(param.getBuffer(), param.getLength());
-    terminal.println();
-  }
-
-  // Ensure everything is sent
-  terminal.flush();
-}
-
 void notifyUser(String message){
   if(pushNotification == 1){
      Blynk.notify(message);
   }
   if(emailNotification == 1){
-     Blynk.email("your_email@mail.com", "UV furnace", message);
+     Blynk.email("UV furnace", message);
   }
   if(twitterNotification == 1){
      Blynk.tweet(message);
@@ -1824,8 +1804,8 @@ void initEnterFunction(){
   page0.show();
   tVersion.setText(VERSION); 
   if(ethernetAvailable){
-    sendNTPpacket(timeServer); // send an NTP packet to a time server
     selETH();
+    sendNTPpacket(timeServer); // send an NTP packet to a time server
 
     // wait to see if a reply is available
     delay(1000);
@@ -1871,9 +1851,9 @@ void initEnterFunction(){
 
       DEBUG_PRINTLN(RTC.set(epoch)); 
     }
-    setSyncProvider(RTC.get());   // the function to get the time from the RTC
+    setSyncProvider(RTC.get);   // the function to get the time from the RTC
   }
- 
+
   tmElements_t tm;
   RTC.read(tm);
   DEBUG_PRINT(tm.Day, DEC);
