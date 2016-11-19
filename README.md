@@ -302,10 +302,10 @@ Start your furnace and you will see the incoming data in your graph:
 
 The smartphone app makes it possible to monitor your furnace when you are not nearby. You will also get a notification when it has finished or if there is an error.
 
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.png "Screenshot")
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.png "Screenshot" width="300")
 
 The App supports Push, Email and Twitter notifications to inform the User when curing has finished or an error happened.
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Settings.png "Settings")
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Settings.png "Settings" width="300")
 
 #### 10.1 App installation
 
