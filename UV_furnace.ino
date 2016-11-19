@@ -246,6 +246,14 @@ float averageTemperature;
 #define DS3231_TEMP_INTERVAL   2000
 elapsedMillis DS3231TempInterval;
 
+//Central European Time (Vienna, Berlin)
+TimeChangeRule myCEST = {"CEST", Last, Sat, Mar, 2, +120};    //Daylight time = UTC + 2 hours
+TimeChangeRule myCET = {"CET", Sun, Sun, Oct, 3, +60};     //Standard time = UTC + 1 hours
+Timezone myTZ(myCEST, myCET);
+
+TimeChangeRule *tcr;        //pointer to the time change rule, use to get TZ abbrev
+time_t utc, local;
+
 byte calcMinutes = 0;
 byte calcHours = 0;
 
@@ -1849,9 +1857,17 @@ void initEnterFunction(){
       }
       DEBUG_PRINTLN(epoch % 60); // print the second
 
-      DEBUG_PRINTLN(RTC.set(epoch)); 
+      setTime(epoch);
+      utc = now();
+      local = myTZ.toLocal(utc, &tcr);
+      RTC.set(local);                     //set the RTC from the system time
     }
     setSyncProvider(RTC.get);   // the function to get the time from the RTC
+    if(timeStatus()!= timeSet){ 
+        DEBUG_PRINTLN(F("Unable to sync with the RTC"));
+    }else{
+        DEBUG_PRINTLN(F("RTC has set the system time"));  
+    }  
   }
 
   tmElements_t tm;
@@ -2051,7 +2067,7 @@ void runUpdateFunction(){
    fadePowerLED();
    refreshCountdown();
 
-   #ifdef InfluxDB
+   #ifdef USE_InfluxDB
        sendToInfluxDB();
    #endif
 }
@@ -2142,7 +2158,7 @@ void preheatUpdateFunction(){
    updateTemperature();
    fadePowerLED();
    refreshCountdown();
-   #ifdef InfluxDB
+   #ifdef USE_InfluxDB
        sendToInfluxDB();
    #endif
 

@@ -13,7 +13,7 @@
   #define DEBUG_PRINTLN(...)
 #endif
 
-//#define InfluxDB
+#define USE_InfluxDB
 
 #define USE_Blynk
 
