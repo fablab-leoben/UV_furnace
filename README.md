@@ -302,7 +302,10 @@ Start your furnace and you will see the incoming data in your graph:
 
 The smartphone app makes it possible to monitor your furnace when you are not nearby. You will also get a notification when it has finished or if there is an error.
 
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.jpg "Screenshot")
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.png "Screenshot")
+
+The App supports Push, Email and Twitter notifications to inform the User when curing has finished or an error happened.
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Settings.png "Settings")
 
 #### 10.1 App installation
 
@@ -311,9 +314,9 @@ Download and install the Blynk app for your [Android](https://play.google.com/st
 ![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/QR_code.png "UV furnace App")
 
 ### 11. To Do
-* screensaver
-* better display bezel
-* preheat function
+
+* ~~better display bezel~~
+* ~~preheat feature~~
 * PID finetuning
 * PID tuning without reflashing the sketch
-* improving the app
+* ~~improving the app~~
