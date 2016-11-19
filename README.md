@@ -29,7 +29,7 @@
 ##### 9.3.2 [Grafana](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#932-grafana "Grafana")
 #### 9.4 [Demonstration](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#94-demonstration-1 "Demonstration")
 ### 10. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#10-app-1 "App")
-#### 10.1 [Features](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "Features")
+//#### 10.1 [Features](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "Features")
 #### 10.2 [App installation](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "App installation")
 ### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#11-to-do-1 "To Do")
 
