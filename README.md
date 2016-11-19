@@ -29,7 +29,8 @@
 ##### 9.3.2 [Grafana](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#932-grafana "Grafana")
 #### 9.4 [Demonstration](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#94-demonstration-1 "Demonstration")
 ### 10. [App](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#10-app-1 "App")
-#### 10.1 [App installation](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "App installation")
+#### 10.1 [Features](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-features "Features")
+#### 10.2 [App installation](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#101-app-installation-1 "App installation")
 ### 11. [To Do](https://github.com/fablab-leoben/UV_furnace/blob/master/README.md#11-to-do-1 "To Do")
 
 
@@ -302,12 +303,25 @@ Start your furnace and you will see the incoming data in your graph:
 
 The smartphone app makes it possible to monitor your furnace when you are not nearby. You will also get a notification when it has finished or if there is an error.
 
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.png "Screenshot")
+#### 10.1 Features
+
+You can monitor the following things:
+
+* furnace on/off
+* LEDs on/off/intensity
+* minutes and hours left
+* current temperature
+* setpoint temperature
+* status LED
+* temperature chart
+
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Screenshot.png "Screenshot" width="300")
 
 The App supports Push, Email and Twitter notifications to inform the User when curing has finished or an error happened.
-![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Settings.png "Settings")
 
-#### 10.1 App installation
+![alt text](https://github.com/fablab-leoben/UV_furnace/blob/master/miscellaneous/APP_Settings.png "Settings" width="300")
+
+#### 10.2 App installation
 
 Download and install the Blynk app for your [Android](https://play.google.com/store/apps/details?id=cc.blynk) or [iOS](https://itunes.apple.com/at/app/blynk-iot-for-arduino-raspberry/id808760481?mt=8) device. Now scan the QR code below and replace Auth code in the access.h file. Currently you can see the the setpoint and current temperature. You will get a notification when the furnace is ready. More features will be added in the future.
 
