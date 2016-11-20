@@ -342,19 +342,19 @@ NexPage page8    = NexPage(8, 0, "page8");
 NexText tVersion = NexText(0, 1, "tVersion");
 
 //Page1
-NexText tTemp = NexText(1, 5, "tTemp");
-NexText hour_uv = NexText(1, 6, "hour_uv");
-NexText min_uv = NexText(1, 4, "min_uv");
-NexWaveform s0 = NexWaveform(1, 3, "s0");
+NexText tTemp = NexText(1, 4, "tTemp");
+NexNumber nhour_uv = NexNumber(1, 11, "nhour_uv");
+NexNumber nmin_uv = NexNumber(1, 12, "nmin_uv");
+NexWaveform sChart = NexWaveform(1, 3, "sChart");
 NexButton bSettings = NexButton(1, 1, "bSettings");
 NexButton bOnOff = NexButton(1, 2, "bOnOff");
-NexText tSetpoint = NexText(1, 7, "tSetpoint");
-NexCrop cLED1 = NexCrop(1, 8, "cLED1");
-NexCrop cLED2 = NexCrop(1, 9, "cLED2");
-NexCrop cLED3 = NexCrop(1, 10, "cLED3");
-NexCrop cLED4 = NexCrop(1, 11, "cLED4");
-NexText tToast = NexText(1, 12, "tToast");
-NexCrop cPreheat = NexCrop(1, 11, "cPreheat");
+NexNumber nSetpoint = NexNumber(1, 13, "nSetpoint");
+NexCrop cLED1 = NexCrop(1, 5, "cLED1");
+NexCrop cLED2 = NexCrop(1, 6, "cLED2");
+NexCrop cLED3 = NexCrop(1, 7, "cLED3");
+NexCrop cLED4 = NexCrop(1, 8, "cLED4");
+NexText tToast = NexText(1, 9, "tToast");
+NexCrop cPreheat = NexCrop(1, 10, "cPreheat");
 
 //Page2
 NexButton bPreSet1   = NexButton(2, 1, "bPreSet1");
@@ -372,7 +372,7 @@ NexButton bCredits = NexButton(2, 12, "bCredits");
 NexButton bUpdate = NexButton(2, 13, "bUpdate");
 
 //Page3
-NexNumber tTempSetup = NexNumber(3, 7, "tTempSetup");
+NexNumber nTempSetup = NexNumber(3, 7, "nTempSetup");
 NexButton bHomeTemp = NexButton(3, 5, "bHomeTemp");
 NexButton bPreheat = NexButton(3, 6 , "bPreheat");
 
@@ -647,7 +647,7 @@ void bHomeTempPopCallback(void *ptr)
     uint32_t number;
     dbSerialPrintln("bTempPlus1PopCallback");
 
-    tTempSetup.getValue(&number);
+    nTempSetup.getValue(&number);
     Setpoint = number;
     
     DEBUG_PRINTLN(Setpoint);
@@ -1558,8 +1558,8 @@ void updateGraph(){
   if(GraphUpdateInterval < GRAPH_UPDATE_INTERVAL){
     return;
   }
-  s0.addValue(0, averageTemperature);
-  s0.addValue(1, Setpoint);
+  sChart.addValue(0, averageTemperature);
+  sChart.addValue(1, Setpoint);
   GraphUpdateInterval = 0;
 }
 
@@ -1568,9 +1568,6 @@ void sendToInfluxDB(){
     return;
   }
   selETH();
-  //int a = Setpoint;
-  //int b = Setpoint * 100;
-  //b = b % 100;
   int c = averageTemperature;
   int d = averageTemperature * 100;
   d = d % 100;  
@@ -1632,11 +1629,9 @@ void refreshCountdown(){
         calcHours = hourAlarm - tm.Hour;
       }
          
-      utoa(calcHours, buffer, 10);
-      hour_uv.setText(buffer);
-
-      utoa(calcMinutes, buffer, 10);
-      min_uv.setText(buffer);
+      nhour_uv.setValue(calcHours);
+      nmin_uv.setValue(calcMinutes);
+      
       Blynk.virtualWrite(V12, calcMinutes);
       Blynk.virtualWrite(V13, calcHours);
 
@@ -1988,7 +1983,7 @@ void setTempEnterFunction(){
   DEBUG_PRINTLN("setTempEnter");
   page3.show();
 
-  tTempSetup.setValue(int(Setpoint));
+  nTempSetup.setValue(int(Setpoint));
   if(myBoolean.preheat == true){
     bPreheat.Set_background_crop_picc(7);
   }else{
@@ -2104,9 +2099,9 @@ void errorExitFunction(){
 void offEnterFunction(){
     DEBUG_PRINTLN(F("offEnter"));
     page1.show();
-    hour_uv.setText(intToChar(hours_oven));
-    min_uv.setText(intToChar(minutes_oven));
-    tSetpoint.setText(intToChar(Setpoint));
+    nhour_uv.setValue(hours_oven);
+    nmin_uv.setValue(minutes_oven);
+    nSetpoint.setValue(int(Setpoint));
     sendCommand("ref 0");
     myPID.SetMode(MANUAL);
     controlLEDs(0, 0, 0, 0);
