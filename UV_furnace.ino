@@ -118,15 +118,10 @@ volatile boolean doorChanged;
 /************************************************
  LED variables
 ************************************************/
-uint32_t LED1_intensity = 0;
-uint32_t LED2_intensity = 0;
-uint32_t LED3_intensity = 0;
-uint32_t LED4_intensity = 0;
-
-uint32_t LED1_intens = 100;
-uint32_t LED2_intens = 100;
-uint32_t LED3_intens = 100;
-uint32_t LED4_intens = 100;
+uint32_t LED1_intensity = 255;
+uint32_t LED2_intensity = 255;
+uint32_t LED3_intensity = 255;
+uint32_t LED4_intensity = 255;
 
 /************************************************
 Config files
@@ -782,15 +777,34 @@ void bHomeLEDPopCallback(void *ptr)
     tLED3.getValue(&LED3_intensity);
     tLED4.getValue(&LED4_intensity);
 
-    LED1_intens = LED1_intensity;
-    LED2_intens = LED2_intensity;
-    LED3_intens = LED3_intensity;
-    LED4_intens = LED4_intensity;
+    if(myBoolean.bLED1State == true){
+       LED1_intensity = map(LED1_intensity, 0, 100, 0, 255);
+    }else{
+      LED1_intensity = 0;
+    }
+
+    if(myBoolean.bLED2State == true){
+       LED2_intensity = map(LED2_intensity, 0, 100, 0, 255);
+    }else{
+      LED2_intensity = 0;
+    }
     
-    LED1_intensity = map(LED1_intensity, 0, 100, 0, 255);
-    LED2_intensity = map(LED2_intensity, 0, 100, 0, 255);
-    LED3_intensity = map(LED3_intensity, 0, 100, 0, 255);
-    LED4_intensity = map(LED4_intensity, 0, 100, 0, 255);
+    if(myBoolean.bLED3State == true){
+       LED3_intensity = map(LED3_intensity, 0, 100, 0, 255);
+    }else{
+      LED3_intensity = 0;
+    }
+
+    if(myBoolean.bLED4State == true){
+       LED4_intensity = map(LED4_intensity, 0, 100, 0, 255);
+    }else{
+      LED4_intensity = 0;
+    }
+    
+    DEBUG_PRINTLN(LED1_intensity);
+    DEBUG_PRINTLN(LED2_intensity);
+    DEBUG_PRINTLN(LED3_intensity);
+    DEBUG_PRINTLN(LED4_intensity);
 
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
@@ -1279,10 +1293,10 @@ int updateBlynk(){
    //DEBUG_PRINTLN(F("updating Blynk"));
    Blynk.virtualWrite(V0, averageTemperature);
    Blynk.virtualWrite(V1, Setpoint);
-   Blynk.virtualWrite(V2, LED1_intens);
-   Blynk.virtualWrite(V3, LED2_intens);
-   Blynk.virtualWrite(V4, LED3_intens);
-   Blynk.virtualWrite(V6, LED4_intens);
+   Blynk.virtualWrite(V2, map(LED1_intensity, 0, 255, 0, 100));
+   Blynk.virtualWrite(V3, map(LED2_intensity, 0, 255, 0, 100));
+   Blynk.virtualWrite(V4, map(LED3_intensity, 0, 255, 0, 100));
+   Blynk.virtualWrite(V6, map(LED4_intensity, 0, 255, 0, 100));
    if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
     Blynk.virtualWrite(V5, 1);
    }else if(uvFurnaceStateMachine.isInState(offState)){
@@ -1554,14 +1568,15 @@ void sendToInfluxDB(){
     return;
   }
   selETH();
-  int a = Setpoint;
-  int b = Setpoint * 100;
-  b = b % 100;
+  //int a = Setpoint;
+  //int b = Setpoint * 100;
+  //b = b % 100;
   int c = averageTemperature;
   int d = averageTemperature * 100;
   d = d % 100;  
   
-  sprintf(msg, "UV Tset=%d.%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d", a, b, c, d, LED1_intens, LED2_intens, LED3_intens);
+  //sprintf(msg, "UV Tset=%d.%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", a, b, c, d, map(LED1_intensity, 0, 255, 0, 100), map(LED2_intensity, 0, 255, 0, 100), map(LED3_intensity, 0, 255, 0, 100), map(LED4_intensity, 0, 255, 0, 100));
+  sprintf(msg, "UV Tset=%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", int(Setpoint), c, d, map(LED1_intensity, 0, 255, 0, 100), map(LED2_intensity, 0, 255, 0, 100), map(LED3_intensity, 0, 255, 0, 100), map(LED4_intensity, 0, 255, 0, 100));
   DEBUG_PRINTLN(msg);
   Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
   Udp.write(msg);
@@ -1737,13 +1752,13 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
     
     } else if (cfg.nameIs("LED3_intensity")) {
 
-      LED1_intensity = cfg.getIntValue();
+      LED3_intensity = cfg.getIntValue();
       DEBUG_PRINT(F("Read LED3_intensity: "));
       DEBUG_PRINTLN(LED3_intensity);
 
     } else if (cfg.nameIs("LED4_intensity")) {
 
-      LED1_intensity = cfg.getIntValue();
+      LED4_intensity = cfg.getIntValue();
       DEBUG_PRINT(F("Read LED4_intensity: "));
       DEBUG_PRINTLN(LED4_intensity);
     
@@ -1968,10 +1983,10 @@ void setLEDsEnterFunction(){
   } 
   sendCommand("ref 0");
 
-  tLED1.setValue(LED1_intens);
-  tLED2.setValue(LED2_intens); 
-  tLED3.setValue(LED3_intens);
-  tLED4.setValue(LED4_intens);
+  tLED1.setValue(map(LED1_intensity, 0, 255, 0, 100));
+  tLED2.setValue(map(LED2_intensity, 0, 255, 0, 100)); 
+  tLED3.setValue(map(LED3_intensity, 0, 255, 0, 100));
+  tLED4.setValue(map(LED4_intensity, 0, 255, 0, 100));
 
   selETH();
   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
