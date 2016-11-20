@@ -45,6 +45,7 @@
 #include <FiniteStateMachine.h>
 #include <SDConfigFile.h>
 #include "NexUpload.h"
+#include <SoftReset.h>
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
@@ -621,6 +622,8 @@ void bUpdatePopCallback(void *ptr)
   DEBUG_PRINTLN(F("updating..."));
   NexUpload nex_download("furnace.tft", 4, 115200);
   nex_download.upload();
+  delay(500);
+  soft_restart();
 }
 
 void bHomeSetPopCallback(void *ptr)
