@@ -1856,22 +1856,6 @@ void initEnterFunction(){
       // print Unix time:
       DEBUG_PRINTLN(epoch);
     
-      // print the hour, minute and second:
-      DEBUG_PRINT(F("The UTC time is "));       // UTC is the time at Greenwich Meridian (GMT)
-      DEBUG_PRINT((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
-      DEBUG_PRINT(F(":"));
-      if ( ((epoch % 3600) / 60) < 10 ) {
-        // In the first 10 minutes of each hour, we'll want a leading '0'
-        DEBUG_PRINT(F("0"));
-      }
-      DEBUG_PRINT((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
-      DEBUG_PRINT(F(":"));
-      if ( (epoch % 60) < 10 ) {
-        // In the first 10 seconds of each minute, we'll want a leading '0'
-        DEBUG_PRINT(F("0"));
-      }
-      DEBUG_PRINTLN(epoch % 60); // print the second
-
       setTime(epoch);
       utc = now();
       local = myTZ.toLocal(utc, &tcr);
