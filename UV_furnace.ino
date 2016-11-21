@@ -119,10 +119,15 @@ volatile boolean doorChanged;
 /************************************************
  LED variables
 ************************************************/
-uint32_t LED1_intensity = 255;
-uint32_t LED2_intensity = 255;
-uint32_t LED3_intensity = 255;
-uint32_t LED4_intensity = 255;
+uint32_t LED1_intensity = 100;
+uint32_t LED2_intensity = 100;
+uint32_t LED3_intensity = 100;
+uint32_t LED4_intensity = 100;
+
+uint32_t LED1_mapped = 0;
+uint32_t LED2_mapped = 0;
+uint32_t LED3_mapped = 0;
+uint32_t LED4_mapped = 0;
 
 /************************************************
 Config files
@@ -379,10 +384,10 @@ NexButton bPreheat = NexButton(3, 6 , "bPreheat");
 
 //Page4
 NexButton bHomeTimer = NexButton(4, 17, "bHomeTimer");
-NexNumber tOvenHourT = NexNumber(4, 18, "tOvenHourT");
-NexNumber tOvenMinuteT = NexNumber(4, 19, "tOvenMinuteT");
-NexNumber tLEDsHourT = NexNumber(4, 20, "tLEDsHourT");
-NexNumber tLEDsMinuteT = NexNumber(4, 21, "tLEDsMinuteT");
+NexNumber nOvenHourT = NexNumber(4, 18, "nOvenHourT");
+NexNumber nOvenMinuteT = NexNumber(4, 19, "nOvenMinuteT");
+NexNumber nLEDsHourT = NexNumber(4, 20, "nLEDsHourT");
+NexNumber nLEDsMinuteT = NexNumber(4, 21, "nLEDsMinuteT");
 
 //Page5
 NexButton bLED1 = NexButton(5, 1, "bLED1");
@@ -390,10 +395,10 @@ NexButton bLED2 = NexButton(5, 2, "bLED2");
 NexButton bLED3 = NexButton(5, 3, "bLED3");
 NexButton bLED4 = NexButton(5, 17, "bLED4");
 NexButton bHomeLED = NexButton(5, 16, "bHomeLED");
-NexNumber tLED1 = NexNumber(5, 26, "tLED1");
-NexNumber tLED2 = NexNumber(5, 27, "tLED2");
-NexNumber tLED3 = NexNumber(5, 28, "tLED3");
-NexNumber tLED4 = NexNumber(5, 29, "tLED4");
+NexNumber nLED1 = NexNumber(5, 26, "nLED1");
+NexNumber nLED2 = NexNumber(5, 27, "nLED2");
+NexNumber nLED3 = NexNumber(5, 28, "nLED3");
+NexNumber nLED4 = NexNumber(5, 29, "nLED4");
 
 //Page6
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
@@ -675,11 +680,8 @@ void bPreheatPopCallback(void *ptr)
 //Page4
 void bHomeTimerPopCallback(void *ptr)
 { 
-  uint32_t number;
-  tOvenMinuteT.getValue(&number);
-  minutes_oven = number;
-  hours_oven = tOvenHourT.getValue(&number);
-  hours_oven = number;
+  nOvenMinuteT.getValue(&minutes_oven);
+  nOvenHourT.getValue(&hours_oven);
   uvFurnaceStateMachine.transitionTo(settingsState);   
 }
 //End Page4
@@ -691,14 +693,11 @@ void bLED1PopCallback(void *ptr)
   bLED1.Get_background_crop_picc(&picNum);
   if(picNum == 9) {
       picNum = 11;
-
       myBoolean.bLED1State = true;
       
     } else if(picNum == 11) {
       picNum = 9;
-
       myBoolean.bLED1State = false;
-
     }
     //DEBUG_PRINTLN(picNum);
     bLED1.Set_background_crop_picc(picNum);
@@ -713,12 +712,9 @@ void bLED2PopCallback(void *ptr)
     bLED2.Get_background_crop_picc(&picNum);
      if(picNum == 9) {
       picNum = 11;
-
       myBoolean.bLED2State = true;
-
     } else if(picNum == 11) {
       picNum = 9;
-
       myBoolean.bLED2State = false;
     }
     //DEBUG_PRINTLN(picNum);
@@ -732,14 +728,10 @@ void bLED3PopCallback(void *ptr)
     bLED3.Get_background_crop_picc(&picNum);
     if(picNum == 9) {
       picNum = 11;
-
       myBoolean.bLED3State = true;
-
     } else if(picNum == 11) {
       picNum = 9;
-
       myBoolean.bLED3State = false;
-
     }
     //DEBUG_PRINTLN(picNum);
     bLED3.Set_background_crop_picc(picNum);
@@ -752,14 +744,10 @@ void bLED4PopCallback(void *ptr)
     bLED4.Get_background_crop_picc(&picNum);
     if(picNum == 9) {
       picNum = 11;
-
       myBoolean.bLED4State = true;
-
     } else if(picNum == 11) {
       picNum = 9;
-
       myBoolean.bLED4State = false;
-
     }
     //DEBUG_PRINTLN(picNum);
     bLED4.Set_background_crop_picc(picNum);
@@ -768,39 +756,39 @@ void bLED4PopCallback(void *ptr)
 
 void bHomeLEDPopCallback(void *ptr)
 {   
-    tLED1.getValue(&LED1_intensity);
-    tLED2.getValue(&LED2_intensity);
-    tLED3.getValue(&LED3_intensity);
-    tLED4.getValue(&LED4_intensity);
+    nLED1.getValue(&LED1_intensity);
+    nLED2.getValue(&LED2_intensity);
+    nLED3.getValue(&LED3_intensity);
+    nLED4.getValue(&LED4_intensity);
 
     if(myBoolean.bLED1State == true){
-       LED1_intensity = map(LED1_intensity, 0, 100, 0, 255);
+       LED1_mapped = map(LED1_intensity, 0, 100, 0, 255);
     }else{
-      LED1_intensity = 0;
+      LED1_mapped = 0;
     }
 
     if(myBoolean.bLED2State == true){
-       LED2_intensity = map(LED2_intensity, 0, 100, 0, 255);
+       LED2_mapped = map(LED2_intensity, 0, 100, 0, 255);
     }else{
-      LED2_intensity = 0;
+      LED2_mapped = 0;
     }
     
     if(myBoolean.bLED3State == true){
-       LED3_intensity = map(LED3_intensity, 0, 100, 0, 255);
+       LED3_mapped = map(LED3_intensity, 0, 100, 0, 255);
     }else{
-      LED3_intensity = 0;
+      LED3_mapped = 0;
     }
 
     if(myBoolean.bLED4State == true){
-       LED4_intensity = map(LED4_intensity, 0, 100, 0, 255);
+       LED4_mapped = map(LED4_intensity, 0, 100, 0, 255);
     }else{
-      LED4_intensity = 0;
+      LED4_mapped = 0;
     }
     
-    DEBUG_PRINTLN(LED1_intensity);
-    DEBUG_PRINTLN(LED2_intensity);
-    DEBUG_PRINTLN(LED3_intensity);
-    DEBUG_PRINTLN(LED4_intensity);
+    DEBUG_PRINTLN(LED1_mapped);
+    DEBUG_PRINTLN(LED2_mapped);
+    DEBUG_PRINTLN(LED3_mapped);
+    DEBUG_PRINTLN(LED4_mapped);
 
     uvFurnaceStateMachine.transitionTo(settingsState);   
 }
@@ -1289,10 +1277,10 @@ int updateBlynk(){
    //DEBUG_PRINTLN(F("updating Blynk"));
    Blynk.virtualWrite(V0, averageTemperature);
    Blynk.virtualWrite(V1, Setpoint);
-   Blynk.virtualWrite(V2, map(LED1_intensity, 0, 255, 0, 100));
-   Blynk.virtualWrite(V3, map(LED2_intensity, 0, 255, 0, 100));
-   Blynk.virtualWrite(V4, map(LED3_intensity, 0, 255, 0, 100));
-   Blynk.virtualWrite(V6, map(LED4_intensity, 0, 255, 0, 100));
+   Blynk.virtualWrite(V2, LED1_intensity);
+   Blynk.virtualWrite(V3, LED2_intensity);
+   Blynk.virtualWrite(V4, LED3_intensity);
+   Blynk.virtualWrite(V6, LED4_intensity);
    if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
     Blynk.virtualWrite(V5, 1);
    }else if(uvFurnaceStateMachine.isInState(offState)){
@@ -1569,7 +1557,7 @@ void sendToInfluxDB(){
   d = d % 100;  
   
   //sprintf(msg, "UV Tset=%d.%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", a, b, c, d, map(LED1_intensity, 0, 255, 0, 100), map(LED2_intensity, 0, 255, 0, 100), map(LED3_intensity, 0, 255, 0, 100), map(LED4_intensity, 0, 255, 0, 100));
-  sprintf(msg, "UV Tset=%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", int(Setpoint), c, d, map(LED1_intensity, 0, 255, 0, 100), map(LED2_intensity, 0, 255, 0, 100), map(LED3_intensity, 0, 255, 0, 100), map(LED4_intensity, 0, 255, 0, 100));
+  sprintf(msg, "UV Tset=%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", int(Setpoint), c, d, LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
   DEBUG_PRINTLN(msg);
   Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
   Udp.write(msg);
@@ -1958,10 +1946,10 @@ void setLEDsEnterFunction(){
   } 
   sendCommand("ref 0");
 
-  tLED1.setValue(map(LED1_intensity, 0, 255, 0, 100));
-  tLED2.setValue(map(LED2_intensity, 0, 255, 0, 100)); 
-  tLED3.setValue(map(LED3_intensity, 0, 255, 0, 100));
-  tLED4.setValue(map(LED4_intensity, 0, 255, 0, 100));
+  nLED1.setValue(LED1_intensity);
+  nLED2.setValue(LED2_intensity); 
+  nLED3.setValue(LED3_intensity);
+  nLED4.setValue(LED4_intensity);
 
   selETH();
   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
@@ -2000,10 +1988,10 @@ void setTempExitFunction(){
 void setTimerEnterFunction(){
   DEBUG_PRINTLN(F("setTimerEnter"));
   page4.show();
-  tOvenMinuteT.setValue(minutes_oven);
-  tOvenHourT.setValue(hours_oven);
-  tLEDsMinuteT.setValue(minutes_LED);
-  tLEDsHourT.setValue(hours_LED);
+  nOvenMinuteT.setValue(minutes_oven);
+  nOvenHourT.setValue(hours_oven);
+  nLEDsMinuteT.setValue(minutes_LED);
+  nLEDsHourT.setValue(hours_LED);
   
   sendCommand("ref 0");
 }
