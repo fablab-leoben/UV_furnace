@@ -406,7 +406,7 @@ NexButton bReset = NexButton(7, 1, "bReset");
 //Page8
 NexButton bHomeCredits = NexButton(8, 1, "bHomeCredits");
 
-char buffer[5] = {0};
+char buffer[3] = {0};
 
 NexTouch *nex_listen_list[] = 
 {
@@ -635,16 +635,9 @@ void bCreditsPopCallback(void *ptr)
 { 
   page8.show();
 }
-
 //End Page2
 
 //Page3
-char* intToChar(int variable){
-    memset(buffer, 0, sizeof(buffer));
-    itoa(variable, buffer, 10);    
-    return buffer;
-}
-
 void bHomeTempPopCallback(void *ptr)
 {   
     uint32_t number;
