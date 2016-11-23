@@ -944,15 +944,29 @@ void setup() {
   }
 
   selETH();
-  if (Ethernet.begin(mac) == 0) {
-    ethernetAvailable = false;
-    DEBUG_PRINTLN(F("Ethernet not available"));
-  } else {
-    ethernetAvailable = true;
-    Udp.begin(localPort); 
-    DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
-    DEBUG_PRINTLN(Ethernet.localIP());
-  }
+  #ifdef USE_Static_IP
+    DEBUG_PRINTLN(F("using static IP..."));
+    if(Ethernet.begin(mac) == 0) {
+      ethernetAvailable = false;
+      DEBUG_PRINTLN(F("Ethernet not available"));
+    } else {
+      ethernetAvailable = true;
+      Udp.begin(localPort); 
+      DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
+      DEBUG_PRINTLN(Ethernet.localIP());
+    }
+  #else
+    DEBUG_PRINTLN(F("using dynamic IP..."));
+    if(Ethernet.begin(mac, ip, dnsServer, gateway, subnet == 0) {
+      ethernetAvailable = false;
+      DEBUG_PRINTLN(F("Ethernet not available"));
+    } else {
+      ethernetAvailable = true;
+      Udp.begin(localPort); 
+      DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
+      DEBUG_PRINTLN(Ethernet.localIP());
+    }
+   #endif
 
   // Run timer2 interrupt every 15 ms 
   TCCR2A = 0;
