@@ -37,7 +37,7 @@
 #include <TimeLib.h>
 #include <Timezone.h>
 #include <SPI.h>
-#include <SD.h>
+#include "SD.h"
 // So we can save and retrieve settings
 #include <EEPROM.h>
 #include <Adafruit_MAX31855.h>
@@ -302,8 +302,6 @@ int twitterNotification = 0;
 #define BLYNK_YELLOW    "#ED9D00"
 #define BLYNK_RED       "#D3435C"
 
-WidgetTerminal terminal(V7);
-
 /*******************************************************************************
  SD-Card
 *******************************************************************************/
@@ -315,7 +313,6 @@ elapsedMillis sdCard;
 /*******************************************************************************
  Display
 *******************************************************************************/
-//NexUpload nex_download("nex.tft", 4, 115200);
 
 /*******************************************************************************
  interrupt service routine for DS3231 clock
