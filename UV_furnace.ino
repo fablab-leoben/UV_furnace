@@ -23,6 +23,9 @@
  * MA 02111-1307 USA                                                    *
  *----------------------------------------------------------------------*/
 
+#include <Arduino.h>
+#include <Wire.h>
+#include <SoftwareSerial.h>
 #include <BlynkSimpleEthernet2.h>
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>
@@ -50,7 +53,7 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "Version 0.1";
 
-typedef struct myBoolStruct
+struct myBoolStruct
 {
    uint8_t preset1: 1;
    uint8_t preset2: 1;
@@ -66,7 +69,7 @@ typedef struct myBoolStruct
    uint8_t bLED4State: 1;
 
    uint8_t didReadConfig: 1;
-}; 
+};
 myBoolStruct myBoolean;
 
 //compatibility with Arduino IDE 1.6.9
@@ -82,7 +85,7 @@ State settingsState = State( settingsEnterFunction, settingsUpdateFunction, sett
 State setLEDs = State( setLEDsEnterFunction, setLEDsUpdateFunction, setLEDsExitFunction );
 State setTemp = State( setTempEnterFunction, setTempUpdateFunction, setTempExitFunction );
 State setTimer = State( setTimerEnterFunction, setTimerUpdateFunction, setTimerExitFunction );
-State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction ); 
+State setPID = State( setPIDEnterFunction, setPIDUpdateFunction, setPIDExitFunction );
 State runState = State( runEnterFunction, runUpdateFunction, runExitFunction );
 State errorState = State( errorEnterFunction, errorUpdateFunction, errorExitFunction );
 State offState = State ( offEnterFunction, offUpdateFunction, offExitFunction );
@@ -178,22 +181,22 @@ const int KdAddress = 24;
 
 //Specify the links and initial tuning parameters
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
- 
+
 // 10 second Time Proportional Output window
-const int WindowSize = 10000; 
+const int WindowSize = 10000;
 unsigned long windowStartTime;
- 
+
 /************************************************
  Auto Tune Variables and constants
 ************************************************/
 byte ATuneModeRemember = 2;
- 
+
 double aTuneStep = 500;
 double aTuneNoise = 1;
 unsigned int aTuneLookBack = 20;
- 
+
 boolean tuning = false;
- 
+
 PID_ATune aTune(&Input, &Output);
 
 /************************************************
@@ -241,7 +244,7 @@ float temperatureSamples[NUMBER_OF_SAMPLES] = DUMMY_ARRAY;
 float averageTemperature;
 
 /*******************************************************************************
- DS3231 
+ DS3231
 *******************************************************************************/
 #define SQW_PIN 3
 #define DS3231_TEMP_INTERVAL   2000
@@ -338,7 +341,7 @@ NexPage page7    = NexPage(7, 0, "page7");
 NexPage page8    = NexPage(8, 0, "page8");
 
 /*
- * Declare a button object [page id:0,component id:1, component name: "b0"]. 
+ * Declare a button object [page id:0,component id:1, component name: "b0"].
  */
 
 //Page0
@@ -410,20 +413,20 @@ NexButton bHomeCredits = NexButton(8, 1, "bHomeCredits");
 
 char buffer[3] = {0};
 
-NexTouch *nex_listen_list[] = 
+NexTouch *nex_listen_list[] =
 {
-    
+
     &bSettings, &bOnOff,
-    
-    &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup, 
+
+    &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup,
     &bTimerSetup, &bLEDSetup, &bPIDSetup, &bHomeSet, &bCredits, &bUpdate,
-    
+
     &bHomeTemp, &bPreheat,
-    
+
     &bHomeTimer,
-    
+
     &bLED1, &bLED2, &bLED3, &bLED4, &bHomeLED,
-    
+
     &bHomePID, &bAutotune,
 
     &bReset,
@@ -434,8 +437,8 @@ NexTouch *nex_listen_list[] =
 
 //Page1
 void bSettingsPopCallback(void *ptr)
-{ 
-  DEBUG_PRINTLN(F("transition to settings")); 
+{
+  DEBUG_PRINTLN(F("transition to settings"));
   uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
@@ -462,7 +465,7 @@ void bOnOffPopCallback(void *ptr)
 
 //Page2
 void bPreSet1PopCallback(void *ptr)
-{   
+{
   uint32_t picNum = 0;
   bPreSet1.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
@@ -515,7 +518,7 @@ void bPreSet3PopCallback(void *ptr)
     } else if(picNum == 4) {
       picNum = 3;
       myBoolean.preset3 = 0;
-  
+
     }
     //DEBUG_PRINTLN(picNum);
     bPreSet3.Set_background_crop_picc(picNum);
@@ -530,11 +533,11 @@ void bPreSet4PopCallback(void *ptr)
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset4);
       myBoolean.preset4 = 1;
-   
+
     } else if(picNum == 4) {
       picNum = 3;
       myBoolean.preset4 = 0;
-         
+
     }
     //DEBUG_PRINTLN(picNum);
     bPreSet4.Set_background_crop_picc(picNum);
@@ -553,7 +556,7 @@ void bPreSet5PopCallback(void *ptr)
 
     } else if(picNum == 4) {
       picNum = 3;
-      myBoolean.preset5 = 0; 
+      myBoolean.preset5 = 0;
     }
     //DEBUG_PRINTLN(picNum);
     bPreSet5.Set_background_crop_picc(picNum);
@@ -572,7 +575,7 @@ void bPreSet6PopCallback(void *ptr)
     } else if(picNum == 4) {
       picNum = 3;
       myBoolean.preset6 = 0;
-      
+
     }
     //DEBUG_PRINTLN(picNum);
     bPreSet6.Set_background_crop_picc(picNum);
@@ -586,7 +589,7 @@ void turnOffPresetButtons(){
     bPreSet4.Set_background_crop_picc(3);
     bPreSet5.Set_background_crop_picc(3);
     bPreSet6.Set_background_crop_picc(3);
-    
+
     myBoolean.preset1 = 0;
     myBoolean.preset2 = 0;
     myBoolean.preset3 = 0;
@@ -603,7 +606,7 @@ void bTempSetupPopCallback(void *ptr)
 }
 
 void bTimerSetupPopCallback(void *ptr)
-{   
+{
     uvFurnaceStateMachine.transitionTo(setTimer);
 }
 
@@ -618,7 +621,7 @@ void bPIDSetupPopCallback(void *ptr)
 }
 
 void bUpdatePopCallback(void *ptr)
-{ 
+{
   selSD();
   SD.end();
   DEBUG_PRINTLN(F("updating..."));
@@ -630,27 +633,27 @@ void bUpdatePopCallback(void *ptr)
 
 void bHomeSetPopCallback(void *ptr)
 {
-    uvFurnaceStateMachine.transitionTo(offState);    
+    uvFurnaceStateMachine.transitionTo(offState);
 }
 
 void bCreditsPopCallback(void *ptr)
-{ 
+{
   page8.show();
 }
 //End Page2
 
 //Page3
 void bHomeTempPopCallback(void *ptr)
-{   
+{
     uint32_t number;
     dbSerialPrintln("bTempPlus1PopCallback");
 
     nTempSetup.getValue(&number);
     Setpoint = number;
-    
+
     DEBUG_PRINTLN(Setpoint);
 
-    uvFurnaceStateMachine.transitionTo(settingsState);   
+    uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
 void bPreheatPopCallback(void *ptr)
@@ -662,7 +665,7 @@ void bPreheatPopCallback(void *ptr)
       picNum = 7;
 
       myBoolean.preheat = 1;
-      
+
     } else if(picNum == 7) {
       picNum = 5;
 
@@ -676,22 +679,22 @@ void bPreheatPopCallback(void *ptr)
 
 //Page4
 void bHomeTimerPopCallback(void *ptr)
-{ 
+{
   nOvenMinuteT.getValue(&minutes_oven);
   nOvenHourT.getValue(&hours_oven);
-  uvFurnaceStateMachine.transitionTo(settingsState);   
+  uvFurnaceStateMachine.transitionTo(settingsState);
 }
 //End Page4
 
 //Page5
 void bLED1PopCallback(void *ptr)
-{ 
+{
   uint32_t picNum = 0;
   bLED1.Get_background_crop_picc(&picNum);
   if(picNum == 9) {
       picNum = 11;
       myBoolean.bLED1State = true;
-      
+
     } else if(picNum == 11) {
       picNum = 9;
       myBoolean.bLED1State = false;
@@ -752,7 +755,7 @@ void bLED4PopCallback(void *ptr)
 }
 
 void bHomeLEDPopCallback(void *ptr)
-{   
+{
     nLED1.getValue(&LED1_intensity);
     nLED2.getValue(&LED2_intensity);
     nLED3.getValue(&LED3_intensity);
@@ -761,40 +764,40 @@ void bHomeLEDPopCallback(void *ptr)
     if(myBoolean.bLED1State == true){
        LED1_mapped = map(LED1_intensity, 0, 100, 0, 255);
     }else{
-      LED1_mapped = 0;
+      LED1_intensity = 0;
     }
 
     if(myBoolean.bLED2State == true){
        LED2_mapped = map(LED2_intensity, 0, 100, 0, 255);
     }else{
-      LED2_mapped = 0;
+      LED2_intensity = 0;
     }
-    
+
     if(myBoolean.bLED3State == true){
        LED3_mapped = map(LED3_intensity, 0, 100, 0, 255);
     }else{
-      LED3_mapped = 0;
+      LED3_intensity = 0;
     }
 
     if(myBoolean.bLED4State == true){
        LED4_mapped = map(LED4_intensity, 0, 100, 0, 255);
     }else{
-      LED4_mapped = 0;
+      LED4_intensity = 0;
     }
-    
+
     DEBUG_PRINTLN(LED1_mapped);
     DEBUG_PRINTLN(LED2_mapped);
     DEBUG_PRINTLN(LED3_mapped);
     DEBUG_PRINTLN(LED4_mapped);
 
-    uvFurnaceStateMachine.transitionTo(settingsState);   
+    uvFurnaceStateMachine.transitionTo(settingsState);
 }
 //End Page5
 
 //Page6
 void bHomePIDPopCallback(void *ptr)
 {
-    uvFurnaceStateMachine.transitionTo(settingsState);   
+    uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
 void bAutotunePopCallback(void *ptr)
@@ -806,7 +809,7 @@ void bAutotunePopCallback(void *ptr)
 //Page7
 void bResetPopCallback(void *ptr)
 {
-  
+
 }
 //End Page7
 
@@ -816,6 +819,40 @@ void bHomeCreditsPopCallback(void *ptr)
   page2.show();
 }
 //End Page8
+
+/*******************************************************************************
+ * Function Name  : selETH
+ * Description    : selects the Ethernet chip to make communication possible
+ * Return         : 0
+ *******************************************************************************/
+ void selETH() {
+  digitalWrite(SDCARD_CS, HIGH);
+  digitalWrite(W5200_CS, LOW);
+  digitalWrite(cs_MAX31855, HIGH);
+}
+
+/*******************************************************************************
+ * Function Name  : selSD
+ * Description    : selects the SD card to make communication possible
+ * Return         : 0
+ *******************************************************************************/
+void selSD() {
+  digitalWrite(W5200_CS, HIGH);
+  digitalWrite(SDCARD_CS, LOW);
+  digitalWrite(cs_MAX31855, HIGH);
+}
+
+/*******************************************************************************
+ * Function Name  : selMAX31855
+ * Description    : selects the MAX31855 thermocouple sensor to make
+ *                  communication possible
+ * Return         : 0
+ *******************************************************************************/
+void selMAX31855(){
+  digitalWrite(W5200_CS, HIGH);
+  digitalWrite(SDCARD_CS, HIGH);
+  digitalWrite(cs_MAX31855, LOW);
+}
 
 /*******************************************************************************
  IO mapping
@@ -835,7 +872,7 @@ void setup() {
   for (i=0; i<NUMBER_OF_SAMPLES; i++) {
     temperatureSamples[i] = DUMMY;
   }
-  
+
   nexInit();
 
   myBoolean.preset1 = 0;
@@ -850,9 +887,9 @@ void setup() {
   myBoolean.bLED2State = false;
   myBoolean.bLED3State = false;
   myBoolean.bLED4State = false;
-  
+
   myBoolean.didReadConfig = false;
-  
+
   /* Register the pop event callback function of the current button component. */
   //Page1
   bOnOff.attachPop(bOnOffPopCallback, &bOnOff);
@@ -872,7 +909,7 @@ void setup() {
   bHomeSet.attachPop(bHomeSetPopCallback, &bHomeSet);
   bCredits.attachPop(bCreditsPopCallback, &bCredits);
   bUpdate.attachPop(bUpdatePopCallback, &bUpdate);
-  
+
   //Page3
   bHomeTemp.attachPop(bHomeTempPopCallback, &bHomeTemp);
   bPreheat.attachPop(bPreheatPopCallback, &bPreheat);
@@ -896,9 +933,9 @@ void setup() {
 
   //Page8
   bHomeCredits.attachPop(bHomeCreditsPopCallback, &bHomeCredits);
-  
+
   //declare and init pins
-  
+
   //Disable the default square wave of the SQW pin.
   RTC.squareWave(SQWAVE_NONE);
 
@@ -923,7 +960,7 @@ void setup() {
   //Initializing Chip Select pin for MAX31855
   pinMode(cs_MAX31855, OUTPUT);
   selMAX31855();
-  
+
   selSD();
   //Initializing SD Card
   DEBUG_PRINTLN(F("Initializing SD card..."));
@@ -932,7 +969,7 @@ void setup() {
   //pinMode(4, OUTPUT);
   //digitalWrite(4, HIGH);
     // see if the card is present and can be initialized:
-  
+
   if (!SD.begin(SDCARD_CS)) {
     DEBUG_PRINTLN(F("Card failed, or not present"));
     // ToDo: disable reading preset from sd card
@@ -942,36 +979,36 @@ void setup() {
 
   selETH();
   #ifdef USE_Static_IP
-    DEBUG_PRINTLN(F("using static IP..."));
+  DEBUG_PRINTLN(F("using static IP..."));
+  if(Ethernet.begin(mac, ip, dnsServer, gateway, subnet == 0)) {
+    ethernetAvailable = false;
+    DEBUG_PRINTLN(F("Ethernet not available"));
+  } else {
+    ethernetAvailable = true;
+    Udp.begin(localPort);
+    DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
+    DEBUG_PRINTLN(Ethernet.localIP());
+  }
+  #else
+    DEBUG_PRINTLN(F("using dynamic IP..."));
     if(Ethernet.begin(mac) == 0) {
       ethernetAvailable = false;
       DEBUG_PRINTLN(F("Ethernet not available"));
     } else {
       ethernetAvailable = true;
-      Udp.begin(localPort); 
-      DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
-      DEBUG_PRINTLN(Ethernet.localIP());
-    }
-  #else
-    DEBUG_PRINTLN(F("using dynamic IP..."));
-    if(Ethernet.begin(mac, ip, dnsServer, gateway, subnet == 0) {
-      ethernetAvailable = false;
-      DEBUG_PRINTLN(F("Ethernet not available"));
-    } else {
-      ethernetAvailable = true;
-      Udp.begin(localPort); 
+      Udp.begin(localPort);
       DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
       DEBUG_PRINTLN(Ethernet.localIP());
     }
    #endif
 
-  // Run timer2 interrupt every 15 ms 
+  // Run timer2 interrupt every 15 ms
   TCCR2A = 0;
   TCCR2B = 1<<CS22 | 1<<CS21 | 1<<CS20;
 
   //Timer2 Overflow Interrupt Enable
   TIMSK2 |= 1<<TOIE2;
-  
+
    #ifdef USE_Blynk
     //init Blynk
     if(ethernetAvailable){
@@ -986,7 +1023,7 @@ void setup() {
 /************************************************
  Timer Interrupt Handler
 ************************************************/
-SIGNAL(TIMER2_OVF_vect) 
+SIGNAL(TIMER2_OVF_vect)
 {
   if (uvFurnaceStateMachine.isInState(offState) == true)
   {
@@ -1011,7 +1048,7 @@ void furnaceDoor() {
  Called by ISR every 15ms to drive the output
 ************************************************/
 void DriveOutput()
-{  
+{
   long now = millis();
   // Set the output
   // "on time" is proportional to the PID output
@@ -1034,20 +1071,20 @@ void loop() {
   #ifdef USE_Blynk
     //all the Blynk magic happens here
     Blynk.run();
-  #endif  
+  #endif
   //this function reads the temperature of the MAX31855 Thermocouple Amplifier
 
   if(doorChanged == true){
     checkDoor();
   }
   doorChanged = false;
-  
+
   readTemperature();
   readInternalTemperature();
   updateBlynk();
   if (alarmIsrWasCalled){
      if (RTC.alarm(ALARM_1)) {
-        DEBUG_PRINTLN("Alarm");
+        DEBUG_PRINTLN("Alarm_1");
         uvFurnaceStateMachine.transitionTo(offState);
      }
      if (RTC.alarm(ALARM_2)){
@@ -1086,7 +1123,7 @@ void checkDoor(){
  * Return         : none
  *******************************************************************************/
 void updateTemperature()
-{      
+{
     if(averageTemperature != lastTemperature && newTemperature == true)  {
       dtostrf(averageTemperature, 5, 1, buffer);
       tTemp.setText(buffer);
@@ -1104,10 +1141,10 @@ void updateTemperature()
                     assuming global: Adafruit_MAX31855 thermocouple(CLK, CS, DO);
  * Return         : 0
  *******************************************************************************/
-int readTemperature(){ 
+void readTemperature(){
    //time is up? no, then come back later
    if (MAX31855SampleInterval < MAX31855_SAMPLE_INTERVAL) {
-    return 0;
+    return;
    }
 
    selMAX31855();
@@ -1116,7 +1153,7 @@ int readTemperature(){
    MAX31855SampleInterval = 0;
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
-   
+
    // MAX31855 cold junction voltage reading in mV
    float coldJunctionTemperature = thermocouple.readInternal();
    float coldJunctionVoltage = -0.176004136860E-01 +
@@ -1129,15 +1166,15 @@ int readTemperature(){
       -0.320207200030E-18 * pow(coldJunctionTemperature, 7.0) +
       0.971511471520E-22  * pow(coldJunctionTemperature, 8.0) +
       -0.121047212750E-25 * pow(coldJunctionTemperature, 9.0) +
-      0.118597600000E+00  * exp(-0.118343200000E-03 * 
-                           pow((coldJunctionTemperature-0.126968600000E+03), 2.0) 
-                        );                     
-                        
-   // cold junction voltage + thermocouple voltage         
+      0.118597600000E+00  * exp(-0.118343200000E-03 *
+                           pow((coldJunctionTemperature-0.126968600000E+03), 2.0)
+                        );
+
+   // cold junction voltage + thermocouple voltage
    float voltageSum = thermocoupleVoltage + coldJunctionVoltage;
-   
-   // calculate corrected temperature reading based on coefficients for 3 different ranges   
-   float b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10;
+
+   // calculate corrected temperature reading based on coefficients for 3 different ranges
+   float b0, b1, b2, b3, b4, b5, b6, b7, b8, b9;
    if(thermocoupleVoltage < 0){
       b0 = 0.0000000E+00;
       b1 = 2.5173462E+01;
@@ -1150,7 +1187,7 @@ int readTemperature(){
       b8 = -5.1920577E-04;
       b9 = 0.0000000E+00;
    }
-   
+
    else if(thermocoupleVoltage < 20.644){
       b0 = 0.000000E+00;
       b1 = 2.508355E+01;
@@ -1163,7 +1200,7 @@ int readTemperature(){
       b8 = 1.057734E-06;
       b9 = -1.052755E-08;
    }
-   
+
    else if(thermocoupleVoltage < 54.886){
       b0 = -1.318058E+02;
       b1 = 4.830222E+01;
@@ -1176,13 +1213,13 @@ int readTemperature(){
       b8 = 0.000000E+00;
       b9 = 0.000000E+00;
    }
-   
+
    else {
       // TODO: handle error - out of range
-      return 0;
+      return;
    }
-   
-   currentTemperature = b0 + 
+
+   currentTemperature = b0 +
       b1 * voltageSum +
       b2 * pow(voltageSum, 2.0) +
       b3 * pow(voltageSum, 3.0) +
@@ -1192,7 +1229,7 @@ int readTemperature(){
       b7 * pow(voltageSum, 7.0) +
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
-    
+
     uint8_t i;
     for (i=0; i< NUMBER_OF_SAMPLES; i++) {
         //store the sample in the next available 'slot' in the array of samples
@@ -1204,12 +1241,12 @@ int readTemperature(){
 
     //is the samples array full? if not, exit and get a new sample
     if ( temperatureSamples[NUMBER_OF_SAMPLES-1] == DUMMY) {
-        return 0;
+        return;
     }
 
     // average all the samples out
     averageTemperature = 0;
-    
+
     for (i=0; i<NUMBER_OF_SAMPLES; i++) {
         averageTemperature += temperatureSamples[i];
     }
@@ -1230,11 +1267,11 @@ int readTemperature(){
  * Description    : reads the temperature of the DS3231
  * Return         : 0
  *******************************************************************************/
-int readInternalTemperature(){
+void readInternalTemperature(){
   if(DS3231TempInterval < DS3231_TEMP_INTERVAL) {
-    return 0;
+    return;
   }
-  
+
   if(RTC.temperature() / 4.0 > 40) {
     DEBUG_PRINTLN(F("ERROR"));
     uvFurnaceStateMachine.immediateTransitionTo(offState);
@@ -1246,13 +1283,15 @@ int readInternalTemperature(){
  * Description    : sets the alarm for the time the user has choosen
  * Return         : 0
 *******************************************************************************/
-int setDS3231Alarm(byte minutes, byte hours) {
+void setDS3231Alarm(byte minutes, byte hours) {
 
   tmElements_t tm;
   RTC.read(tm);
 
-  hourAlarm, minuteAlarm, secondAlarm = 0;
-  
+  hourAlarm = 0;
+  minuteAlarm = 0;
+  secondAlarm = 0;
+
   hourAlarm = tm.Hour + hours;
   minuteAlarm = tm.Minute + minutes;
   secondAlarm = tm.Second;
@@ -1272,8 +1311,8 @@ int setDS3231Alarm(byte minutes, byte hours) {
   RTC.setAlarm(ALM1_MATCH_HOURS, secondAlarm, minuteAlarm, hourAlarm, 1);
   RTC.alarm(ALARM_1);
   RTC.alarmInterrupt(ALARM_1, true);
-  
-  return 0;
+
+  return;
 }
 
 /*******************************************************************************
@@ -1281,9 +1320,9 @@ int setDS3231Alarm(byte minutes, byte hours) {
  * Description    : updates the blynk app
  * Return         : 0
 *******************************************************************************/
-int updateBlynk(){
+void updateBlynk(){
    if (BlynkInterval < BLYNK_INTERVAL) {
-    return 0;
+    return;
    }
    //DEBUG_PRINTLN(F("updating Blynk"));
    Blynk.virtualWrite(V0, averageTemperature);
@@ -1351,7 +1390,7 @@ void LoadParameters()
    Kp = EEPROM_readDouble(KpAddress);
    Ki = EEPROM_readDouble(KiAddress);
    Kd = EEPROM_readDouble(KdAddress);
-   
+
    // Use defaults if EEPROM values are invalid
    if (isnan(Setpoint))
    {
@@ -1368,7 +1407,7 @@ void LoadParameters()
    if (isnan(Kd))
    {
      Kd = 0.1;
-   }  
+   }
 }
 
 /*******************************************************************************
@@ -1379,7 +1418,7 @@ void LoadParameters()
 void EEPROM_writeDouble(int address, double value)
 {
    DEBUG_PRINTLN(F("EEPROM_writeDouble"));
-   
+
    byte* p = (byte*)(void*)&value;
    for (int i = 0; i < sizeof(value); i++)
    {
@@ -1414,7 +1453,7 @@ void DoControl()
 {
   // Read the input:
     Input = averageTemperature;
-    
+
   if (tuning) // run the auto-tuner
   {
      if (aTune.Runtime()) // returns 'true' when done
@@ -1426,9 +1465,9 @@ void DoControl()
   {
      myPID.Compute();
   }
-  
+
   // Time Proportional relay state is updated regularly via timer interrupt.
-  onTime = Output; 
+  onTime = Output;
 }
 
 /*******************************************************************************
@@ -1440,7 +1479,7 @@ void StartAutoTune()
 {
    // REmember the mode we were in
    ATuneModeRemember = myPID.GetMode();
- 
+
    // set up the auto-tune parameters
    aTune.SetNoiseBand(aTuneNoise);
    aTune.SetOutputStep(aTuneStep);
@@ -1452,56 +1491,22 @@ void StartAutoTune()
  * Function Name  : FinishAutoTune
  * Description    : Return to normal control
  * Return         : 0
-*******************************************************************************/ 
+*******************************************************************************/
 void FinishAutoTune()
 {
    tuning = false;
- 
+
    // Extract the auto-tune calculated parameters
    Kp = aTune.GetKp();
    Ki = aTune.GetKi();
    Kd = aTune.GetKd();
- 
+
    // Re-tune the PID and revert to normal control mode
    myPID.SetTunings(Kp,Ki,Kd);
    myPID.SetMode(ATuneModeRemember);
-   
+
    // Persist any changed parameters to EEPROM
    SaveParameters();
-}
-
-/*******************************************************************************
- * Function Name  : selETH
- * Description    : selects the Ethernet chip to make communication possible
- * Return         : 0
- *******************************************************************************/
- void selETH() {    
-  digitalWrite(SDCARD_CS, HIGH);
-  digitalWrite(W5200_CS, LOW);
-  digitalWrite(cs_MAX31855, HIGH); 
-}
-
-/*******************************************************************************
- * Function Name  : selSD
- * Description    : selects the SD card to make communication possible
- * Return         : 0
- *******************************************************************************/
-void selSD() {     
-  digitalWrite(W5200_CS, HIGH);
-  digitalWrite(SDCARD_CS, LOW);
-  digitalWrite(cs_MAX31855, HIGH); 
-}
-
-/*******************************************************************************
- * Function Name  : selMAX31855
- * Description    : selects the MAX31855 thermocouple sensor to make 
- *                  communication possible
- * Return         : 0
- *******************************************************************************/
-void selMAX31855(){  
-  digitalWrite(W5200_CS, HIGH);
-  digitalWrite(SDCARD_CS, HIGH);
-  digitalWrite(cs_MAX31855, LOW); 
 }
 
 /*******************************************************************************
@@ -1565,10 +1570,9 @@ void sendToInfluxDB(){
   selETH();
   int c = averageTemperature;
   int d = averageTemperature * 100;
-  d = d % 100;  
-  
-  //sprintf(msg, "UV Tset=%d.%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", a, b, c, d, map(LED1_intensity, 0, 255, 0, 100), map(LED2_intensity, 0, 255, 0, 100), map(LED3_intensity, 0, 255, 0, 100), map(LED4_intensity, 0, 255, 0, 100));
-  sprintf(msg, "UV Tset=%d,T=%d.%d,LED1=%d,LED2=%d,LED3=%d,LED4=%d", int(Setpoint), c, d, LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
+  d = d % 100;
+
+  sprintf(msg, "UV Tset=%d,T=%d.%d,LED1=%lu,LED2=%lu,LED3=%lu,LED4=%lu", int(Setpoint), c, d, LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
   DEBUG_PRINTLN(msg);
   Udp.beginPacket(INFLUXDB_HOST, INFLUXDB_PORT);
   Udp.write(msg);
@@ -1580,8 +1584,8 @@ void sendToInfluxDB(){
  * Function Name  : sendNTPpacket
  * Description    : send an NTP request to the time server at the given address
  * Return         : timestamp
- *******************************************************************************/ 
-unsigned long sendNTPpacket(char* address){ 
+ *******************************************************************************/
+unsigned long sendNTPpacket(char* address){
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
@@ -1615,7 +1619,7 @@ void refreshCountdown(){
       }
       tmElements_t tm;
       RTC.read(tm);
-      
+
       if(minuteAlarm < tm.Minute) {
         calcMinutes = 60 - (tm.Minute - minuteAlarm);
         calcHours = hourAlarm - tm.Hour - 1;
@@ -1623,10 +1627,10 @@ void refreshCountdown(){
         calcMinutes = minuteAlarm - tm.Minute;
         calcHours = hourAlarm - tm.Hour;
       }
-         
+
       nhour_uv.setValue(calcHours);
       nmin_uv.setValue(calcMinutes);
-      
+
       Blynk.virtualWrite(V12, calcMinutes);
       Blynk.virtualWrite(V13, calcHours);
 
@@ -1658,7 +1662,7 @@ void blinkPowerLED(){
 void fadePowerLED(){
    fadeTime = millis();
    fadeValue = 128+127*cos(2*PI/periode*fadeTime);
-   analogWrite(onOffButton, fadeValue);           // sets the value (range from 0 to 255) 
+   analogWrite(onOffButton, fadeValue);           // sets the value (range from 0 to 255)
 }
 
 /*******************************************************************************
@@ -1675,25 +1679,25 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
    */
   selSD();
   const uint8_t CONFIG_LINE_LENGTH = 20;
-  
+
   // The open configuration file.
   SDConfigFile cfg;
-  
+
   // Open the configuration file.
   if (!cfg.begin(CONFIG_FILE, CONFIG_LINE_LENGTH)) {
     DEBUG_PRINT(F("Failed to open configuration file: "));
     DEBUG_PRINTLN(CONFIG_preset1);
     return false;
   }
-  
+
   // Read each setting from the file.
   while (cfg.readNextSetting()) {
-    
+
     // Put a nameIs() block here for each setting you have.
 
     // doDelay
     if (cfg.nameIs("myBoolean.bLED1State")) {
-      
+
       myBoolean.bLED1State = cfg.getBooleanValue();
       DEBUG_PRINT(F("Read myBoolean.bLED1State: "));
       if (myBoolean.bLED1State) {
@@ -1701,10 +1705,10 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
       } else {
         DEBUG_PRINTLN(F("false"));
       }
-    
+
     // waitMs integer
     } else if (cfg.nameIs("myBoolean.bLED2State")) {
-      
+
       myBoolean.bLED2State = cfg.getBooleanValue();
       DEBUG_PRINT(F("Read myBoolean.bLED2State: "));
       if (myBoolean.bLED2State) {
@@ -1713,7 +1717,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
         DEBUG_PRINTLN(F("false"));
       }
     } else if (cfg.nameIs("myBoolean.bLED3State")) {
-      
+
       myBoolean.bLED3State = cfg.getBooleanValue();
       DEBUG_PRINT(F("Read myBoolean.bLED3State: "));
       if (myBoolean.bLED3State) {
@@ -1722,7 +1726,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
         DEBUG_PRINTLN(F("false"));
       }
     } else if (cfg.nameIs("temp")) {
-      
+
       Setpoint = cfg.getIntValue();
       DEBUG_PRINT(F("Read Setpoint: "));
       DEBUG_PRINTLN(Setpoint);
@@ -1733,13 +1737,13 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
       LED1_intensity = cfg.getIntValue();
       DEBUG_PRINT(F("Read LED1_intensity: "));
       DEBUG_PRINTLN(LED1_intensity);
-      
+
     } else if (cfg.nameIs("LED2_intensity")) {
 
       LED2_intensity = cfg.getIntValue();
       DEBUG_PRINT(F("Read LED2_intensity: "));
       DEBUG_PRINTLN(LED2_intensity);
-    
+
     } else if (cfg.nameIs("LED3_intensity")) {
 
       LED3_intensity = cfg.getIntValue();
@@ -1751,7 +1755,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
       LED4_intensity = cfg.getIntValue();
       DEBUG_PRINT(F("Read LED4_intensity: "));
       DEBUG_PRINTLN(LED4_intensity);
-    
+
     } else if (cfg.nameIs("hours_oven")) {
 
       hours_oven = cfg.getIntValue();
@@ -1770,7 +1774,7 @@ boolean readConfiguration(const char CONFIG_FILE[]) {
       DEBUG_PRINT(F("Unknown name in config: "));
       DEBUG_PRINTLN(cfg.getName());
     }
-  } 
+  }
   // clean up
   cfg.end();
 }
@@ -1815,7 +1819,7 @@ void initEnterFunction(){
   //start the timer of this cycle
   initTimer = 0;
   page0.show();
-  tVersion.setText(VERSION); 
+  tVersion.setText(VERSION);
   if(ethernetAvailable){
     selETH();
     sendNTPpacket(timeServer); // send an NTP packet to a time server
@@ -1828,7 +1832,7 @@ void initEnterFunction(){
 
       //the timestamp starts at byte 40 of the received packet and is four bytes,
       // or two words, long. First, extract the two words:
- 
+
       unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
       unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
       // combine the four bytes (two words) into a long integer
@@ -1845,18 +1849,18 @@ void initEnterFunction(){
       unsigned long epoch = secsSince1900 - seventyYears;
       // print Unix time:
       DEBUG_PRINTLN(epoch);
-    
+
       setTime(epoch);
       utc = now();
       local = myTZ.toLocal(utc, &tcr);
       RTC.set(local);                     //set the RTC from the system time
     }
     setSyncProvider(RTC.get);   // the function to get the time from the RTC
-    if(timeStatus()!= timeSet){ 
+    if(timeStatus()!= timeSet){
         DEBUG_PRINTLN(F("Unable to sync with the RTC"));
     }else{
-        DEBUG_PRINTLN(F("RTC has set the system time"));  
-    }  
+        DEBUG_PRINTLN(F("RTC has set the system time"));
+    }
   }
 
   tmElements_t tm;
@@ -1871,7 +1875,7 @@ void initEnterFunction(){
   DEBUG_PRINT(F(":"));
   DEBUG_PRINT(tm.Minute,DEC);
   DEBUG_PRINT(F(":"));
-  DEBUG_PRINTLN(tm.Second,DEC);  
+  DEBUG_PRINTLN(tm.Second,DEC);
 }
 
 void initUpdateFunction(){
@@ -1886,7 +1890,7 @@ void initExitFunction(){
 }
 
 void idleEnterFunction(){
-  
+
   //DEBUG_PRINTLN(F("idleEnter"));
 }
 void idleUpdateFunction(){
@@ -1899,7 +1903,7 @@ void idleExitFunction(){
 void settingsEnterFunction(){
   DEBUG_PRINTLN(F("settingsEnter"));
   page2.show();
-  
+
   if(myBoolean.preset1 == 1){
       bPreSet1.Set_background_crop_picc(4);
   }
@@ -1918,7 +1922,7 @@ void settingsEnterFunction(){
   if(myBoolean.preset6 == 1){
       bPreSet6.Set_background_crop_picc(4);
   }
- 
+
   sendCommand("ref 0");
   selETH();
   Blynk.setProperty(V14, "color", "BLYNK_GREEN");
@@ -1949,16 +1953,16 @@ void setLEDsEnterFunction(){
     bLED3.Set_background_crop_picc(11);
   }else{
     bLED3.Set_background_crop_picc(9);
-  } 
+  }
   if(myBoolean.bLED4State == true){
     bLED4.Set_background_crop_picc(11);
   }else{
     bLED4.Set_background_crop_picc(9);
-  } 
+  }
   sendCommand("ref 0");
 
   nLED1.setValue(LED1_intensity);
-  nLED2.setValue(LED2_intensity); 
+  nLED2.setValue(LED2_intensity);
   nLED3.setValue(LED3_intensity);
   nLED4.setValue(LED4_intensity);
 
@@ -1972,6 +1976,7 @@ void setLEDsUpdateFunction(){
 
 void setLEDsExitFunction(){
   DEBUG_PRINTLN("setLEDsExit");
+
 }
 
 void setTempEnterFunction(){
@@ -1990,7 +1995,7 @@ void setTempEnterFunction(){
 
 void setTempUpdateFunction(){
   //DEBUG_PRINTLN(F("setTempUpdate"));
-  
+
 }
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
@@ -2003,7 +2008,7 @@ void setTimerEnterFunction(){
   nOvenHourT.setValue(hours_oven);
   nLEDsMinuteT.setValue(minutes_LED);
   nLEDsHourT.setValue(hours_LED);
-  
+
   sendCommand("ref 0");
 }
 void setTimerUpdateFunction(){
@@ -2028,12 +2033,12 @@ void setPIDExitFunction(){
 
 void runEnterFunction(){
    DEBUG_PRINTLN(F("runEnter"));
- 
+
    //set alarm
    setDS3231Alarm(minutes_oven, hours_oven);
 
    controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
-  
+
    //turn the PID on
    myPID.SetMode(AUTOMATIC);
    windowStartTime = millis();
@@ -2048,9 +2053,8 @@ void runEnterFunction(){
 
 void runUpdateFunction(){
    //DEBUG_PRINTLN(F("runUpdate"));
-    
-   DoControl(); 
-   float pct = map(Output, 0, WindowSize, 0, 1000); 
+
+   DoControl();
    updateGraph();
    updateTemperature();
    fadePowerLED();
@@ -2063,7 +2067,7 @@ void runUpdateFunction(){
 
 void runExitFunction(){
   DEBUG_PRINTLN(F("runExit"));
-  
+
   minutes_oven = 0;
   hours_oven = 0;
 
@@ -2102,7 +2106,7 @@ void offEnterFunction(){
     controlLEDs(0, 0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
     RTC.alarmInterrupt(ALARM_1, false);
-    
+
     if(myBoolean.preheat == 1){
       cPreheat.Set_background_crop_picc(1);
     } else{
@@ -2110,7 +2114,7 @@ void offEnterFunction(){
     }
 }
 
-void offUpdateFunction(){ 
+void offUpdateFunction(){
     //DEBUG_PRINTLN(F("offUpdate"));
     updateTemperature();
 }
@@ -2137,12 +2141,9 @@ void preheatEnterFunction(){
    InfluxdbUpdateInterval = 0;
 }
 
-void preheatUpdateFunction(){ 
+void preheatUpdateFunction(){
     //DEBUG_PRINTLN(F("preheatUpdate"));
-    DoControl();
-      
-   float pct = map(Output, 0, WindowSize, 0, 1000);
-   
+   DoControl();
    updateGraph();
    updateTemperature();
    fadePowerLED();
@@ -2151,11 +2152,11 @@ void preheatUpdateFunction(){
        sendToInfluxDB();
    #endif
 
-   if(averageTemperature >= (Setpoint * 0,975) && averageTemperature <= (Setpoint * 1,025)){
+   if(averageTemperature >= (Setpoint * 0.975) && averageTemperature <= (Setpoint * 1.025)){
           uvFurnaceStateMachine.transitionTo(runState);
-          
+
           notifyUser("Preheating done!");
-   }   
+   }
 }
 
 void preheatExitFunction(){

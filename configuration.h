@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /************************************************
   Debug
 ************************************************/
@@ -13,15 +15,16 @@
   #define DEBUG_PRINTLN(...)
 #endif
 
-#define USE_InfluxDB
+//#define USE_InfluxDB
 
 #define USE_Blynk
 
-#define USE_Static_IP
-
+//#define USE_Static_IP
+uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+#ifdef USE_Static_IP
 //Ethernet shield MAC address
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 10, 0, 0, 177 };
-byte dnsServer[] = {10, 0, 0, 1};
-byte gateway[] = {10, 0, 0, 1};
-byte subnet[] = {255, 255, 255, 0};
+uint8_t ip[] = { 10, 0, 0, 177 };
+uint8_t dnsServer[] = {10, 0, 0, 1};
+uint8_t gateway[] = {10, 0, 0, 1};
+uint8_t subnet[] = {255, 255, 255, 0};
+#endif
