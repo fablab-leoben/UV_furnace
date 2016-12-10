@@ -49,9 +49,10 @@
 #include <SDConfigFile.h>
 #include "NexUpload.h"
 #include <SoftReset.h>
+#include <stdlib.h>
 
 #define APP_NAME "UV furnace"
-const char VERSION[] = "Version 0.1";
+const char VERSION[] = "Version 0.2";
 
 struct myBoolStruct
 {
@@ -339,6 +340,7 @@ NexPage page5    = NexPage(5, 0, "page5");
 NexPage page6    = NexPage(6, 0, "page6");
 NexPage page7    = NexPage(7, 0, "page7");
 NexPage page8    = NexPage(8, 0, "page8");
+NexPage page9    = NexPage(9, 0, "page9");
 
 /*
  * Declare a button object [page id:0,component id:1, component name: "b0"].
@@ -403,7 +405,9 @@ NexNumber nLED4 = NexNumber(5, 29, "nLED4");
 //Page6
 NexButton bHomePID = NexButton(6, 1, "bHomePID");
 NexButton bAutotune = NexButton(6, 2, "bAutotune");
-NexNumber nP = NexNumber(6, 4, "nP");
+NexText tP = NexText(6, 3, "tP");
+NexText tI = NexText(6, 4, "tI");
+NexText tD = NexText(6, 5, "tD");
 
 //Page7
 NexButton bReset = NexButton(7, 1, "bReset");
@@ -411,11 +415,13 @@ NexButton bReset = NexButton(7, 1, "bReset");
 //Page8
 NexButton bHomeCredits = NexButton(8, 1, "bHomeCredits");
 
-char buffer[3] = {0};
+//page9
+NexButton bEnter = NexButton(9, 2, "bEnter");
+
+char buffer[10] = {0};
 
 NexTouch *nex_listen_list[] =
 {
-
     &bSettings, &bOnOff,
 
     &bPreSet1, &bPreSet2, &bPreSet3, &bPreSet4, &bPreSet5, &bPreSet6, &bTempSetup,
@@ -432,6 +438,8 @@ NexTouch *nex_listen_list[] =
     &bReset,
 
     &bHomeCredits,
+
+    &bEnter,
     NULL
 };
 
@@ -797,7 +805,27 @@ void bHomeLEDPopCallback(void *ptr)
 //Page6
 void bHomePIDPopCallback(void *ptr)
 {
-    uvFurnaceStateMachine.transitionTo(settingsState);
+  memset(buffer, 0, sizeof(buffer));
+  tP.getText(buffer, sizeof(buffer));
+  Kp = atof(buffer);
+  DEBUG_PRINTLN(Kp);
+  memset(buffer, 0, sizeof(buffer));
+  tP.getText(buffer, sizeof(buffer));
+  DEBUG_PRINTLN(buffer);
+  Kp = atof(buffer);
+  DEBUG_PRINTLN(Kp);
+  memset(buffer, 0, sizeof(buffer));
+  tI.getText(buffer, sizeof(buffer));
+  Ki = atof(buffer);
+  DEBUG_PRINTLN(Ki);
+  memset(buffer, 0, sizeof(buffer));
+  tD.getText(buffer, sizeof(buffer));
+  Kd = atof(buffer);
+  DEBUG_PRINTLN(Kd);
+
+  SaveParameters();
+
+  uvFurnaceStateMachine.transitionTo(settingsState);
 }
 
 void bAutotunePopCallback(void *ptr)
@@ -819,6 +847,13 @@ void bHomeCreditsPopCallback(void *ptr)
   page2.show();
 }
 //End Page8
+
+//page9
+void bEnterPopCallback(void *ptr)
+{
+
+}
+
 
 /*******************************************************************************
  * Function Name  : selETH
@@ -933,6 +968,9 @@ void setup() {
 
   //Page8
   bHomeCredits.attachPop(bHomeCreditsPopCallback, &bHomeCredits);
+
+  //page9
+  bEnter.attachPop(bEnterPopCallback, &bEnter);
 
   //declare and init pins
 
@@ -1357,9 +1395,9 @@ void updateBlynk(){
 *******************************************************************************/
 void SaveParameters()
 {
+   DEBUG_PRINTLN(F("Save any parameter changes to EEPROM"));
    if (Setpoint != EEPROM_readDouble(SpAddress))
    {
-      DEBUG_PRINTLN(F("Save any parameter changes to EEPROM"));
       EEPROM_writeDouble(SpAddress, Setpoint);
    }
    if (Kp != EEPROM_readDouble(KpAddress))
@@ -1384,12 +1422,14 @@ void SaveParameters()
 void LoadParameters()
 {
    DEBUG_PRINTLN(F("Load parameters from EEPROM"));
-
    // Load from EEPROM
    Setpoint = EEPROM_readDouble(SpAddress);
    Kp = EEPROM_readDouble(KpAddress);
    Ki = EEPROM_readDouble(KiAddress);
    Kd = EEPROM_readDouble(KdAddress);
+   DEBUG_PRINTLN(Kp);
+   DEBUG_PRINTLN(Ki);
+   DEBUG_PRINTLN(Kd);
 
    // Use defaults if EEPROM values are invalid
    if (isnan(Setpoint))
@@ -1433,7 +1473,7 @@ void EEPROM_writeDouble(int address, double value)
 *******************************************************************************/
 double EEPROM_readDouble(int address)
 {
-   DEBUG_PRINTLN(F("EEPROM_readDouble"));
+   //DEBUG_PRINTLN(F("EEPROM_readDouble"));
 
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
@@ -2021,12 +2061,20 @@ void setTimerExitFunction(){
 void setPIDEnterFunction(){
   DEBUG_PRINTLN(F("setPIDEnter"));
   page6.show();
-  nP.setValue(int(Kp));
+  LoadParameters();
+  //tP.setText("567");
+  tP.setText(dtostrf(Kp, 4, 2, buffer));
+  tI.setText(dtostrf(Ki, 4, 2, buffer));
+  tD.setText(dtostrf(Kd, 4, 2, buffer));
+
+  //nP.setValue(int(Kp));
   sendCommand("ref 0");
 }
+
 void setPIDUpdateFunction(){
   //DEBUG_PRINTLN(F("setPIDUpdate"));
 }
+
 void setPIDExitFunction(){
   DEBUG_PRINTLN(F("setPIDExit"));
 }
