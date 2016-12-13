@@ -477,16 +477,16 @@ void bPreSet1PopCallback(void *ptr)
   uint32_t picNum = 0;
   bPreSet1.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
-    picNum = 4;
+    picNum = 5;
     turnOffPresetButtons();
     myBoolean.didReadConfig = readConfiguration(CONFIG_preset1);
     myBoolean.preset1 = 1;
 
-    } else if(picNum == 4) {
+  } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset1 = 0;
 
-    }
+  }
     //DEBUG_PRINTLN(picNum);
 
     bPreSet1.Set_background_crop_picc(picNum);
@@ -498,12 +498,12 @@ void bPreSet2PopCallback(void *ptr)
    uint32_t picNum = 0;
   bPreSet2.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
-      picNum = 4;
+      picNum = 5;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset2);
       myBoolean.preset2 = 1;
 
-    } else if(picNum == 4) {
+    } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset2 = 0;
 
@@ -518,12 +518,12 @@ void bPreSet3PopCallback(void *ptr)
   uint32_t picNum = 0;
   bPreSet3.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
-      picNum = 4;
+      picNum = 5;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset3);
       myBoolean.preset3 = 1;
 
-    } else if(picNum == 4) {
+    } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset3 = 0;
 
@@ -537,12 +537,12 @@ void bPreSet4PopCallback(void *ptr)
   uint32_t picNum = 0;
   bPreSet4.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
-      picNum = 4;
+      picNum = 5;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset4);
       myBoolean.preset4 = 1;
 
-    } else if(picNum == 4) {
+    } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset4 = 0;
 
@@ -556,13 +556,13 @@ void bPreSet5PopCallback(void *ptr)
   uint32_t picNum = 0;
   bPreSet5.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
-      picNum = 4;
+      picNum = 5;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset5);
       myBoolean.preset5 = 1;
 
 
-    } else if(picNum == 4) {
+    } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset5 = 0;
     }
@@ -575,12 +575,12 @@ void bPreSet6PopCallback(void *ptr)
   uint32_t picNum = 0;
   bPreSet6.Get_background_crop_picc(&picNum);
   if(picNum == 3) {
-      picNum = 4;
+      picNum = 5;
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset6);
       myBoolean.preset6 = 1;
 
-    } else if(picNum == 4) {
+    } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset6 = 0;
 
@@ -669,13 +669,13 @@ void bPreheatPopCallback(void *ptr)
     uint32_t picNum = 0;
     bPreheat.Get_background_crop_picc(&picNum);
     DEBUG_PRINTLN(picNum);
-    if(picNum == 5) {
-      picNum = 7;
+    if(picNum == 6) {
+      picNum = 8;
 
       myBoolean.preheat = 1;
 
-    } else if(picNum == 7) {
-      picNum = 5;
+    } else if(picNum == 8) {
+      picNum = 6;
 
       myBoolean.preheat = 0;
     }
@@ -699,12 +699,12 @@ void bLED1PopCallback(void *ptr)
 {
   uint32_t picNum = 0;
   bLED1.Get_background_crop_picc(&picNum);
-  if(picNum == 9) {
-      picNum = 11;
+  if(picNum == 11) {
+      picNum = 13;
       myBoolean.bLED1State = true;
 
-    } else if(picNum == 11) {
-      picNum = 9;
+    } else if(picNum == 13) {
+      picNum = 11;
       myBoolean.bLED1State = false;
     }
     //DEBUG_PRINTLN(picNum);
@@ -718,11 +718,11 @@ void bLED2PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bLED2.Get_background_crop_picc(&picNum);
-     if(picNum == 9) {
-      picNum = 11;
+     if(picNum == 11) {
+      picNum = 13;
       myBoolean.bLED2State = true;
-    } else if(picNum == 11) {
-      picNum = 9;
+    } else if(picNum == 13) {
+      picNum = 11;
       myBoolean.bLED2State = false;
     }
     //DEBUG_PRINTLN(picNum);
@@ -734,11 +734,11 @@ void bLED3PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bLED3.Get_background_crop_picc(&picNum);
-    if(picNum == 9) {
-      picNum = 11;
+    if(picNum == 11) {
+      picNum = 13;
       myBoolean.bLED3State = true;
-    } else if(picNum == 11) {
-      picNum = 9;
+    } else if(picNum == 13) {
+      picNum = 11;
       myBoolean.bLED3State = false;
     }
     //DEBUG_PRINTLN(picNum);
@@ -750,11 +750,11 @@ void bLED4PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bLED4.Get_background_crop_picc(&picNum);
-    if(picNum == 9) {
-      picNum = 11;
+    if(picNum == 11) {
+      picNum = 13;
       myBoolean.bLED4State = true;
-    } else if(picNum == 11) {
-      picNum = 9;
+    } else if(picNum == 13) {
+      picNum = 11;
       myBoolean.bLED4State = false;
     }
     //DEBUG_PRINTLN(picNum);
@@ -1980,24 +1980,24 @@ void setLEDsEnterFunction(){
   page5.show();
 
   if(myBoolean.bLED1State == true){
-    bLED1.Set_background_crop_picc(11);
+    bLED1.Set_background_crop_picc(13);
   }else{
-    bLED1.Set_background_crop_picc(9);
+    bLED1.Set_background_crop_picc(11);
   }
   if(myBoolean.bLED2State == true){
-    bLED2.Set_background_crop_picc(11);
+    bLED2.Set_background_crop_picc(13);
   }else{
-    bLED2.Set_background_crop_picc(9);
+    bLED2.Set_background_crop_picc(11);
   }
   if(myBoolean.bLED3State == true){
-    bLED3.Set_background_crop_picc(11);
+    bLED3.Set_background_crop_picc(13);
   }else{
-    bLED3.Set_background_crop_picc(9);
+    bLED3.Set_background_crop_picc(11);
   }
   if(myBoolean.bLED4State == true){
-    bLED4.Set_background_crop_picc(11);
+    bLED4.Set_background_crop_picc(13);
   }else{
-    bLED4.Set_background_crop_picc(9);
+    bLED4.Set_background_crop_picc(11);
   }
   sendCommand("ref 0");
 
@@ -2025,9 +2025,9 @@ void setTempEnterFunction(){
 
   nTempSetup.setValue(int(Setpoint));
   if(myBoolean.preheat == true){
-    bPreheat.Set_background_crop_picc(7);
+    bPreheat.Set_background_crop_picc(8);
   }else{
-    bPreheat.Set_background_crop_picc(5);
+    bPreheat.Set_background_crop_picc(6);
   }
 
   sendCommand("ref 0");
