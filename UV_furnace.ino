@@ -810,11 +810,6 @@ void bHomePIDPopCallback(void *ptr)
   Kp = atof(buffer);
   DEBUG_PRINTLN(Kp);
   memset(buffer, 0, sizeof(buffer));
-  tP.getText(buffer, sizeof(buffer));
-  DEBUG_PRINTLN(buffer);
-  Kp = atof(buffer);
-  DEBUG_PRINTLN(Kp);
-  memset(buffer, 0, sizeof(buffer));
   tI.getText(buffer, sizeof(buffer));
   Ki = atof(buffer);
   DEBUG_PRINTLN(Ki);
@@ -830,7 +825,7 @@ void bHomePIDPopCallback(void *ptr)
 
 void bAutotunePopCallback(void *ptr)
 {
-
+  StartAutoTune();
 }
 //End Page6
 
