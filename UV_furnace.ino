@@ -481,10 +481,12 @@ void bPreSet1PopCallback(void *ptr)
     picNum = 5;
     turnOffPresetButtons();
     myBoolean.didReadConfig = readConfiguration(CONFIG_preset1);
+
     if (!myBoolean.didReadConfig) {
       DEBUG_PRINTLN(F("Error reading config"));
       return;
     }
+
     myBoolean.preset1 = 1;
 
   } else if(picNum == 5) {
@@ -1338,10 +1340,10 @@ void setDS3231Alarm(byte minutes, byte hours) {
     minuteAlarm = tm.Minute + minutes;
   }
 
-  if(hours + tm.Hour >= 24)
+  if((hours + tm.Hour / 24) >= 1)
   {
-    dayAlarm = tm.Day + 1;
-    hourAlarm = hours + tm.Hour - 24;
+    dayAlarm = tm.Day + (hours + tm.Hour / 24);
+    hourAlarm = hours + tm.Hour - (24 *(hours + tm.Hour / 24));
   } else
     {
       dayAlarm = tm.Day;
