@@ -206,6 +206,7 @@ PID_ATune aTune(&Input, &Output);
 byte hourAlarm = 0;
 byte minuteAlarm = 0;
 byte secondAlarm = 0;
+uint16_t dayAlarm = 0;
 
 /************************************************
  time settings variables for heating and leds
@@ -480,6 +481,10 @@ void bPreSet1PopCallback(void *ptr)
     picNum = 5;
     turnOffPresetButtons();
     myBoolean.didReadConfig = readConfiguration(CONFIG_preset1);
+    if (!myBoolean.didReadConfig) {
+      DEBUG_PRINTLN(F("Error reading config"));
+      return;
+    }
     myBoolean.preset1 = 1;
 
   } else if(picNum == 5) {
@@ -1321,21 +1326,28 @@ void setDS3231Alarm(byte minutes, byte hours) {
   tmElements_t tm;
   RTC.read(tm);
 
+  dayAlarm = 0;
   hourAlarm = 0;
   minuteAlarm = 0;
   secondAlarm = 0;
 
-  hourAlarm = tm.Hour + hours;
-  minuteAlarm = tm.Minute + minutes;
-  secondAlarm = tm.Second;
+  if(tm.Minute + minutes >= 60){
+    hours += 1;
+    minuteAlarm = tm.Minute + minutes - 60;
+  } else {
+    minuteAlarm = tm.Minute + minutes;
+  }
 
-  if(minuteAlarm >= 60){
-    minuteAlarm = minuteAlarm - 60;
-    hourAlarm += 1;
-  }
-  if(hourAlarm >= 24) {
-    hourAlarm = hourAlarm - 24;
-  }
+  if(hours + tm.Hour >= 24)
+  {
+    dayAlarm = tm.Day + 1;
+    hourAlarm = hours + tm.Hour - 24;
+  } else
+    {
+      dayAlarm = tm.Day;
+      hourAlarm = hours + tm.Hour;
+    }
+
   DEBUG_PRINTLN(F("Alarm"));
   DEBUG_PRINTLN(secondAlarm);
   DEBUG_PRINTLN(minuteAlarm);
@@ -1620,7 +1632,7 @@ void sendToInfluxDB(){
  * Description    : send an NTP request to the time server at the given address
  * Return         : timestamp
  *******************************************************************************/
-unsigned long sendNTPpacket(char* address){
+  void sendNTPpacket(char* address){
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
@@ -1654,6 +1666,8 @@ void refreshCountdown(){
       }
       tmElements_t tm;
       RTC.read(tm);
+
+
 
       if(minuteAlarm < tm.Minute) {
         calcMinutes = 60 - (tm.Minute - minuteAlarm);
