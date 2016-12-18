@@ -983,7 +983,7 @@ void setup() {
   digitalWrite(LEDlight, 0);
 
   pinMode(reedSwitch, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, RISING);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
@@ -1116,8 +1116,8 @@ void loop() {
 
   if(doorChanged == true){
     checkDoor();
+    doorChanged = false;
   }
-  doorChanged = false;
 
   readTemperature();
   readInternalTemperature();
@@ -1147,13 +1147,12 @@ void checkDoor(){
   if(digitalRead(reedSwitch) == HIGH){
       digitalWrite(LEDlight, 255);
       controlLEDs(0,0,0,0);
-      DEBUG_PRINTLN("door open");
+      //DEBUG_PRINTLN("door open");
   }else if(digitalRead(reedSwitch) == LOW){
       if(uvFurnaceStateMachine.isInState(runState)){
         controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
       }
       digitalWrite(LEDlight, 0);
-      DEBUG_PRINTLN("door closed");
   }
 }
 
@@ -1669,7 +1668,9 @@ void refreshCountdown(){
       tmElements_t tm;
       RTC.read(tm);
 
-
+      if(dayAlarm < tm.Day){
+        
+      }
 
       if(minuteAlarm < tm.Minute) {
         calcMinutes = 60 - (tm.Minute - minuteAlarm);
@@ -2160,7 +2161,7 @@ void offEnterFunction(){
     nhour_uv.setValue(hours_oven);
     nmin_uv.setValue(minutes_oven);
     nSetpoint.setValue(int(Setpoint));
-    sendCommand("ref 0");
+    //sendCommand("ref 0");
     myPID.SetMode(MANUAL);
     controlLEDs(0, 0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
