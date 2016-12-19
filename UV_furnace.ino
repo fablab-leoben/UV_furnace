@@ -167,7 +167,7 @@ double Setpoint;
 double Input;
 double Output;
 
-volatile long onTime = 0;
+volatile unsigned long onTime = 0;
 
 // pid tuning parameters
 double Kp;
@@ -251,6 +251,7 @@ float averageTemperature;
 #define SQW_PIN 3
 #define DS3231_TEMP_INTERVAL   2000
 elapsedMillis DS3231TempInterval;
+time_t t;
 
 //Central European Time (Vienna, Berlin)
 TimeChangeRule myCEST = {"CEST", Last, Sat, Mar, 2, +120};    //Daylight time = UTC + 2 hours
@@ -260,8 +261,8 @@ Timezone myTZ(myCEST, myCET);
 TimeChangeRule *tcr;        //pointer to the time change rule, use to get TZ abbrev
 time_t utc, local;
 
-byte calcMinutes = 0;
-byte calcHours = 0;
+uint8_t calcMinutes = 0;
+uint8_t calcHours = 0;
 
 /*******************************************************************************
  Countdown
@@ -1324,37 +1325,19 @@ void readInternalTemperature(){
 *******************************************************************************/
 void setDS3231Alarm(byte minutes, byte hours) {
 
-  tmElements_t tm;
-  RTC.read(tm);
-
-  dayAlarm = 0;
-  hourAlarm = 0;
-  minuteAlarm = 0;
-  secondAlarm = 0;
-
-  if(tm.Minute + minutes >= 60){
-    hours += 1;
-    minuteAlarm = tm.Minute + minutes - 60;
-  } else {
-    minuteAlarm = tm.Minute + minutes;
-  }
-
-  if((hours + tm.Hour / 24) >= 1)
-  {
-    dayAlarm = tm.Day + (hours + tm.Hour / 24);
-    hourAlarm = hours + tm.Hour - (24 *(hours + tm.Hour / 24));
-  } else
-    {
-      dayAlarm = tm.Day;
-      hourAlarm = hours + tm.Hour;
-    }
-
-  DEBUG_PRINTLN(F("Alarm"));
-  DEBUG_PRINTLN(secondAlarm);
-  DEBUG_PRINTLN(minuteAlarm);
-  DEBUG_PRINTLN(hourAlarm);
-
-  RTC.setAlarm(ALM1_MATCH_HOURS, secondAlarm, minuteAlarm, hourAlarm, 1);
+  //tmElements_t tm;
+  //RTC.read(tm);
+  t = now();
+  DEBUG_PRINTLN(t);
+  t += minutes * 60 + hours * 3600;
+  DEBUG_PRINTLN(t);
+  RTC.setAlarm(ALM1_MATCH_DATE, second(t), minute(t), hour(t), day(t));
+  DEBUG_PRINT(hour(t));
+  DEBUG_PRINT(":");
+  DEBUG_PRINT(minute(t));
+  DEBUG_PRINT(":");
+  DEBUG_PRINTLN(second(t));
+  DEBUG_PRINTLN(day(t));
   RTC.alarm(ALARM_1);
   RTC.alarmInterrupt(ALARM_1, true);
 
@@ -1485,7 +1468,7 @@ double EEPROM_readDouble(int address)
 
    double value = 0.0;
    byte* p = (byte*)(void*)&value;
-   for (int i = 0; i < sizeof(value); i++)
+   for (uint16_t i = 0; i < sizeof(value); i++)
    {
       *p++ = EEPROM.read(address++);
    }
@@ -1665,11 +1648,17 @@ void refreshCountdown(){
       if(CountdownUpdateInterval < COUNTDOWN_UPDATE_INTERVAL){
         return;
       }
-      tmElements_t tm;
-      RTC.read(tm);
+      //tmElements_t tm;
+      //RTC.read(tm);
+      time_t trest = now();
 
+      calcMinutes = (t - trest) / 60;
+      calcHours = calcMinutes / 60;
+      calcMinutes -= calcHours * 60;
+
+      /*
       if(dayAlarm < tm.Day){
-        
+
       }
 
       if(minuteAlarm < tm.Minute) {
@@ -1679,7 +1668,7 @@ void refreshCountdown(){
         calcMinutes = minuteAlarm - tm.Minute;
         calcHours = hourAlarm - tm.Hour;
       }
-
+      */
       nhour_uv.setValue(calcHours);
       nmin_uv.setValue(calcMinutes);
 
@@ -2161,7 +2150,6 @@ void offEnterFunction(){
     nhour_uv.setValue(hours_oven);
     nmin_uv.setValue(minutes_oven);
     nSetpoint.setValue(int(Setpoint));
-    //sendCommand("ref 0");
     myPID.SetMode(MANUAL);
     controlLEDs(0, 0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
