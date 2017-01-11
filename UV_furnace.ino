@@ -52,7 +52,7 @@
 #include <stdlib.h>
 
 #define APP_NAME "UV furnace"
-const char VERSION[] = "Version 0.2";
+const char VERSION[] = "0.2";
 
 struct myBoolStruct
 {
@@ -260,9 +260,6 @@ Timezone myTZ(myCEST, myCET);
 
 TimeChangeRule *tcr;        //pointer to the time change rule, use to get TZ abbrev
 time_t utc, local;
-
-uint8_t calcMinutes = 0;
-uint8_t calcHours = 0;
 
 /*******************************************************************************
  Countdown
@@ -1652,28 +1649,14 @@ void refreshCountdown(){
       //RTC.read(tm);
       time_t trest = now();
 
-      calcMinutes = (t - trest) / 60;
-      calcHours = calcMinutes / 60;
+      uint8_t calcMinutes = (t - trest) / 60;
+      uint8_t calcHours = calcMinutes / 60;
       calcMinutes -= calcHours * 60;
 
-      /*
-      if(dayAlarm < tm.Day){
-
-      }
-
-      if(minuteAlarm < tm.Minute) {
-        calcMinutes = 60 - (tm.Minute - minuteAlarm);
-        calcHours = hourAlarm - tm.Hour - 1;
-      } else {
-        calcMinutes = minuteAlarm - tm.Minute;
-        calcHours = hourAlarm - tm.Hour;
-      }
-      */
       nhour_uv.setValue(calcHours);
       nmin_uv.setValue(calcMinutes);
 
-      Blynk.virtualWrite(V12, calcMinutes);
-      Blynk.virtualWrite(V13, calcHours);
+      Blynk.virtualWrite(V12, calcHours + ":" + calcMinutes);
 
       CountdownUpdateInterval = 0;
 }
@@ -2195,7 +2178,6 @@ void preheatUpdateFunction(){
    updateGraph();
    updateTemperature();
    fadePowerLED();
-   refreshCountdown();
    #ifdef USE_InfluxDB
        sendToInfluxDB();
    #endif
