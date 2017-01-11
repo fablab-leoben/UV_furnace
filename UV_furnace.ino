@@ -33,12 +33,9 @@
 #include "configuration.h"
 #include <PID_AutoTune_v0.h>
 #include <PID_v1.h>
-//Library for DS3231 clock
-#include <DS3232RTC.h>
 //Library for LCD touch screen
 #include <Nextion.h>
 #include <TimeLib.h>
-#include <Timezone.h>
 #include <SPI.h>
 #include "SD.h"
 // So we can save and retrieve settings
@@ -50,6 +47,7 @@
 #include "NexUpload.h"
 #include <SoftReset.h>
 #include <stdlib.h>
+#include <SimpleTimer.h>
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "0.2";
@@ -148,7 +146,7 @@ boolean readConfiguration();
 /************************************************
 Ethernet
 ************************************************/
-#define W5200_CS  10
+#define W5500_CS  10
 
 const unsigned int localPort = 8888;       // local port to listen for UDP packets
 char timeServer[] = "time.nist.gov"; // time.nist.gov NTP server
@@ -246,28 +244,6 @@ float temperatureSamples[NUMBER_OF_SAMPLES] = DUMMY_ARRAY;
 float averageTemperature;
 
 /*******************************************************************************
- DS3231
-*******************************************************************************/
-#define SQW_PIN 3
-#define DS3231_TEMP_INTERVAL   2000
-elapsedMillis DS3231TempInterval;
-time_t t;
-
-//Central European Time (Vienna, Berlin)
-TimeChangeRule myCEST = {"CEST", Last, Sat, Mar, 2, +120};    //Daylight time = UTC + 2 hours
-TimeChangeRule myCET = {"CET", Sun, Sun, Oct, 3, +60};     //Standard time = UTC + 1 hours
-Timezone myTZ(myCEST, myCET);
-
-TimeChangeRule *tcr;        //pointer to the time change rule, use to get TZ abbrev
-time_t utc, local;
-
-/*******************************************************************************
- Countdown
-*******************************************************************************/
-#define COUNTDOWN_UPDATE_INTERVAL   1000
-elapsedMillis CountdownUpdateInterval;
-
-/*******************************************************************************
  Power LED
 *******************************************************************************/
 #define POWERLED_BLINK_INTERVAL   500
@@ -316,15 +292,6 @@ elapsedMillis sdCard;
 /*******************************************************************************
  Display
 *******************************************************************************/
-
-/*******************************************************************************
- interrupt service routine for DS3231 clock
-*******************************************************************************/
-volatile boolean alarmIsrWasCalled = false;
-
-void alarmIsr(){
-    alarmIsrWasCalled = true;
-}
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -862,7 +829,7 @@ void bEnterPopCallback(void *ptr)
  *******************************************************************************/
  void selETH() {
   digitalWrite(SDCARD_CS, HIGH);
-  digitalWrite(W5200_CS, LOW);
+  digitalWrite(W5500_CS, LOW);
   digitalWrite(cs_MAX31855, HIGH);
 }
 
@@ -872,7 +839,7 @@ void bEnterPopCallback(void *ptr)
  * Return         : 0
  *******************************************************************************/
 void selSD() {
-  digitalWrite(W5200_CS, HIGH);
+  digitalWrite(W5500_CS, HIGH);
   digitalWrite(SDCARD_CS, LOW);
   digitalWrite(cs_MAX31855, HIGH);
 }
@@ -884,7 +851,7 @@ void selSD() {
  * Return         : 0
  *******************************************************************************/
 void selMAX31855(){
-  digitalWrite(W5200_CS, HIGH);
+  digitalWrite(W5500_CS, HIGH);
   digitalWrite(SDCARD_CS, HIGH);
   digitalWrite(cs_MAX31855, LOW);
 }
@@ -892,6 +859,13 @@ void selMAX31855(){
 /*******************************************************************************
  IO mapping
 *******************************************************************************/
+
+SimpleTimer timer;
+
+int CountdownRemainReset;
+long CountdownRemain;
+int CountdownTimer;
+
 void setup() {
   // Initialize LEDs:
   pinMode(LED1, OUTPUT);
@@ -974,9 +948,6 @@ void setup() {
 
   //declare and init pins
 
-  //Disable the default square wave of the SQW pin.
-  RTC.squareWave(SQWAVE_NONE);
-
   pinMode(LEDlight, OUTPUT);
   digitalWrite(LEDlight, 0);
 
@@ -985,9 +956,6 @@ void setup() {
 
   pinMode(onOffButton, OUTPUT);
   digitalWrite(onOffButton, onOffState);
-
-  pinMode(SQW_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(SQW_PIN), alarmIsr, FALLING);
 
   // Initialize the PID and related variables
   LoadParameters();
@@ -1118,23 +1086,58 @@ void loop() {
   }
 
   readTemperature();
-  readInternalTemperature();
   updateBlynk();
-  if (alarmIsrWasCalled){
-     if (RTC.alarm(ALARM_1)) {
-        DEBUG_PRINTLN("Alarm_1");
-        uvFurnaceStateMachine.transitionTo(offState);
-     }
-     if (RTC.alarm(ALARM_2)){
-        DEBUG_PRINTLN("Alarm_2");
-     }
-     alarmIsrWasCalled = false;
-  }
+
+  timer.run();
 
   //this function updates the FSM
   // the FSM is the heart of the UV furnace - all actions are defined by its states
   uvFurnaceStateMachine.update();
 }
+
+void CountdownTimerFunction() {
+  CountdownRemain--; // remove 1 every second
+  CountdownShowFormatted(CountdownRemain);
+  if (!CountdownRemain) { // check if CountdownRemain == 0/FALSE/LOW
+    timer.disable(CountdownTimer); // if 0 stop timer
+    //Blynk.virtualWrite(1, LOW); // reset START/STOP button status
+    Blynk.virtualWrite(V12, "Curing finished");
+    uvFurnaceStateMachine.transitionTo(offState);
+  } else {
+
+  }
+}
+
+void CountdownShowFormatted(int seconds) {
+  long days = 0;
+  long hours = 0;
+  long mins = 0;
+  long secs = 0;
+  String secs_o = ":";
+  String mins_o = ":";
+  String hours_o = ":";
+  secs = seconds; // set the seconds remaining
+  mins = secs / 60; //convert seconds to minutes
+  hours = mins / 60; //convert minutes to hours
+  days = hours / 24; //convert hours to days
+  secs = secs - (mins * 60); //subtract the coverted seconds to minutes in order to display 59 secs max
+  mins = mins - (hours * 60); //subtract the coverted minutes to hours in order to display 59 minutes max
+  hours = hours - (days * 24); //subtract the coverted hours to days in order to display 23 hours max
+  if (secs < 10) {
+    secs_o = ":0";
+  }
+  if (mins < 10) {
+    mins_o = ":0";
+  }
+  if (hours < 10) {
+    hours_o = ":0";
+  }
+  nhour_uv.setValue(hours);
+  nmin_uv.setValue(mins);
+  Blynk.virtualWrite(V12, days + hours_o + hours + mins_o + mins + secs_o + secs);
+}
+
+
 
 /*******************************************************************************
  * Function Name  : checkDoor
@@ -1300,48 +1303,6 @@ void readTemperature(){
 }
 
 /*******************************************************************************
- * Function Name  : readInternalTemperature
- * Description    : reads the temperature of the DS3231
- * Return         : 0
- *******************************************************************************/
-void readInternalTemperature(){
-  if(DS3231TempInterval < DS3231_TEMP_INTERVAL) {
-    return;
-  }
-
-  if(RTC.temperature() / 4.0 > 40) {
-    DEBUG_PRINTLN(F("ERROR"));
-    uvFurnaceStateMachine.immediateTransitionTo(offState);
-  }
-}
-
-/*******************************************************************************
- * Function Name  : setDS3231Alarm
- * Description    : sets the alarm for the time the user has choosen
- * Return         : 0
-*******************************************************************************/
-void setDS3231Alarm(byte minutes, byte hours) {
-
-  //tmElements_t tm;
-  //RTC.read(tm);
-  t = now();
-  DEBUG_PRINTLN(t);
-  t += minutes * 60 + hours * 3600;
-  DEBUG_PRINTLN(t);
-  RTC.setAlarm(ALM1_MATCH_DATE, second(t), minute(t), hour(t), day(t));
-  DEBUG_PRINT(hour(t));
-  DEBUG_PRINT(":");
-  DEBUG_PRINT(minute(t));
-  DEBUG_PRINT(":");
-  DEBUG_PRINTLN(second(t));
-  DEBUG_PRINTLN(day(t));
-  RTC.alarm(ALARM_1);
-  RTC.alarmInterrupt(ALARM_1, true);
-
-  return;
-}
-
-/*******************************************************************************
  * Function Name  : updateBlynk
  * Description    : updates the blynk app
  * Return         : 0
@@ -1353,10 +1314,30 @@ void updateBlynk(){
    //DEBUG_PRINTLN(F("updating Blynk"));
    Blynk.virtualWrite(V0, averageTemperature);
    Blynk.virtualWrite(V1, Setpoint);
-   Blynk.virtualWrite(V2, LED1_intensity);
-   Blynk.virtualWrite(V3, LED2_intensity);
-   Blynk.virtualWrite(V4, LED3_intensity);
-   Blynk.virtualWrite(V6, LED4_intensity);
+   if(myBoolean.bLED1State == true){
+     Blynk.virtualWrite(V2, LED1_intensity);
+   }else{
+     Blynk.virtualWrite(V2, 0);
+   }
+
+   if(myBoolean.bLED2State == true){
+     Blynk.virtualWrite(V3, LED2_intensity);
+   }else{
+     Blynk.virtualWrite(V3, 0);
+   }
+
+   if(myBoolean.bLED3State == true){
+     Blynk.virtualWrite(V4, LED3_intensity);
+   }else{
+     Blynk.virtualWrite(V4, 0);
+   }
+
+   if(myBoolean.bLED4State == true){
+     Blynk.virtualWrite(V6, LED4_intensity);
+   }else{
+     Blynk.virtualWrite(V6, 0);
+   }
+
    if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
     Blynk.virtualWrite(V5, 1);
    }else if(uvFurnaceStateMachine.isInState(offState)){
@@ -1609,59 +1590,6 @@ void sendToInfluxDB(){
 }
 
 /*******************************************************************************
- * Function Name  : sendNTPpacket
- * Description    : send an NTP request to the time server at the given address
- * Return         : timestamp
- *******************************************************************************/
-  void sendNTPpacket(char* address){
-  // set all bytes in the buffer to 0
-  memset(packetBuffer, 0, NTP_PACKET_SIZE);
-  // Initialize values needed to form NTP request
-  // (see URL above for details on the packets)
-  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
-  packetBuffer[1] = 0;     // Stratum, or type of clock
-  packetBuffer[2] = 6;     // Polling Interval
-  packetBuffer[3] = 0xEC;  // Peer Clock Precision
-  // 8 bytes of zero for Root Delay & Root Dispersion
-  packetBuffer[12]  = 49;
-  packetBuffer[13]  = 0x4E;
-  packetBuffer[14]  = 49;
-  packetBuffer[15]  = 52;
-
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:
-  Udp.beginPacket(address, 123); //NTP requests are to port 123
-  Udp.write(packetBuffer, NTP_PACKET_SIZE);
-  Udp.endPacket();
-}
-
-/*******************************************************************************
- * Function Name  : refreshCountdown
- * Description    : updates the countdown on the Display
- * Return         : 0
- *******************************************************************************/
-void refreshCountdown(){
-      //refresh countdown
-      if(CountdownUpdateInterval < COUNTDOWN_UPDATE_INTERVAL){
-        return;
-      }
-      //tmElements_t tm;
-      //RTC.read(tm);
-      time_t trest = now();
-
-      uint8_t calcMinutes = (t - trest) / 60;
-      uint8_t calcHours = calcMinutes / 60;
-      calcMinutes -= calcHours * 60;
-
-      nhour_uv.setValue(calcHours);
-      nmin_uv.setValue(calcMinutes);
-
-      Blynk.virtualWrite(V12, calcHours + ":" + calcMinutes);
-
-      CountdownUpdateInterval = 0;
-}
-
-/*******************************************************************************
  * Function Name  : blinkPowerLED
  * Description    : blinks the LED of the Power button
  * Return         : 0
@@ -1844,62 +1772,9 @@ void initEnterFunction(){
   initTimer = 0;
   page0.show();
   tVersion.setText(VERSION);
-  if(ethernetAvailable){
-    selETH();
-    sendNTPpacket(timeServer); // send an NTP packet to a time server
 
-    // wait to see if a reply is available
-    delay(1000);
-    if ( Udp.parsePacket() ) {
-      // We've received a packet, read the data from it
-      Udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-
-      //the timestamp starts at byte 40 of the received packet and is four bytes,
-      // or two words, long. First, extract the two words:
-
-      unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
-      unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
-      // combine the four bytes (two words) into a long integer
-      // this is NTP time (seconds since Jan 1 1900):
-      unsigned long secsSince1900 = highWord << 16 | lowWord;
-      DEBUG_PRINT(F("Seconds since Jan 1 1900 = " ));
-      DEBUG_PRINTLN(secsSince1900);
-
-      // now convert NTP time into everyday time:
-      DEBUG_PRINT(F("Unix time = "));
-      // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-      const unsigned long seventyYears = 2208988800UL;
-      // subtract seventy years:
-      unsigned long epoch = secsSince1900 - seventyYears;
-      // print Unix time:
-      DEBUG_PRINTLN(epoch);
-
-      setTime(epoch);
-      utc = now();
-      local = myTZ.toLocal(utc, &tcr);
-      RTC.set(local);                     //set the RTC from the system time
-    }
-    setSyncProvider(RTC.get);   // the function to get the time from the RTC
-    if(timeStatus()!= timeSet){
-        DEBUG_PRINTLN(F("Unable to sync with the RTC"));
-    }else{
-        DEBUG_PRINTLN(F("RTC has set the system time"));
-    }
-  }
-
-  tmElements_t tm;
-  RTC.read(tm);
-  DEBUG_PRINT(tm.Day, DEC);
-  DEBUG_PRINT(F("."));
-  DEBUG_PRINT(tm.Month, DEC);
-  DEBUG_PRINT(F("."));
-  DEBUG_PRINT(year(), DEC);
-  DEBUG_PRINT(F(" "));
-  DEBUG_PRINT(tm.Hour, DEC);
-  DEBUG_PRINT(F(":"));
-  DEBUG_PRINT(tm.Minute,DEC);
-  DEBUG_PRINT(F(":"));
-  DEBUG_PRINTLN(tm.Second,DEC);
+  CountdownTimer = timer.setInterval(1000, CountdownTimerFunction);
+  timer.disable(CountdownTimer); // disable it on boot
 }
 
 void initUpdateFunction(){
@@ -2066,8 +1941,9 @@ void setPIDExitFunction(){
 void runEnterFunction(){
    DEBUG_PRINTLN(F("runEnter"));
 
-   //set alarm
-   setDS3231Alarm(minutes_oven, hours_oven);
+   CountdownRemain = hours_oven * 60 * 60 + minutes_oven * 60;
+
+   timer.enable(CountdownTimer);
 
    controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
 
@@ -2090,7 +1966,6 @@ void runUpdateFunction(){
    updateGraph();
    updateTemperature();
    fadePowerLED();
-   refreshCountdown();
 
    #ifdef USE_InfluxDB
        sendToInfluxDB();
@@ -2112,8 +1987,6 @@ void errorEnterFunction(){
   //Turn off LEDs
   controlLEDs(0, 0, 0, 0);
   digitalWrite(RelayPin, LOW);  // make sure it is off
-  RTC.alarm(ALARM_1);
-  RTC.alarmInterrupt(ALARM_1, false);
   selETH();
   notifyUser("Error occured");
   Blynk.setProperty(V14, "color", "BLYNK_RED");
@@ -2136,7 +2009,6 @@ void offEnterFunction(){
     myPID.SetMode(MANUAL);
     controlLEDs(0, 0, 0, 0);
     digitalWrite(RelayPin, LOW);  // make sure it is off
-    RTC.alarmInterrupt(ALARM_1, false);
 
     if(myBoolean.preheat == 1){
       cPreheat.Set_background_crop_picc(1);
