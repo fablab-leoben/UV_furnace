@@ -420,7 +420,7 @@ void bOnOffPopCallback(void *ptr)
 {
     uint32_t picNum = 0;
     bOnOff.Get_background_crop_picc(&picNum);
-     if(picNum == 1) {
+     if(picNum == 1 && myBoolean.preheat == 0) {
       picNum = 2;
       uvFurnaceStateMachine.transitionTo(runState);
 
