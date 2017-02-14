@@ -48,6 +48,7 @@
 #include <SoftReset.h>
 #include <stdlib.h>
 #include <SimpleTimer.h>
+#include <Timer5.h>
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "0.2";
@@ -116,7 +117,7 @@ elapsedMillis initTimer;
 volatile boolean doorChanged;
 
 // ON/OFF Button LED
-#define onOffButton 12
+#define powerButton 12
 
 /************************************************
  LED variables
@@ -199,14 +200,6 @@ boolean tuning = false;
 PID_ATune aTune(&Input, &Output);
 
 /************************************************
- Timer Variables
-************************************************/
-byte hourAlarm = 0;
-byte minuteAlarm = 0;
-byte secondAlarm = 0;
-uint16_t dayAlarm = 0;
-
-/************************************************
  time settings variables for heating and leds
 ************************************************/
 uint32_t hours_oven = 0;
@@ -228,7 +221,7 @@ uint32_t minutes_LED = 0;
 //#define DO   22
 //#define CS   23
 //#define CLK  24
-#define MAX31855_SAMPLE_INTERVAL   100    // Sample room temperature every 5 seconds
+#define MAX31855_SAMPLE_INTERVAL   100    // Sample furnace temperature every 100 milliseconds
 //Adafruit_MAX31855 thermocouple(CLK, CS, DO);
 #define cs_MAX31855   47
 Adafruit_MAX31855 thermocouple(cs_MAX31855);
@@ -248,7 +241,7 @@ float averageTemperature;
 *******************************************************************************/
 #define POWERLED_BLINK_INTERVAL   500
 elapsedMillis POWERLEDBlinkInterval;
-boolean onOffState = HIGH;
+boolean powerState = HIGH;
 
 unsigned long fadeTime = 0;
 byte fadeValue;
@@ -954,8 +947,8 @@ void setup() {
   pinMode(reedSwitch, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
 
-  pinMode(onOffButton, OUTPUT);
-  digitalWrite(onOffButton, onOffState);
+  pinMode(powerButton, OUTPUT);
+  digitalWrite(powerButton, powerState);
 
   // Initialize the PID and related variables
   LoadParameters();
@@ -1038,12 +1031,13 @@ SIGNAL(TIMER2_OVF_vect)
   else
   {
     DriveOutput();
+
     //DEBUG_PRINTLN("DriveOutput");
   }
 }
 
 /************************************************
- Timer Interrupt Handler
+ Reed Switch Interrupt Handler
 ************************************************/
 void furnaceDoor() {
  doorChanged = !doorChanged;
@@ -1596,12 +1590,12 @@ void sendToInfluxDB(){
  *******************************************************************************/
 void blinkPowerLED(){
   if (POWERLEDBlinkInterval > POWERLED_BLINK_INTERVAL){
-    if (onOffState == LOW) {
-      onOffState = HIGH;
+    if (powerState == LOW) {
+      powerState = HIGH;
     } else {
-      onOffState = LOW;
+      powerState = LOW;
     }
-    digitalWrite(onOffButton, onOffState);
+    digitalWrite(powerButton, powerState);
     POWERLEDBlinkInterval = 0;
   }
 }
@@ -1614,7 +1608,7 @@ void blinkPowerLED(){
 void fadePowerLED(){
    fadeTime = millis();
    fadeValue = 128+127*cos(2*PI/periode*fadeTime);
-   analogWrite(onOffButton, fadeValue);           // sets the value (range from 0 to 255)
+   analogWrite(powerButton, fadeValue);           // sets the value (range from 0 to 255)
 }
 
 /*******************************************************************************
