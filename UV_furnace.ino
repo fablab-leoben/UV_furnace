@@ -860,9 +860,8 @@ void selMAX31855(){
 
 SimpleTimer timer;
 
-int CountdownRemainReset;
 uint32_t CountdownRemain;
-int CountdownTimer;
+uint32_t OldCountdownRemain = 0;
 
 void setup() {
   // Initialize LEDs:
@@ -1045,7 +1044,7 @@ ISR(timer5Event)
   // Make sure to do your work as fast as possible, since interrupts are automatically
   // disabled when this event happens (refer to interrupts() and noInterrupts() for
   // more information on that)
-  CountdownTimerFunction();
+  CountdownRemain--;
 }
 
 /************************************************
@@ -1102,7 +1101,7 @@ void loop() {
 }
 
 void CountdownTimerFunction() {
-  CountdownRemain--; // remove 1 every second
+   // remove 1 every second
   DEBUG_PRINTLN(CountdownRemain);
   CountdownShowFormatted(CountdownRemain);
 
@@ -1139,15 +1138,17 @@ void CountdownShowFormatted(uint32_t seconds) {
   if (hours < 10) {
     hours_o = ":0";
   }
+
+
 if(hours != oldhours){
   //DEBUG_PRINTLN(hours);
-  //nhour_uv.setValue(hours);
+  nhour_uv.setValue(hours);
 
   oldhours = hours;
 }
 if(mins != oldmins){
    //DEBUG_PRINTLN(mins);
-   //nmin_uv.setValue(mins);
+   nmin_uv.setValue(mins);
    Blynk.virtualWrite(V12, days + hours_o + hours + mins_o + mins);// + secs_o + secs);
 
    oldmins = mins;
@@ -1521,7 +1522,7 @@ void updateGraph(){
   }
   sChart.addValue(0, averageTemperature);
   sChart.addValue(1, Setpoint);
-  nmin_uv.setValue(mins);
+
   GraphUpdateInterval = 0;
 }
 
@@ -1919,6 +1920,11 @@ void runUpdateFunction(){
    updateGraph();
    updateTemperature();
    fadePowerLED();
+
+   if(OldCountdownRemain != CountdownRemain){
+     CountdownTimerFunction();
+     OldCountdownRemain = CountdownRemain;
+   }
 
    #ifdef USE_InfluxDB
        sendToInfluxDB();
