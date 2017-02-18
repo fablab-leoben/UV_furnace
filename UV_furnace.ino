@@ -1723,6 +1723,10 @@ void initEnterFunction(){
   page0.show();
   tVersion.setText(VERSION);
   TempTimer.setInterval(1000, readTemperature);
+
+  DEBUG_PRINTLN(F("starting Timer"));
+  startTimer5(1000000L);
+  pauseTimer5();
 }
 
 void initUpdateFunction(){
@@ -1893,10 +1897,6 @@ void runEnterFunction(){
    CountdownRemain = hours_oven * 60 * 60 + minutes_oven * 60;
    DEBUG_PRINTLN(CountdownRemain);
 
-   startTimer5(1000000L);
-   DEBUG_PRINTLN(F("starting Timer"));
-   //timer.enable(CountdownTimer);
-
    controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
 
    //turn the PID on
@@ -1905,6 +1905,8 @@ void runEnterFunction(){
 
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
+
+   resumeTimer5();
 
    //selETH();
    //Udp.begin(INFLUXDB_PORT);
@@ -1933,6 +1935,8 @@ void runUpdateFunction(){
 
 void runExitFunction(){
   DEBUG_PRINTLN(F("runExit"));
+
+  pauseTimer5();
 
   minutes_oven = 0;
   hours_oven = 0;
