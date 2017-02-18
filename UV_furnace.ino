@@ -53,6 +53,12 @@
 #define APP_NAME "UV furnace"
 const char VERSION[] = "0.2";
 
+uint32_t oldhours = 0;
+uint32_t oldmins = 0;
+const String secs_o = ":";
+const String mins_o = ":";
+const String hours_o = ":";
+
 struct myBoolStruct
 {
    uint8_t preset1: 1;
@@ -149,10 +155,6 @@ Ethernet
 ************************************************/
 #define W5500_CS  10
 
-const unsigned int localPort = 8888;       // local port to listen for UDP packets
-char timeServer[] = "time.nist.gov"; // time.nist.gov NTP server
-const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 bool ethernetAvailable = false;
 
 // A UDP instance to let us send and receive packets over UDP
@@ -221,19 +223,16 @@ uint32_t minutes_LED = 0;
 //#define DO   22
 //#define CS   23
 //#define CLK  24
-#define MAX31855_SAMPLE_INTERVAL   100    // Sample furnace temperature every 100 milliseconds
+
+SimpleTimer TempTimer;
+
 //Adafruit_MAX31855 thermocouple(CLK, CS, DO);
 #define cs_MAX31855   47
 Adafruit_MAX31855 thermocouple(cs_MAX31855);
-elapsedMillis MAX31855SampleInterval;
 float currentTemperature;
 float lastTemperature;
 bool newTemperature = false;
 
-const int NUMBER_OF_SAMPLES = 10;
-#define DUMMY -100
-#define DUMMY_ARRAY { DUMMY, DUMMY, DUMMY, DUMMY, DUMMY, DUMMY, DUMMY, DUMMY, DUMMY, DUMMY };
-float temperatureSamples[NUMBER_OF_SAMPLES] = DUMMY_ARRAY;
 float averageTemperature;
 
 /*******************************************************************************
@@ -264,7 +263,7 @@ char msg[30];
  Blynk
  Your blynk token goes in another file to avoid sharing it by mistake
 *******************************************************************************/
-#define BLYNK_INTERVAL   10000
+#define BLYNK_INTERVAL   33333
 elapsedMillis BlynkInterval;
 
 int pushNotification = 0;
@@ -427,7 +426,6 @@ void bOnOffPopCallback(void *ptr)
      bOnOff.Set_background_crop_picc(picNum);
      sendCommand("ref bOnOff");
 }
-
 //End Page1
 
 //Page2
@@ -623,7 +621,7 @@ void bHomeTempPopCallback(void *ptr)
 
     nTempSetup.getValue(&number);
     Setpoint = number;
-
+    Blynk.virtualWrite(V1, Setpoint);
     DEBUG_PRINTLN(Setpoint);
 
     uvFurnaceStateMachine.transitionTo(settingsState);
@@ -655,6 +653,7 @@ void bHomeTimerPopCallback(void *ptr)
 {
   nOvenMinuteT.getValue(&minutes_oven);
   nOvenHourT.getValue(&hours_oven);
+  DEBUG_PRINTLN(minutes_oven);
   uvFurnaceStateMachine.transitionTo(settingsState);
 }
 //End Page4
@@ -758,6 +757,12 @@ void bHomeLEDPopCallback(void *ptr)
       LED4_intensity = 0;
     }
 
+    Blynk.virtualWrite(V2, LED1_intensity);
+    Blynk.virtualWrite(V3, LED2_intensity);
+    Blynk.virtualWrite(V4, LED3_intensity);
+    Blynk.virtualWrite(V5, LED4_intensity);
+
+
     DEBUG_PRINTLN(LED1_mapped);
     DEBUG_PRINTLN(LED2_mapped);
     DEBUG_PRINTLN(LED3_mapped);
@@ -856,7 +861,7 @@ void selMAX31855(){
 SimpleTimer timer;
 
 int CountdownRemainReset;
-long CountdownRemain;
+uint32_t CountdownRemain;
 int CountdownTimer;
 
 void setup() {
@@ -868,12 +873,6 @@ void setup() {
   // Initialize Relay Control:
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
   digitalWrite(RelayPin, LOW);  // make sure it is off to start
-
-  //reset samples array to default so we fill it up with new samples
-  uint8_t i;
-  for (i=0; i<NUMBER_OF_SAMPLES; i++) {
-    temperatureSamples[i] = DUMMY;
-  }
 
   nexInit();
 
@@ -984,7 +983,6 @@ void setup() {
     DEBUG_PRINTLN(F("Ethernet not available"));
   } else {
     ethernetAvailable = true;
-    Udp.begin(localPort);
     DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
     DEBUG_PRINTLN(Ethernet.localIP());
   }
@@ -995,7 +993,6 @@ void setup() {
       DEBUG_PRINTLN(F("Ethernet not available"));
     } else {
       ethernetAvailable = true;
-      Udp.begin(localPort);
       DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
       DEBUG_PRINTLN(Ethernet.localIP());
     }
@@ -1034,6 +1031,21 @@ SIGNAL(TIMER2_OVF_vect)
 
     //DEBUG_PRINTLN("DriveOutput");
   }
+}
+
+// Define the function which will handle the notifications (interrupts)
+ISR(timer5Event)
+{
+  // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
+  resetTimer5();
+  // For a smaller and faster code, the line above could safely be replaced with a call
+  // to the function resetTimer1Unsafe() as, despite its name, it IS safe to call
+  // that function in here (interrupts are disabled)
+
+  // Make sure to do your work as fast as possible, since interrupts are automatically
+  // disabled when this event happens (refer to interrupts() and noInterrupts() for
+  // more information on that)
+  CountdownTimerFunction();
 }
 
 /************************************************
@@ -1079,7 +1091,7 @@ void loop() {
     doorChanged = false;
   }
 
-  readTemperature();
+  TempTimer.run();
   updateBlynk();
 
   timer.run();
@@ -1091,10 +1103,12 @@ void loop() {
 
 void CountdownTimerFunction() {
   CountdownRemain--; // remove 1 every second
+  DEBUG_PRINTLN(CountdownRemain);
   CountdownShowFormatted(CountdownRemain);
+
   if (!CountdownRemain) { // check if CountdownRemain == 0/FALSE/LOW
-    timer.disable(CountdownTimer); // if 0 stop timer
-    //Blynk.virtualWrite(1, LOW); // reset START/STOP button status
+    //timer.disable(CountdownTimer); // if 0 stop timer
+    Blynk.virtualWrite(1, LOW); // reset START/STOP button status
     Blynk.virtualWrite(V12, "Curing finished");
     uvFurnaceStateMachine.transitionTo(offState);
   } else {
@@ -1102,14 +1116,13 @@ void CountdownTimerFunction() {
   }
 }
 
-void CountdownShowFormatted(int seconds) {
-  long days = 0;
-  long hours = 0;
-  long mins = 0;
-  long secs = 0;
-  String secs_o = ":";
-  String mins_o = ":";
-  String hours_o = ":";
+uint32_t days = 0;
+uint32_t hours = 0;
+uint32_t mins = 15;
+uint32_t secs = 0;
+
+void CountdownShowFormatted(uint32_t seconds) {
+
   secs = seconds; // set the seconds remaining
   mins = secs / 60; //convert seconds to minutes
   hours = mins / 60; //convert minutes to hours
@@ -1126,12 +1139,20 @@ void CountdownShowFormatted(int seconds) {
   if (hours < 10) {
     hours_o = ":0";
   }
-  nhour_uv.setValue(hours);
-  nmin_uv.setValue(mins);
-  Blynk.virtualWrite(V12, days + hours_o + hours + mins_o + mins + secs_o + secs);
+if(hours != oldhours){
+  //DEBUG_PRINTLN(hours);
+  //nhour_uv.setValue(hours);
+
+  oldhours = hours;
 }
+if(mins != oldmins){
+   //DEBUG_PRINTLN(mins);
+   //nmin_uv.setValue(mins);
+   Blynk.virtualWrite(V12, days + hours_o + hours + mins_o + mins);// + secs_o + secs);
 
-
+   oldmins = mins;
+}
+}
 
 /*******************************************************************************
  * Function Name  : checkDoor
@@ -1161,9 +1182,11 @@ void updateTemperature()
     if(averageTemperature != lastTemperature && newTemperature == true)  {
       dtostrf(averageTemperature, 5, 1, buffer);
       tTemp.setText(buffer);
+      Blynk.virtualWrite(V0, averageTemperature);
+      Blynk.virtualWrite(V1, Setpoint);
       lastTemperature = averageTemperature;
+      newTemperature = false;
     }
-    newTemperature = false;
 }
 
 /*******************************************************************************
@@ -1176,15 +1199,8 @@ void updateTemperature()
  * Return         : 0
  *******************************************************************************/
 void readTemperature(){
-   //time is up? no, then come back later
-   if (MAX31855SampleInterval < MAX31855_SAMPLE_INTERVAL) {
-    return;
-   }
-
    selMAX31855();
 
-   //time is up, reset timer
-   MAX31855SampleInterval = 0;
    // MAX31855 thermocouple voltage reading in mV
    float thermocoupleVoltage = (thermocouple.readCelsius() - thermocouple.readInternal()) * 0.041276;
 
@@ -1264,35 +1280,13 @@ void readTemperature(){
       b8 * pow(voltageSum, 8.0) +
       b9 * pow(voltageSum, 9.0);
 
-    uint8_t i;
-    for (i=0; i< NUMBER_OF_SAMPLES; i++) {
-        //store the sample in the next available 'slot' in the array of samples
-        if ( temperatureSamples[i] == DUMMY) {
-            temperatureSamples[i] = currentTemperature;
-        break;
-        }
-    }
+      currentTemperature *= 10;
+      currentTemperature = (int)currentTemperature;
+      currentTemperature /= 10;
 
-    //is the samples array full? if not, exit and get a new sample
-    if ( temperatureSamples[NUMBER_OF_SAMPLES-1] == DUMMY) {
-        return;
-    }
+    averageTemperature = currentTemperature;
 
-    // average all the samples out
-    averageTemperature = 0;
-
-    for (i=0; i<NUMBER_OF_SAMPLES; i++) {
-        averageTemperature += temperatureSamples[i];
-    }
-    averageTemperature /= NUMBER_OF_SAMPLES;
-    averageTemperature = int((averageTemperature + 0.05) * 10);
-    averageTemperature /= 10;
-
-    //reset samples array to default so we fill it up again with new samples
-    for (i=0; i<NUMBER_OF_SAMPLES; i++) {
-        temperatureSamples[i] = DUMMY;
-    }
-    DEBUG_PRINTLN(averageTemperature);
+    DEBUG_PRINTLN(averageTemperature, 1);
     newTemperature = true;
 }
 
@@ -1306,49 +1300,13 @@ void updateBlynk(){
     return;
    }
    //DEBUG_PRINTLN(F("updating Blynk"));
-   Blynk.virtualWrite(V0, averageTemperature);
-   Blynk.virtualWrite(V1, Setpoint);
-   if(myBoolean.bLED1State == true){
-     Blynk.virtualWrite(V2, LED1_intensity);
-   }else{
-     Blynk.virtualWrite(V2, 0);
-   }
 
-   if(myBoolean.bLED2State == true){
-     Blynk.virtualWrite(V3, LED2_intensity);
-   }else{
-     Blynk.virtualWrite(V3, 0);
-   }
+   Blynk.syncVirtual(V9, V10, V11);
 
-   if(myBoolean.bLED3State == true){
-     Blynk.virtualWrite(V4, LED3_intensity);
-   }else{
-     Blynk.virtualWrite(V4, 0);
-   }
-
-   if(myBoolean.bLED4State == true){
-     Blynk.virtualWrite(V6, LED4_intensity);
-   }else{
-     Blynk.virtualWrite(V6, 0);
-   }
-
-   if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState)){
-    Blynk.virtualWrite(V5, 1);
-   }else if(uvFurnaceStateMachine.isInState(offState)){
-    Blynk.virtualWrite(V5, 0);
-   }
-   Blynk.syncVirtual(V9);
-   Blynk.syncVirtual(V10);
-   if(uvFurnaceStateMachine.isInState(errorState)){
-      Blynk.setProperty(V14, "color", BLYNK_RED);
-      Blynk.virtualWrite(V14, BLYNK_RED);
-      Blynk.virtualWrite(V14, 255);
-   } else{
-      Blynk.setProperty(V14, "color", BLYNK_GREEN);
-      Blynk.virtualWrite(V14, BLYNK_GREEN);
-      Blynk.virtualWrite(V14, 255);
-   }
-   BlynkInterval = 0;
+      //Blynk.setProperty(V14, "color", BLYNK_GREEN);
+      //Blynk.virtualWrite(V14, BLYNK_GREEN);
+      //Blynk.virtualWrite(V14, 255);
+  BlynkInterval = 0;
 }
 
 /*******************************************************************************
@@ -1563,6 +1521,7 @@ void updateGraph(){
   }
   sChart.addValue(0, averageTemperature);
   sChart.addValue(1, Setpoint);
+  nmin_uv.setValue(mins);
   GraphUpdateInterval = 0;
 }
 
@@ -1590,11 +1549,7 @@ void sendToInfluxDB(){
  *******************************************************************************/
 void blinkPowerLED(){
   if (POWERLEDBlinkInterval > POWERLED_BLINK_INTERVAL){
-    if (powerState == LOW) {
-      powerState = HIGH;
-    } else {
-      powerState = LOW;
-    }
+    !powerState;
     digitalWrite(powerButton, powerState);
     POWERLEDBlinkInterval = 0;
   }
@@ -1766,9 +1721,7 @@ void initEnterFunction(){
   initTimer = 0;
   page0.show();
   tVersion.setText(VERSION);
-
-  CountdownTimer = timer.setInterval(1000, CountdownTimerFunction);
-  timer.disable(CountdownTimer); // disable it on boot
+  TempTimer.setInterval(1000, readTemperature);
 }
 
 void initUpdateFunction(){
@@ -1779,6 +1732,8 @@ void initUpdateFunction(){
   }
 }
 void initExitFunction(){
+  Blynk.virtualWrite(V12, "0:00:00");
+
   DEBUG_PRINTLN(F("Initialization done"));
 }
 
@@ -1934,10 +1889,12 @@ void setPIDExitFunction(){
 
 void runEnterFunction(){
    DEBUG_PRINTLN(F("runEnter"));
-
    CountdownRemain = hours_oven * 60 * 60 + minutes_oven * 60;
+   DEBUG_PRINTLN(CountdownRemain);
 
-   timer.enable(CountdownTimer);
+   startTimer5(1000000L);
+   DEBUG_PRINTLN(F("starting Timer"));
+   //timer.enable(CountdownTimer);
 
    controlLEDs(LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
 
@@ -1948,9 +1905,11 @@ void runEnterFunction(){
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
 
-   selETH();
-   Udp.begin(INFLUXDB_PORT);
-   InfluxdbUpdateInterval = 0;
+   //selETH();
+   //Udp.begin(INFLUXDB_PORT);
+   //InfluxdbUpdateInterval = 0;
+
+   Blynk.virtualWrite(V5, 1);
 }
 
 void runUpdateFunction(){
@@ -1983,8 +1942,12 @@ void errorEnterFunction(){
   digitalWrite(RelayPin, LOW);  // make sure it is off
   selETH();
   notifyUser("Error occured");
-  Blynk.setProperty(V14, "color", "BLYNK_RED");
+
+  Blynk.setProperty(V14, "color", BLYNK_RED);
+  Blynk.virtualWrite(V14, BLYNK_RED);
+  Blynk.virtualWrite(V14, 255);
 }
+
 void errorUpdateFunction(){
   DEBUG_PRINTLN(F("errorUpdate"));
   blinkPowerLED();
@@ -1995,6 +1958,8 @@ void errorExitFunction(){
 }
 
 void offEnterFunction(){
+    pauseTimer5();
+
     DEBUG_PRINTLN(F("offEnter"));
     page1.show();
     nhour_uv.setValue(hours_oven);
@@ -2009,6 +1974,7 @@ void offEnterFunction(){
     } else{
         cPreheat.Set_background_crop_picc(2);
     }
+    Blynk.virtualWrite(V5, 0);
 }
 
 void offUpdateFunction(){
@@ -2033,9 +1999,11 @@ void preheatEnterFunction(){
    tToast.setText("preheating");
    tToast.Set_background_crop_picc(1);
 
-   selETH();
-   Udp.begin(INFLUXDB_PORT);
-   InfluxdbUpdateInterval = 0;
+   //selETH();
+   //Udp.begin(INFLUXDB_PORT);
+   //InfluxdbUpdateInterval = 0;
+
+   Blynk.virtualWrite(V5, 1);
 }
 
 void preheatUpdateFunction(){
