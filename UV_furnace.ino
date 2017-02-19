@@ -1,6 +1,6 @@
 /* UV furnace                                                          *
  *                                                                      *
- * Copyright 2016 Thomas Rockenbauer, Fablab Leoben,                    *
+ * Copyright 2017 Thomas Rockenbauer, Fablab Leoben,                    *
  * rockenbauer.thomas@gmail.com                                         *
  *                                                                      *
  * http://www.fablab-leoben.at                                          *
@@ -33,20 +33,16 @@
 #include "configuration.h"
 #include <PID_AutoTune_v0.h>
 #include <PID_v1.h>
-//Library for LCD touch screen
-#include <Nextion.h>
-#include <TimeLib.h>
+#include <Nextion.h> //Library for LCD touch screen
 #include <SPI.h>
 #include "SD.h"
-// So we can save and retrieve settings
-#include <EEPROM.h>
+#include <EEPROM.h> // So we can save and retrieve settings
 #include <Adafruit_MAX31855.h>
 #include <elapsedMillis.h>
 #include <FiniteStateMachine.h>
 #include <SDConfigFile.h>
 #include "NexUpload.h"
 #include <SoftReset.h>
-#include <stdlib.h>
 #include <SimpleTimer.h>
 #include <Timer5.h>
 
@@ -75,7 +71,7 @@ struct myBoolStruct
 };
 myBoolStruct myBoolean;
 
-//compatibility with Arduino IDE 1.6.9+
+// FSM compatibility with Arduino IDE 1.6.9+
 void dummy(){}
 
 /*******************************************************************************
@@ -1722,17 +1718,6 @@ void initExitFunction(){
   DEBUG_PRINTLN(F("Initialization done"));
 }
 
-void idleEnterFunction(){
-
-  //DEBUG_PRINTLN(F("idleEnter"));
-}
-void idleUpdateFunction(){
-  //DEBUG_PRINTLN(F("idleUpdate"));
-}
-void idleExitFunction(){
-  //DEBUG_PRINTLN(F("idleExit"));
-}
-
 void settingsEnterFunction(){
   DEBUG_PRINTLN(F("settingsEnter"));
   page2.show();
@@ -1809,7 +1794,6 @@ void setLEDsUpdateFunction(){
 
 void setLEDsExitFunction(){
   DEBUG_PRINTLN("setLEDsExit");
-
 }
 
 void setTempEnterFunction(){
@@ -1882,7 +1866,6 @@ void runEnterFunction(){
    //turn the PID on
    myPID.SetMode(AUTOMATIC);
    windowStartTime = millis();
-
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
 
@@ -1981,7 +1964,6 @@ void preheatEnterFunction(){
     //turn the PID on
    myPID.SetMode(AUTOMATIC);
    windowStartTime = millis();
-
    SaveParameters();
    myPID.SetTunings(Kp,Ki,Kd);
 
