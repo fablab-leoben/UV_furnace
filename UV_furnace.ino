@@ -219,10 +219,6 @@ uint32_t minutes_LED = 0;
  Creating a thermocouple instance with software SPI on any three
  digital IO pins.
 *******************************************************************************/
-//#define DO   22
-//#define CS   23
-//#define CLK  24
-
 SimpleTimer TempTimer;
 
 //Adafruit_MAX31855 thermocouple(CLK, CS, DO);
@@ -466,7 +462,6 @@ void bPreSet2PopCallback(void *ptr)
     } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset2 = 0;
-
     }
     //DEBUG_PRINTLN(picNum);
     bPreSet2.Set_background_crop_picc(picNum);
@@ -482,12 +477,11 @@ void bPreSet3PopCallback(void *ptr)
       turnOffPresetButtons();
       myBoolean.didReadConfig = readConfiguration(CONFIG_preset3);
       myBoolean.preset3 = 1;
-
-    } else if(picNum == 5) {
+  } else if(picNum == 5) {
       picNum = 3;
       myBoolean.preset3 = 0;
 
-    }
+  }
     //DEBUG_PRINTLN(picNum);
     bPreSet3.Set_background_crop_picc(picNum);
     sendCommand("ref bPreSet3");}
@@ -673,8 +667,6 @@ void bLED1PopCallback(void *ptr)
     sendCommand("ref bLED1");
 }
 
-
-
 void bLED2PopCallback(void *ptr)
 {
     uint32_t picNum = 0;
@@ -813,10 +805,7 @@ void bHomeCreditsPopCallback(void *ptr)
 //page9
 void bEnterPopCallback(void *ptr)
 {
-
 }
-
-
 /*******************************************************************************
  * Function Name  : selETH
  * Description    : selects the Ethernet chip to make communication possible
@@ -851,10 +840,6 @@ void selMAX31855(){
   digitalWrite(cs_MAX31855, LOW);
 }
 
-/*******************************************************************************
- IO mapping
-*******************************************************************************/
-
 SimpleTimer timer;
 
 uint32_t CountdownRemain;
@@ -870,7 +855,15 @@ void setup() {
   pinMode(RelayPin, OUTPUT);    // Output mode to drive relay
   digitalWrite(RelayPin, LOW);  // make sure it is off to start
 
-  nexInit();
+  //declare and init pins
+  pinMode(LEDlight, OUTPUT);
+  digitalWrite(LEDlight, 0);
+
+  pinMode(reedSwitch, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
+
+  pinMode(powerButton, OUTPUT);
+  digitalWrite(powerButton, powerState);
 
   myBoolean.preset1 = 0;
   myBoolean.preset2 = 0;
@@ -886,7 +879,11 @@ void setup() {
   myBoolean.bLED4State = false;
 
   myBoolean.didReadConfig = false;
+}
 
+void initDisplay()
+{
+  nexInit();
   /* Register the pop event callback function of the current button component. */
   //Page1
   bOnOff.attachPop(bOnOffPopCallback, &bOnOff);
@@ -933,83 +930,6 @@ void setup() {
 
   //page9
   bEnter.attachPop(bEnterPopCallback, &bEnter);
-
-  //declare and init pins
-
-  pinMode(LEDlight, OUTPUT);
-  digitalWrite(LEDlight, 0);
-
-  pinMode(reedSwitch, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(reedSwitch), furnaceDoor, CHANGE);
-
-  pinMode(powerButton, OUTPUT);
-  digitalWrite(powerButton, powerState);
-
-  // Initialize the PID and related variables
-  LoadParameters();
-  myPID.SetTunings(Kp,Ki,Kd);
-  myPID.SetSampleTime(1000);
-  myPID.SetOutputLimits(0, WindowSize);
-
-  //Initializing Chip Select pin for MAX31855
-  pinMode(cs_MAX31855, OUTPUT);
-  selMAX31855();
-
-  selSD();
-  //Initializing SD Card
-  DEBUG_PRINTLN(F("Initializing SD card..."));
-  // make sure that the default chip select pin is set to
-  // output, even if you don't use it:
-  //pinMode(4, OUTPUT);
-  //digitalWrite(4, HIGH);
-    // see if the card is present and can be initialized:
-
-  if (!SD.begin(SDCARD_CS)) {
-    DEBUG_PRINTLN(F("Card failed, or not present"));
-    // ToDo: disable reading preset from sd card
-  } else{
-    DEBUG_PRINTLN(F("card initialized."));
-  }
-
-  selETH();
-  #ifdef USE_Static_IP
-  DEBUG_PRINTLN(F("using static IP..."));
-  if(Ethernet.begin(mac, ip, dnsServer, gateway, subnet == 0)) {
-    ethernetAvailable = false;
-    DEBUG_PRINTLN(F("Ethernet not available"));
-  } else {
-    ethernetAvailable = true;
-    DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
-    DEBUG_PRINTLN(Ethernet.localIP());
-  }
-  #else
-    DEBUG_PRINTLN(F("using dynamic IP..."));
-    if(Ethernet.begin(mac) == 0) {
-      ethernetAvailable = false;
-      DEBUG_PRINTLN(F("Ethernet not available"));
-    } else {
-      ethernetAvailable = true;
-      DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
-      DEBUG_PRINTLN(Ethernet.localIP());
-    }
-   #endif
-
-  // Run timer2 interrupt every 15 ms
-  TCCR2A = 0;
-  TCCR2B = 1<<CS22 | 1<<CS21 | 1<<CS20;
-
-  //Timer2 Overflow Interrupt Enable
-  TIMSK2 |= 1<<TOIE2;
-
-   #ifdef USE_Blynk
-    //init Blynk
-    if(ethernetAvailable){
-      Blynk.begin(auth);
-    }
-   #endif
-
-  DEBUG_PRINTLN(F("setup ready"));
-
 }
 
 /************************************************
@@ -1718,6 +1638,72 @@ void initEnterFunction(){
   initTimer = 0;
   page0.show();
   tVersion.setText(VERSION);
+
+  initDisplay();
+
+  // Initialize the PID and related variables
+  LoadParameters();
+  myPID.SetTunings(Kp,Ki,Kd);
+  myPID.SetSampleTime(1000);
+  myPID.SetOutputLimits(0, WindowSize);
+
+  //Initializing Chip Select pin for MAX31855
+  pinMode(cs_MAX31855, OUTPUT);
+
+  selSD();
+  //Initializing SD Card
+  DEBUG_PRINTLN(F("Initializing SD card..."));
+  // make sure that the default chip select pin is set to
+  // output, even if you don't use it:
+  //pinMode(4, OUTPUT);
+  //digitalWrite(4, HIGH);
+    // see if the card is present and can be initialized:
+
+  if (!SD.begin(SDCARD_CS)) {
+    DEBUG_PRINTLN(F("Card failed, or not present"));
+    // ToDo: disable reading preset from sd card
+  } else{
+    DEBUG_PRINTLN(F("card initialized."));
+  }
+
+  selETH();
+  #ifdef USE_Static_IP
+  DEBUG_PRINTLN(F("using static IP..."));
+  if(Ethernet.begin(mac, ip, dnsServer, gateway, subnet == 0)) {
+    ethernetAvailable = false;
+    DEBUG_PRINTLN(F("Ethernet not available"));
+  } else {
+    ethernetAvailable = true;
+    DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
+    DEBUG_PRINTLN(Ethernet.localIP());
+  }
+  #else
+    DEBUG_PRINTLN(F("using dynamic IP..."));
+    if(Ethernet.begin(mac) == 0) {
+      ethernetAvailable = false;
+      DEBUG_PRINTLN(F("Ethernet not available"));
+    } else {
+      ethernetAvailable = true;
+      DEBUG_PRINTLN(F("IP number assigned by DHCP is "));
+      DEBUG_PRINTLN(Ethernet.localIP());
+    }
+   #endif
+
+  // Run timer2 interrupt every 15 ms
+  TCCR2A = 0;
+  TCCR2B = 1<<CS22 | 1<<CS21 | 1<<CS20;
+
+  //Timer2 Overflow Interrupt Enable
+  TIMSK2 |= 1<<TOIE2;
+
+   #ifdef USE_Blynk
+    //init Blynk
+    if(ethernetAvailable){
+      Blynk.begin(auth);
+    }
+   #endif
+  DEBUG_PRINTLN(F("setup ready"));
+
   TempTimer.setInterval(1000, readTemperature);
 
   DEBUG_PRINTLN(F("starting Timer"));
@@ -1733,8 +1719,6 @@ void initUpdateFunction(){
   }
 }
 void initExitFunction(){
-  Blynk.virtualWrite(V12, "0:00:00");
-
   DEBUG_PRINTLN(F("Initialization done"));
 }
 
@@ -1931,7 +1915,6 @@ void runUpdateFunction(){
 
 void runExitFunction(){
   DEBUG_PRINTLN(F("runExit"));
-
   pauseTimer5();
 
   minutes_oven = 0;
@@ -1981,6 +1964,7 @@ void offEnterFunction(){
         cPreheat.Set_background_crop_picc(2);
     }
     Blynk.virtualWrite(V5, 0);
+    Blynk.virtualWrite(V12, "0:00:00");
 }
 
 void offUpdateFunction(){
@@ -1989,7 +1973,6 @@ void offUpdateFunction(){
 }
 
 void offExitFunction(){
-
 }
 
 void preheatEnterFunction(){
@@ -2004,10 +1987,6 @@ void preheatEnterFunction(){
 
    tToast.setText("preheating");
    tToast.Set_background_crop_picc(1);
-
-   //selETH();
-   //Udp.begin(INFLUXDB_PORT);
-   //InfluxdbUpdateInterval = 0;
 
    Blynk.virtualWrite(V5, 1);
 }
@@ -2024,7 +2003,6 @@ void preheatUpdateFunction(){
 
    if(currentTemperature >= (Setpoint * 0.975) && currentTemperature <= (Setpoint * 1.025)){
           uvFurnaceStateMachine.transitionTo(runState);
-
           notifyUser("Preheating done!");
    }
 }
