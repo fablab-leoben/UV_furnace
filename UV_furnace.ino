@@ -55,9 +55,6 @@ const char VERSION[] = "0.2";
 
 uint32_t oldhours = 0;
 uint32_t oldmins = 0;
-const String secs_o = ":";
-const String mins_o = ":";
-const String hours_o = ":";
 
 struct myBoolStruct
 {
@@ -78,7 +75,7 @@ struct myBoolStruct
 };
 myBoolStruct myBoolean;
 
-//compatibility with Arduino IDE 1.6.9
+//compatibility with Arduino IDE 1.6.9+
 void dummy(){}
 
 /*******************************************************************************
@@ -86,7 +83,6 @@ void dummy(){}
 *******************************************************************************/
 State dummyState = State(dummy);
 State initState = State( initEnterFunction, initUpdateFunction, initExitFunction );
-State idleState = State( idleEnterFunction, idleUpdateFunction, idleExitFunction );
 State settingsState = State( settingsEnterFunction, settingsUpdateFunction, settingsExitFunction );
 State setLEDs = State( setLEDsEnterFunction, setLEDsUpdateFunction, setLEDsExitFunction );
 State setTemp = State( setTempEnterFunction, setTempUpdateFunction, setTempExitFunction );
@@ -107,7 +103,6 @@ elapsedMillis initTimer;
 /************************************************
  Pin definitions
 ************************************************/
-
 // LEDs
 #define LED1 5
 #define LED2 6
@@ -124,6 +119,12 @@ volatile boolean doorChanged;
 
 // ON/OFF Button LED
 #define powerButton 12
+
+// Ethernet
+#define W5500_CS  10
+
+// SD card
+#define SDCARD_CS = 4;
 
 /************************************************
  LED variables
@@ -153,8 +154,6 @@ boolean readConfiguration();
 /************************************************
 Ethernet
 ************************************************/
-#define W5500_CS  10
-
 bool ethernetAvailable = false;
 
 // A UDP instance to let us send and receive packets over UDP
@@ -213,7 +212,7 @@ uint32_t minutes_LED = 0;
 /************************************************
  chart definitions for Nextion 4,3" display
 ************************************************/
-#define inputOffset 0
+
 
 /*******************************************************************************
  MAX31855 Thermocouple Amplifier
@@ -233,7 +232,7 @@ float currentTemperature;
 float lastTemperature;
 bool newTemperature = false;
 
-float averageTemperature;
+#define inputOffset 0
 
 /*******************************************************************************
  Power LED
@@ -276,7 +275,6 @@ int twitterNotification = 0;
 /*******************************************************************************
  SD-Card
 *******************************************************************************/
-const int SDCARD_CS = 4;
 File dataFile;
 #define SD_CARD_SAMPLE_INTERVAL   1000
 elapsedMillis sdCard;
@@ -284,6 +282,7 @@ elapsedMillis sdCard;
 /*******************************************************************************
  Display
 *******************************************************************************/
+char buffer[10] = {0};
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -375,8 +374,6 @@ NexButton bHomeCredits = NexButton(8, 1, "bHomeCredits");
 
 //page9
 NexButton bEnter = NexButton(9, 2, "bEnter");
-
-char buffer[10] = {0};
 
 NexTouch *nex_listen_list[] =
 {
@@ -762,7 +759,6 @@ void bHomeLEDPopCallback(void *ptr)
     Blynk.virtualWrite(V4, LED3_intensity);
     Blynk.virtualWrite(V5, LED4_intensity);
 
-
     DEBUG_PRINTLN(LED1_mapped);
     DEBUG_PRINTLN(LED2_mapped);
     DEBUG_PRINTLN(LED3_mapped);
@@ -802,7 +798,7 @@ void bAutotunePopCallback(void *ptr)
 //Page7
 void bResetPopCallback(void *ptr)
 {
-
+  
 }
 //End Page7
 
@@ -1121,7 +1117,6 @@ uint32_t mins = 15;
 uint32_t secs = 0;
 
 void CountdownShowFormatted(uint32_t seconds) {
-
   secs = seconds; // set the seconds remaining
   mins = secs / 60; //convert seconds to minutes
   hours = mins / 60; //convert minutes to hours
@@ -1129,6 +1124,10 @@ void CountdownShowFormatted(uint32_t seconds) {
   secs = secs - (mins * 60); //subtract the coverted seconds to minutes in order to display 59 secs max
   mins = mins - (hours * 60); //subtract the coverted minutes to hours in order to display 59 minutes max
   hours = hours - (days * 24); //subtract the coverted hours to days in order to display 23 hours max
+  const String secs_o = ":";
+  const String mins_o = ":";
+  const String hours_o = ":";
+
   if (secs < 10) {
     secs_o = ":0";
   }
@@ -1139,20 +1138,18 @@ void CountdownShowFormatted(uint32_t seconds) {
     hours_o = ":0";
   }
 
+  if(hours != oldhours){
+    //DEBUG_PRINTLN(hours);
+    nhour_uv.setValue(hours);
+    oldhours = hours;
+  }
 
-if(hours != oldhours){
-  //DEBUG_PRINTLN(hours);
-  nhour_uv.setValue(hours);
-
-  oldhours = hours;
-}
-if(mins != oldmins){
-   //DEBUG_PRINTLN(mins);
-   nmin_uv.setValue(mins);
-   Blynk.virtualWrite(V12, days + hours_o + hours + mins_o + mins);// + secs_o + secs);
-
-   oldmins = mins;
-}
+  if(mins != oldmins){
+    //DEBUG_PRINTLN(mins);
+    nmin_uv.setValue(mins);
+    Blynk.virtualWrite(V12, days + hours_o + hours + mins_o + mins);// + secs_o + secs);
+    oldmins = mins;
+  }
 }
 
 /*******************************************************************************
@@ -1180,12 +1177,12 @@ void checkDoor(){
  *******************************************************************************/
 void updateTemperature()
 {
-    if(averageTemperature != lastTemperature && newTemperature == true)  {
-      dtostrf(averageTemperature, 5, 1, buffer);
+    if(currentTemperature != lastTemperature && newTemperature == true)  {
+      dtostrf(currentTemperature, 5, 1, buffer);
       tTemp.setText(buffer);
-      Blynk.virtualWrite(V0, averageTemperature);
+      Blynk.virtualWrite(V0, currentTemperature);
       Blynk.virtualWrite(V1, Setpoint);
-      lastTemperature = averageTemperature;
+      lastTemperature = currentTemperature;
       newTemperature = false;
     }
 }
@@ -1285,9 +1282,7 @@ void readTemperature(){
       currentTemperature = (int)currentTemperature;
       currentTemperature /= 10;
 
-    averageTemperature = currentTemperature;
-
-    DEBUG_PRINTLN(averageTemperature, 1);
+    DEBUG_PRINTLN(currentTemperature, 1);
     newTemperature = true;
 }
 
@@ -1414,7 +1409,7 @@ double EEPROM_readDouble(int address)
 void DoControl()
 {
   // Read the input:
-    Input = averageTemperature;
+    Input = currentTemperature;
 
   if (tuning) // run the auto-tuner
   {
@@ -1520,7 +1515,7 @@ void updateGraph(){
   if(GraphUpdateInterval < GRAPH_UPDATE_INTERVAL){
     return;
   }
-  sChart.addValue(0, averageTemperature);
+  sChart.addValue(0, currentTemperature);
   sChart.addValue(1, Setpoint);
 
   GraphUpdateInterval = 0;
@@ -1531,8 +1526,8 @@ void sendToInfluxDB(){
     return;
   }
   selETH();
-  int c = averageTemperature;
-  int d = averageTemperature * 100;
+  int c = currentTemperature;
+  int d = currentTemperature * 100;
   d = d % 100;
 
   sprintf(msg, "UV Tset=%d,T=%d.%d,LED1=%lu,LED2=%lu,LED3=%lu,LED4=%lu", int(Setpoint), c, d, LED1_intensity, LED2_intensity, LED3_intensity, LED4_intensity);
@@ -2026,7 +2021,7 @@ void preheatUpdateFunction(){
        sendToInfluxDB();
    #endif
 
-   if(averageTemperature >= (Setpoint * 0.975) && averageTemperature <= (Setpoint * 1.025)){
+   if(currentTemperature >= (Setpoint * 0.975) && currentTemperature <= (Setpoint * 1.025)){
           uvFurnaceStateMachine.transitionTo(runState);
 
           notifyUser("Preheating done!");
