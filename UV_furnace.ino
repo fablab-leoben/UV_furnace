@@ -124,7 +124,7 @@ volatile boolean doorChanged;
 #define W5500_CS  10
 
 // SD card
-#define SDCARD_CS = 4;
+#define SDCARD_CS  4
 
 /************************************************
  LED variables
@@ -798,7 +798,8 @@ void bAutotunePopCallback(void *ptr)
 //Page7
 void bResetPopCallback(void *ptr)
 {
-  
+  delay(500);
+  soft_restart();
 }
 //End Page7
 
