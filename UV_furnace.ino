@@ -1098,7 +1098,12 @@ void updateTemperature()
       dtostrf(currentTemperature, 5, 1, buffer);
       tTemp.setText(buffer);
       Blynk.virtualWrite(V0, currentTemperature);
-      Blynk.virtualWrite(V1, Setpoint);
+
+      if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState))
+      {
+        Blynk.virtualWrite(V20, currentTemperature);
+        Blynk.virtualWrite(V21, Setpoint);
+      }
       lastTemperature = currentTemperature;
       newTemperature = false;
     }
@@ -1630,12 +1635,12 @@ void notifyUser(String message){
 void initEnterFunction(){
   DEBUG_PRINTLN(F("initEnter"));
 
+  initDisplay();
+
   //start the timer of this cycle
   initTimer = 0;
   page0.show();
   tVersion.setText(VERSION);
-
-  initDisplay();
 
   // Initialize the PID and related variables
   LoadParameters();
