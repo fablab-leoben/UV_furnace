@@ -1014,13 +1014,12 @@ void loop() {
 }
 
 void CountdownTimerFunction() {
-   // remove 1 every second
   DEBUG_PRINTLN(CountdownRemain);
   CountdownShowFormatted(CountdownRemain);
 
   if (!CountdownRemain) { // check if CountdownRemain == 0/FALSE/LOW
     //timer.disable(CountdownTimer); // if 0 stop timer
-    Blynk.virtualWrite(1, LOW); // reset START/STOP button status
+    Blynk.virtualWrite(V5, LOW); // reset START/STOP button status
     Blynk.virtualWrite(V12, "Curing finished");
     uvFurnaceStateMachine.transitionTo(offState);
   } else {
@@ -1098,6 +1097,7 @@ void updateTemperature()
       dtostrf(currentTemperature, 5, 1, buffer);
       tTemp.setText(buffer);
       Blynk.virtualWrite(V0, currentTemperature);
+      Blynk.virtualWrite(V1, Setpoint);
 
       if(uvFurnaceStateMachine.isInState(runState) || uvFurnaceStateMachine.isInState(preheatState))
       {
@@ -1703,6 +1703,10 @@ void initEnterFunction(){
       Blynk.begin(auth);
     }
    #endif
+
+   Blynk.virtualWrite(V5, 0);
+   Blynk.virtualWrite(V12, "0:00:00");
+   
   DEBUG_PRINTLN(F("setup ready"));
 
   TempTimer.setInterval(1000, readTemperature);
@@ -1951,8 +1955,6 @@ void offEnterFunction(){
     } else{
         cPreheat.Set_background_crop_picc(2);
     }
-    Blynk.virtualWrite(V5, 0);
-    Blynk.virtualWrite(V12, "0:00:00");
 }
 
 void offUpdateFunction(){
