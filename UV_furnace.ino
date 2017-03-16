@@ -45,6 +45,7 @@
 #include <SoftReset.h>
 #include <SimpleTimer.h>
 #include <Timer5.h>
+#include <Adafruit_NeoPixel.h>
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "0.2";
@@ -105,6 +106,12 @@ elapsedMillis initTimer;
 #define LED3 7
 #define LED4 8
 #define LEDlight 9
+
+#define NEOPIN 13
+#define BRIGHTNESS 64 // set max brightness 0-255
+byte hourval, minuteval, secondval; // holds the time
+byte pixelColorRed, pixelColorGreen, pixelColorBlue; // holds color values
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(24, NEOPIN, NEO_GRB + NEO_KHZ800); // strip object
 
 // Output relay
 #define RelayPin 32
@@ -275,6 +282,7 @@ elapsedMillis sdCard;
  Display
 *******************************************************************************/
 char buffer[10] = {0};
+char errorMessage[40] = {0};
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -875,6 +883,18 @@ void setup() {
   myBoolean.bLED4State = false;
 
   myBoolean.didReadConfig = false;
+
+  strip.begin();
+  //strip.show(); // Initialize all pixels to 'off'
+
+  strip.setBrightness(BRIGHTNESS); // set brightness
+
+  // startup sequence
+  delay(500);
+  colorWipe(strip.Color(255, 0, 0), 20); // Red
+  colorWipe(strip.Color(0, 255, 0), 20); // Green
+  colorWipe(strip.Color(0, 0, 255), 20); // Blue
+  delay(500);
 }
 
 void initDisplay()
@@ -996,7 +1016,6 @@ void loop() {
     //all the Blynk magic happens here
     Blynk.run();
   #endif
-  //this function reads the temperature of the MAX31855 Thermocouple Amplifier
 
   if(doorChanged == true){
     checkDoor();
@@ -1029,7 +1048,7 @@ void CountdownTimerFunction() {
 
 uint32_t days = 0;
 uint32_t hours = 0;
-uint32_t mins = 15;
+uint32_t mins = 0;
 uint32_t secs = 0;
 
 void CountdownShowFormatted(uint32_t seconds) {
@@ -1053,6 +1072,46 @@ void CountdownShowFormatted(uint32_t seconds) {
   if (hours < 10) {
     hours_o = ":0";
   }
+
+  secondval = secs;  // get seconds
+  minuteval = mins;  // get minutes
+  hourval = hours;  	// get hours
+
+  hourval = (hourval * 60 + minuteval) / 12; //each red dot represents 24 minutes.
+
+  // arc mode
+  for (uint8_t i = 0; i < strip.numPixels(); i++) {
+
+    if (i <= secondval) {
+      // calculates a faded arc from low to maximum brightness
+      pixelColorBlue = (i + 1) * (255 / (secondval + 1));
+      //pixelColorBlue = 255;
+    }
+    else {
+      pixelColorBlue = 0;
+    }
+
+    if (i <= minuteval) {
+      pixelColorGreen = (i + 1) * (255 / (minuteval + 1));
+      //pixelColorGreen = 255;
+    }
+    else {
+      pixelColorGreen = 0;
+    }
+
+    if (i <= hourval) {
+      pixelColorRed = (i + 1) * (255 / (hourval + 1));
+      //pixelColorRed = 255;
+    }
+    else {
+      pixelColorRed = 0;
+    }
+
+    strip.setPixelColor(i, strip.Color(pixelColorRed, pixelColorGreen, pixelColorBlue));
+  }
+
+  //display
+  strip.show();
 
   if(hours != oldhours){
     //DEBUG_PRINTLN(hours);
@@ -1625,6 +1684,15 @@ void notifyUser(String message){
   }
 }
 
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
+
 /*******************************************************************************
 ********************************************************************************
 ********************************************************************************
@@ -1662,7 +1730,8 @@ void initEnterFunction(){
 
   if (!SD.begin(SDCARD_CS)) {
     DEBUG_PRINTLN(F("Card failed, or not present"));
-    // ToDo: disable reading preset from sd card
+    uvFurnaceStateMachine.transitionTo(errorState);
+
   } else{
     DEBUG_PRINTLN(F("card initialized."));
   }
@@ -1706,7 +1775,7 @@ void initEnterFunction(){
 
    Blynk.virtualWrite(V5, 0);
    Blynk.virtualWrite(V12, "0:00:00");
-   
+
   DEBUG_PRINTLN(F("setup ready"));
 
   TempTimer.setInterval(1000, readTemperature);
