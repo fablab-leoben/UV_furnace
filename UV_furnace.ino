@@ -107,7 +107,7 @@ elapsedMillis initTimer;
 #define LED4 8
 #define LEDlight 9
 
-#define NEO_PIN 12
+#define NEO_PIN 13
 
 // Pattern types supported:
 enum  pattern { NONE, RAINBOW_CYCLE, THEATER_CHASE, COLOR_WIPE, SCANNER, FADE };
