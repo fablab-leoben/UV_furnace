@@ -45,7 +45,6 @@
 #include <SoftReset.h>
 #include <SimpleTimer.h>
 #include <Timer5.h>
-#include <Adafruit_NeoPixel.h>
 
 #define APP_NAME "UV furnace"
 const char VERSION[] = "0.3";
@@ -107,6 +106,7 @@ elapsedMillis initTimer;
 #define LED4 8
 #define LEDlight 9
 
+<<<<<<< HEAD
 #define NEO_PIN 13
 
 // Pattern types supported:
@@ -418,6 +418,8 @@ void Ring1Complete()
 }
 
 
+=======
+>>>>>>> parent of 2a2302e... add neopixel ring
 // Output relay
 #define RelayPin 32
 
@@ -587,7 +589,6 @@ elapsedMillis sdCard;
  Display
 *******************************************************************************/
 char buffer[10] = {0};
-char errorMessage[40] = {0};
 
 /*******************************************************************************
  Nextion 4,3" LCD touch display
@@ -1315,6 +1316,7 @@ void loop() {
     //all the Blynk magic happens here
     Blynk.run();
   #endif
+  //this function reads the temperature of the MAX31855 Thermocouple Amplifier
 
   if(doorChanged == true){
     checkDoor();
@@ -1350,7 +1352,7 @@ void CountdownTimerFunction() {
 
 uint32_t days = 0;
 uint32_t hours = 0;
-uint32_t mins = 0;
+uint32_t mins = 15;
 uint32_t secs = 0;
 
 void CountdownShowFormatted(uint32_t seconds) {
@@ -1983,8 +1985,7 @@ void initEnterFunction(){
 
   if (!SD.begin(SDCARD_CS)) {
     DEBUG_PRINTLN(F("Card failed, or not present"));
-    uvFurnaceStateMachine.transitionTo(errorState);
-
+    // ToDo: disable reading preset from sd card
   } else{
     DEBUG_PRINTLN(F("card initialized."));
   }
@@ -2028,7 +2029,7 @@ void initEnterFunction(){
 
    Blynk.virtualWrite(V5, 0);
    Blynk.virtualWrite(V12, "0:00:00");
-
+   
   DEBUG_PRINTLN(F("setup ready"));
 
   TempTimer.setInterval(1000, readTemperature);
