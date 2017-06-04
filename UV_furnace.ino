@@ -2080,7 +2080,7 @@ void settingsEnterFunction(){
 void settingsUpdateFunction(){
   //DEBUG_PRINTLN(F("settingsUpdate"));
   Ring1.ActivePattern = FADE;
-  Ring1.Interval = 40;
+  Ring1.Interval = 60;
 }
 void settingsExitFunction(){
   DEBUG_PRINTLN("settingsExit");
@@ -2141,12 +2141,14 @@ void setTempEnterFunction(){
   }
 
   sendCommand("ref 0");
+  Ring1.RainbowCycle(3);
+Ring1.Color1 = Ring1.Wheel(random(255));
 }
 
 void setTempUpdateFunction(){
   //DEBUG_PRINTLN(F("setTempUpdate"));
-
 }
+
 void setTempExitFunction(){
   DEBUG_PRINTLN(F("setTempExit"));
 }
